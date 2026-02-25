@@ -1,0 +1,386 @@
+[
+  {
+    "_id": "6998164de8dab25513c0382f",
+    "name": "BLUE SHIRT",
+    "description": "Care Instructions: Hand Wash or Machine Wash onlyPremium Shirt, extremely soft finish and rich lookStylish Full Sleeves Printed Stiped Casual/Formal Shirtshirt for men || casual shirt for men || men stylish shirt || men Printed ShirtStyle - Enhance your look by wearing this Casual Stylish Men's shirt, Team it with a pair of tapered denims Or Solid Chinos and Loafers for a fun Smart Casual look",
+    "price": 500,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771574829/crayzee_products/nh0znfpn7n7ki94dtbtl.webp",
+        "public_id": "crayzee_products/nh0znfpn7n7ki94dtbtl",
+        "_id": "6998164de8dab25513c03830"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Mens",
+    "stock": 100,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-20T08:07:41.964Z",
+    "__v": 0
+  },
+  {
+    "_id": "699895286aa25577368f973a",
+    "name": "White & Grey Striped Cotton Linen Shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Striped\n\nFit: Regular Fit\n\nNeck: Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Full Sleeve\n\nHemline: Straight",
+    "price": 999,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771607065/crayzee_products/by29luc5hfpfp3idxxzp.webp",
+        "public_id": "crayzee_products/by29luc5hfpfp3idxxzp",
+        "_id": "699895286aa25577368f973b"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Mens",
+    "stock": 50,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-20T17:08:56.266Z",
+    "__v": 0
+  },
+  {
+    "_id": "699895976aa25577368f9741",
+    "name": "Pink Cotton Linen Shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Solid\n\nFit: Regular Fit\n\nNeck: Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Full Sleeve\n\nHemline: Straight",
+    "price": 899,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771607406/crayzee_products/gj3hptls1x4the69brnt.webp",
+        "public_id": "crayzee_products/gj3hptls1x4the69brnt",
+        "_id": "699895976aa25577368f9742"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Mens",
+    "stock": 75,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-20T17:10:47.126Z",
+    "__v": 0
+  },
+  {
+    "_id": "699896536aa25577368f974f",
+    "name": "Blue & White Checked Cotton Linen Shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Checked\n\nFit: Regular Fit\n\nNeck: Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Full Sleeve\n\nHemline: Straight",
+    "price": 1299,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771607606/crayzee_products/j8jwx5o71z1mtxjnlius.jpg",
+        "public_id": "crayzee_products/j8jwx5o71z1mtxjnlius",
+        "_id": "699896536aa25577368f9750"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Mens",
+    "stock": 85,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-20T17:13:55.562Z",
+    "__v": 0
+  },
+  {
+    "_id": "699897316aa25577368f976e",
+    "name": "Men's Blue & Maroon Checked Shirts",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Checked\n\nFit: Regular Fit\n\nNeck: Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Full Sleeve\n\nHemline: Straight",
+    "price": 1119,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771607821/crayzee_products/gdq1vmt6y23q5jk7rn6l.jpg",
+        "public_id": "crayzee_products/gdq1vmt6y23q5jk7rn6l",
+        "_id": "699897316aa25577368f976f"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Mens",
+    "stock": 125,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-20T17:17:37.411Z",
+    "__v": 0
+  },
+  {
+    "_id": "699897e76aa25577368f9775",
+    "name": "Orange & Black Checked Shirts",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Checked\n\nFit: Regular Fit\n\nNeck: Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Full Sleeve\n\nHemline: Straight",
+    "price": 799,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771607979/crayzee_products/xu5jxw0nze8goynraxgg.webp",
+        "public_id": "crayzee_products/xu5jxw0nze8goynraxgg",
+        "_id": "699897e76aa25577368f9776"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Mens",
+    "stock": 150,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-20T17:20:39.981Z",
+    "__v": 0
+  },
+  {
+    "_id": "699898106aa25577368f977c",
+    "name": "Olive Green Checked Shacket",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Checked\n\nFit: Regular Fit\n\nNeck: Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Full Sleeve\n\nHemline: Straight",
+    "price": 1099,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771608053/crayzee_products/wnxlrz63z9dz64xhuom3.jpg",
+        "public_id": "crayzee_products/wnxlrz63z9dz64xhuom3",
+        "_id": "699898106aa25577368f977d"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Mens",
+    "stock": 65,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-20T17:21:20.278Z",
+    "__v": 0
+  },
+  {
+    "_id": "699898e16aa25577368f9783",
+    "name": "Monks Robe Brown Cotton Linen Crop Shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Striped\n\nFit: Regular Fit\n\nNeck: Resort Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Full Sleeve\n\nHemline: Asymmetric",
+    "price": 1199,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771608286/crayzee_products/tcuqxiqxpjwet3g2t3b2.jpg",
+        "public_id": "crayzee_products/tcuqxiqxpjwet3g2t3b2",
+        "_id": "699898e16aa25577368f9784"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Womens",
+    "stock": 49,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-20T17:24:49.547Z",
+    "__v": 0
+  },
+  {
+    "_id": "6998997c6aa25577368f978a",
+    "name": "Multicolor All Over Printed Oversized Shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Solid\n\nFit: Oversized Fit\n\nNeck: Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Full Sleeve\n\nHemline: Straight",
+    "price": 1119,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771608441/crayzee_products/y0tujxvuilzm06pzxjl3.jpg",
+        "public_id": "crayzee_products/y0tujxvuilzm06pzxjl3",
+        "_id": "6998997c6aa25577368f978b"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Womens",
+    "stock": 75,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-20T17:27:24.885Z",
+    "__v": 0
+  },
+  {
+    "_id": "69991c63514cb3cada0062f5",
+    "name": "Blue Spirit Of Tiger Graphic Printed Shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Printed\n\nFit: Regular Fit\n\nNeck: Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Full Sleeve\n\nHemline: Straight",
+    "price": 899,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771641910/crayzee_products/t2w2fq0365pw17mgcheq.webp",
+        "public_id": "crayzee_products/t2w2fq0365pw17mgcheq",
+        "_id": "69991c63514cb3cada0062f6"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Womens",
+    "stock": 95,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-21T02:45:55.548Z",
+    "__v": 0
+  },
+  {
+    "_id": "69991c9f514cb3cada0062fc",
+    "name": "Pink All Over Printed Oversized Shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Printed\n\nFit: Oversized Fit\n\nNeck: Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Full Sleeve\n\nHemline: Straight",
+    "price": 1199,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771642013/crayzee_products/rv5f9ijm6ckqqi8w37eu.webp",
+        "public_id": "crayzee_products/rv5f9ijm6ckqqi8w37eu",
+        "_id": "69991c9f514cb3cada0062fd"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Womens",
+    "stock": 55,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-21T02:46:55.484Z",
+    "__v": 0
+  },
+  {
+    "_id": "69991e4b514cb3cada006335",
+    "name": "Black Batman Outline Logo Graphic Printed Oversized T-shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Printed\n\nFit: Oversized Fit\n\nNeck: Without Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Half Sleeve\n\nHemline: Straight",
+    "price": 649,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771642372/crayzee_products/me3oarvvkuqeyg2vhqis.webp",
+        "public_id": "crayzee_products/me3oarvvkuqeyg2vhqis",
+        "_id": "69991e4b514cb3cada006336"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Oversized",
+    "stock": 115,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-21T02:54:03.200Z",
+    "__v": 0
+  },
+  {
+    "_id": "69991e78514cb3cada00633c",
+    "name": "Black Hangin Astronaut Graphic Printed Oversized T-shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Printed\n\nFit: Oversized Fit\n\nNeck: Without Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Half Sleeve\n\nHemline: Straight",
+    "price": 699,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771642454/crayzee_products/etosla1upi4okiop6yfc.webp",
+        "public_id": "crayzee_products/etosla1upi4okiop6yfc",
+        "_id": "69991e78514cb3cada00633d"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Oversized",
+    "stock": 80,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-21T02:54:48.973Z",
+    "__v": 0
+  },
+  {
+    "_id": "69991e99514cb3cada006343",
+    "name": "Black Need Space Snoopy Graphic Printed Oversized T-shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Printed\n\nFit: Oversized Fit\n\nNeck: Without Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Half Sleeve\n\nHemline: Straight",
+    "price": 749,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771642499/crayzee_products/tm6js7qwjwd4fkdglbjg.webp",
+        "public_id": "crayzee_products/tm6js7qwjwd4fkdglbjg",
+        "_id": "69991e99514cb3cada006344"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Oversized",
+    "stock": 45,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-21T02:55:21.454Z",
+    "__v": 0
+  },
+  {
+    "_id": "69991ebd514cb3cada00634a",
+    "name": "Blue Oversized Fit T-shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Printed\n\nFit: Oversized Fit\n\nNeck: Without Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Half Sleeve\n\nHemline: Straight",
+    "price": 599,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771642533/crayzee_products/gfthgpqqodu95v2njslf.webp",
+        "public_id": "crayzee_products/gfthgpqqodu95v2njslf",
+        "_id": "69991ebd514cb3cada00634b"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Oversized",
+    "stock": 70,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-21T02:55:57.585Z",
+    "__v": 0
+  },
+  {
+    "_id": "69991f20514cb3cada006355",
+    "name": "Green Oversized Acid Wash T-shirt",
+    "description": "Key Highlights: Sweat absorbent & breathable, Season-smart, Durable\n\nDesign: Printed\n\nFit: Oversized Fit\n\nNeck: Without Collar\n\nOccasion: Casual Wear\n\nSleeve Style: Half Sleeve\n\nHemline: Straight",
+    "price": 799,
+    "images": [
+      {
+        "url": "https://res.cloudinary.com/dylz9fegd/image/upload/v1771642637/crayzee_products/yrq7w47i6rmxaicxhl2f.webp",
+        "public_id": "crayzee_products/yrq7w47i6rmxaicxhl2f",
+        "_id": "69991f20514cb3cada006356"
+      }
+    ],
+    "mainCategory": "Clothing",
+    "subCategory": "Oversized",
+    "stock": 60,
+    "sizes": [],
+    "rating": 0,
+    "numReviews": 0,
+    "likes": [],
+    "isFeatured": false,
+    "comments": [],
+    "createdAt": "2026-02-21T02:57:36.494Z",
+    "__v": 0
+  }
+]
