@@ -48,6 +48,15 @@ export default function DiscoveryView({
     searchParams.get('sizes') ? searchParams.get('sizes').split(',') : []
   );
   const [showFilters, setShowFilters] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
+
+  const sortOptions = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'popular', label: 'Popularity' },
+    { value: 'priceLow', label: 'Price: Low to High' },
+    { value: 'priceHigh', label: 'Price: High to Low' },
+    { value: 'oldest', label: 'Oldest First' }
+  ];
 
   // Sync state to URL
   useEffect(() => {
@@ -71,7 +80,7 @@ export default function DiscoveryView({
 
   // Update Heading Logic
   const getDynamicTitle = () => {
-    if (isSearch) return `Search: ${query}`;
+    if (isSearch) return query;
 
     let titleParts = [];
     if (activeGender && activeGender !== 'all') titleParts.push(activeGender.toUpperCase());
@@ -143,22 +152,31 @@ export default function DiscoveryView({
         <div className="mb-12">
           <div className="flex items-center gap-3 text-[#fb5607] font-black uppercase tracking-[0.3em] text-[10px] mb-4">
             <span>Discovery Mode</span>
-            {activeMainCat !== 'all' && (
+            {isSearch ? (
               <>
                 <ChevronRight size={10} className="text-zinc-300" />
-                <span>{activeMainCat}</span>
+                <span>Search Results</span>
               </>
-            )}
-            {activeGender !== 'all' && (
+            ) : (
               <>
-                <ChevronRight size={10} className="text-zinc-300" />
-                <span>{activeGender}</span>
-              </>
-            )}
-            {activeSubCat !== 'all' && (
-              <>
-                <ChevronRight size={10} className="text-zinc-300" />
-                <span>{activeSubCat}</span>
+                {activeMainCat !== 'all' && (
+                  <>
+                    <ChevronRight size={10} className="text-zinc-300" />
+                    <span>{activeMainCat}</span>
+                  </>
+                )}
+                {activeGender !== 'all' && (
+                  <>
+                    <ChevronRight size={10} className="text-zinc-300" />
+                    <span>{activeGender}</span>
+                  </>
+                )}
+                {activeSubCat !== 'all' && (
+                  <>
+                    <ChevronRight size={10} className="text-zinc-300" />
+                    <span>{activeSubCat}</span>
+                  </>
+                )}
               </>
             )}
           </div>
@@ -213,24 +231,60 @@ export default function DiscoveryView({
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="relative group flex-1 md:flex-none">
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-                className="appearance-none bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-[#fb5607] w-full md:w-48 cursor-pointer text-zinc-900 dark:text-white"
+            {/* Custom Premium Sort Dropdown */}
+            <div className="relative flex-1 md:flex-none">
+              <button
+                onClick={() => setIsSortOpen(!isSortOpen)}
+                className="flex items-center justify-between gap-4 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none hover:border-[#fb5607] transition-all w-full md:w-56 cursor-pointer text-zinc-900 dark:text-white group"
               >
-                <option value="newest">Newest First</option>
-                <option value="popular">Popularity</option>
-                <option value="priceLow">Price: Low to High</option>
-                <option value="priceHigh">Price: High to Low</option>
-                <option value="oldest">Oldest First</option>
-              </select>
-              <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400" />
+                <span>{sortOptions.find(o => o.value === sort)?.label || 'Sort By'}</span>
+                <ChevronDown
+                  size={14}
+                  className={`text-zinc-400 group-hover:text-[#fb5607] transition-transform duration-300 ${isSortOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              <AnimatePresence>
+                {isSortOpen && (
+                  <>
+                    {/* Backdrop to close dropdown */}
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setIsSortOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-white/10 rounded-2xl shadow-2xl shadow-black/10 overflow-hidden z-50 py-2"
+                    >
+                      {sortOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            setSort(option.value);
+                            setIsSortOpen(false);
+                          }}
+                          className={`w-full px-6 py-3 text-left text-[10px] font-black uppercase tracking-widest transition-all ${sort === option.value
+                            ? 'text-[#fb5607] bg-zinc-50 dark:bg-white/5'
+                            : 'text-zinc-500 hover:text-black dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/5'
+                            }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`p-3 rounded-2xl border transition-all ${showFilters ? 'bg-black text-white border-black' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white hover:border-[#fb5607]'}`}
+              className={`p-3 rounded-2xl border transition-all duration-300 transform active:scale-95 ${showFilters
+                ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white shadow-lg'
+                : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white hover:border-[#fb5607] hover:text-[#fb5607] shadow-sm'
+                }`}
             >
               <SlidersHorizontal size={20} />
             </button>

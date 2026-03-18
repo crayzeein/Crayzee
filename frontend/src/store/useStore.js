@@ -19,28 +19,33 @@ export const useStore = create(
       },
       setWishlist: (wishlist) => set({ wishlist }),
 
-      addToCart: (product, qty = 1) => set((state) => {
-        const itemIndex = state.cart.findIndex((item) => item._id === product._id);
+      addToCart: (product, qty = 1, size = null) => set((state) => {
+        const cartItemId = size ? `${product._id}-${size}` : product._id;
+        const itemIndex = state.cart.findIndex((item) => item.cartItemId === cartItemId);
+
         if (itemIndex > -1) {
           const newCart = [...state.cart];
           const potentialQty = newCart[itemIndex].qty + qty;
           newCart[itemIndex].qty = product.stock !== undefined ? Math.min(potentialQty, product.stock) : potentialQty;
           return { cart: newCart };
         }
+
         const finalQty = product.stock !== undefined ? Math.min(qty, product.stock) : qty;
-        return { cart: [...state.cart, { ...product, qty: finalQty }] };
+        return {
+          cart: [...state.cart, { ...product, cartItemId, qty: finalQty, selectedSize: size }]
+        };
       }),
 
-      updateCartQty: (productId, qty) => set((state) => ({
+      updateCartQty: (cartItemId, qty) => set((state) => ({
         cart: state.cart.map((item) =>
-          item._id === productId ? { ...item, qty: Math.max(0, qty) } : item
+          item.cartItemId === cartItemId ? { ...item, qty: Math.max(0, qty) } : item
         )
       })),
 
       setCart: (newCart) => set({ cart: newCart }),
 
-      removeFromCart: (productId) => set((state) => ({
-        cart: state.cart.filter((item) => item._id !== productId)
+      removeFromCart: (cartItemId) => set((state) => ({
+        cart: state.cart.filter((item) => item.cartItemId !== cartItemId)
       })),
 
       clearCart: () => set({ cart: [] }),

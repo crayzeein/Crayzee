@@ -7,7 +7,7 @@ import API from '@/utils/api';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, Zap, Flame, Crown, ArrowRight, Star } from 'lucide-react';
+import { ChevronRight, Zap, Flame, Crown, ArrowRight, Star, Instagram, Mail } from 'lucide-react';
 
 export default function Home() {
   const [newArrivals, setNewArrivals] = useState([]);
@@ -89,7 +89,7 @@ export default function Home() {
                 >
                   <div className="aspect-square rounded-full overflow-hidden mb-5 border-4 border-transparent group-hover:border-[#fb5607] transition-all shadow-xl group-hover:scale-110 duration-500 relative bg-zinc-100 dark:bg-zinc-800">
                     {cat.img ? (
-                      <Image src={cat.img} alt={cat.name} fill className="object-cover" />
+                      <Image src={cat.img} alt={cat.name} fill className="object-cover" unoptimized />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-[8px] font-black text-zinc-400 uppercase">Empty</div>
                     )}
@@ -171,11 +171,12 @@ export default function Home() {
                 India's wildest streetwear label. We don't just sell clothes, we drop vibes. Built for the rebels, the dreamers, and the ones who never blend in.
               </p>
               <div className="flex gap-4">
-                {['Instagram', 'Snapchat', 'Discord', 'Twitter'].map(social => (
-                  <span key={social} className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center hover:bg-[#fb5607] transition-all cursor-pointer group">
-                    <div className="text-[8px] font-black text-white uppercase group-hover:scale-110">{social[0]}</div>
-                  </span>
-                ))}
+                <a href="https://www.instagram.com/crayzee.in?igsh=MXQzNjF3cDE3bmpoZA==" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center hover:bg-gradient-to-br hover:from-[#f09433] hover:via-[#e6683c] hover:to-[#bc1888] transition-all cursor-pointer group">
+                  <Instagram size={18} className="text-white group-hover:scale-110 transition-transform" />
+                </a>
+                <a href="https://mail.google.com/mail/?view=cm&to=crayzee.in@gmail.com" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center hover:bg-[#fb5607] transition-all cursor-pointer group">
+                  <Mail size={18} className="text-white group-hover:scale-110 transition-transform" />
+                </a>
               </div>
             </div>
 
@@ -192,9 +193,8 @@ export default function Home() {
             <div>
               <h4 className="font-black uppercase tracking-[0.2em] text-xs mb-8 text-zinc-500">The Vibe</h4>
               <ul className="space-y-4">
-                <li><Link href="#" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">Privacy Policy</Link></li>
-                <li><Link href="#" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">Shipping & Returns</Link></li>
-                <li><Link href="#" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">Contact Us</Link></li>
+                <li><Link href="/privacy-policy" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">Privacy Policy</Link></li>
+                <li><Link href="/contact" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">Contact Us</Link></li>
               </ul>
             </div>
           </div>

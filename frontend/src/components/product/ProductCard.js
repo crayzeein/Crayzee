@@ -27,6 +27,7 @@ export default function ProductCard({ product }) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             className="object-cover transition-transform duration-700 group-hover:scale-110"
             loading="lazy"
+            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-zinc-400 font-black uppercase text-[10px] tracking-widest">
@@ -62,8 +63,8 @@ export default function ProductCard({ product }) {
             onClick={(e) => { e.preventDefault(); if (product.stock > 0) addToCart(product, 1); }}
             disabled={product.stock === 0}
             className={`w-full py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-2xl transition-all ${product.stock === 0
-                ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
-                : 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-[#fb5607]'
+              ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
+              : 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-[#fb5607]'
               }`}
           >
             <ShoppingBag size={14} /> {product.stock === 0 ? 'Sold Out' : 'Instant Bag'}
@@ -77,20 +78,22 @@ export default function ProductCard({ product }) {
           <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">{product.subCategory}</span>
         </div>
         <Link href={`/product/${product._id}`}>
-          <h3 className="font-black text-base md:text-lg mb-3 leading-tight group-hover:text-[#fb5607] transition-colors truncate tracking-tighter uppercase text-zinc-900 dark:text-white">
+          <h3 className="font-black text-base md:text-lg mb-1 leading-tight group-hover:text-[#fb5607] transition-colors truncate tracking-tighter uppercase text-zinc-900 dark:text-white">
             {product.name}
           </h3>
         </Link>
+        <div className="flex items-center gap-1.5 mb-3">
+          <div className="flex text-[#fb5607]">
+            <span className="text-[10px] font-black">★</span>
+          </div>
+          <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+            {product.rating > 0 ? `${product.rating.toFixed(1)} (${product.numReviews})` : 'No reviews'}
+          </span>
+        </div>
         <div className="flex items-end justify-between">
-          <div className="flex flex-col">
-            <span className="text-zinc-400 dark:text-zinc-500 line-through text-[10px] font-bold mb-0.5">₹{Math.round(product.price * 1.6)}</span>
-            <span className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">
-              ₹{product.price}
-            </span>
-          </div>
-          <div className="flex items-center gap-1 text-[10px] font-black text-[#fb5607] bg-[#fb5607]/10 px-2 py-1 rounded-lg">
-            -{Math.round(100 - (product.price / (product.price * 1.6)) * 100)}%
-          </div>
+          <span className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter leading-none">
+            ₹{product.price}
+          </span>
         </div>
       </div>
     </motion.div>

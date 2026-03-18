@@ -56,15 +56,27 @@ exports.getProducts = async (req, res) => {
     };
 
     if (search) {
-      const safeSearch = escapeRegex(search);
-      const regex = new RegExp(safeSearch, 'i');
-      query.$or = [
-        { name: regex },
-        { description: regex },
-        { category: regex },
-        { subCategory: regex },
-        { gender: regex }
-      ];
+      // Clean query: remove common punctuation but keep alphanumeric and spaces
+      // This helps with queries like "blu," or "shirt!"
+      const cleanSearch = search.replace(/[.,!?;:]/g, ' ').trim();
+      const keywords = cleanSearch.split(/\s+/).filter(word => word.length > 0);
+
+      if (keywords.length > 0) {
+        // Build a query where EACH keyword must match at least one of the fields
+        query.$and = keywords.map(kw => {
+          const safeKw = escapeRegex(kw);
+          const regex = new RegExp(safeKw, 'i');
+          return {
+            $or: [
+              { name: regex },
+              { description: regex },
+              { category: regex },
+              { subCategory: regex },
+              { gender: regex }
+            ]
+          };
+        });
+      }
     }
 
     if (sizes) {
@@ -96,7 +108,7 @@ exports.getProducts = async (req, res) => {
       .sort(sortQuery)
       .skip(skip)
       .limit(limit)
-      .select('name price images category subCategory gender stock isFeatured createdAt')
+      .select('name price images category subCategory gender stock isFeatured createdAt rating numReviews reviews')
       .lean();
 
     console.log(`Found ${products.length} products (Total: ${count})`);
@@ -139,6 +151,15 @@ exports.createProduct = async (req, res) => {
     // which were uploaded via a separate endpoint or previously
     const images = req.body.images || [];
 
+    let productSizes = [];
+    if (sizes) {
+      if (typeof sizes === 'string') {
+        productSizes = sizes.split(',');
+      } else if (Array.isArray(sizes)) {
+        productSizes = sizes;
+      }
+    }
+
     const product = new Product({
       name,
       description,
@@ -149,7 +170,7 @@ exports.createProduct = async (req, res) => {
       subCategory,
       stock,
       isFeatured,
-      sizes: sizes ? sizes.split(',') : []
+      sizes: productSizes
     });
 
     const createdProduct = await product.save();
@@ -234,32 +255,74 @@ exports.likeProduct = async (req, res) => {
   }
 };
 
-exports.addComment = async (req, res) => {
+exports.createProductReview = async (req, res) => {
   try {
-    const { text } = req.body;
+    const { rating, comment } = req.body;
     const product = await Product.findById(req.params.id);
+
     if (product) {
-      const comment = {
-        user: req.user._id,
+      const alreadyReviewed = product.reviews.find(
+        (r) => r.user.toString() === req.user._id.toString()
+      );
+
+      if (alreadyReviewed) {
+        // Update existing review
+        alreadyReviewed.rating = Number(rating);
+        alreadyReviewed.comment = comment;
+        alreadyReviewed.createdAt = Date.now();
+
+        product.rating =
+          product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+          product.reviews.length;
+
+        await product.save();
+        return res.status(200).json({ message: 'Review updated' });
+      }
+
+      const review = {
         name: req.user.name,
-        text
+        rating: Number(rating),
+        comment,
+        user: req.user._id,
       };
-      product.comments.push(comment);
+
+      product.reviews.push(review);
+      product.numReviews = product.reviews.length;
+      product.rating =
+        product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+        product.reviews.length;
+
       await product.save();
-      res.status(201).json(product);
+      res.status(201).json({ message: 'Review added' });
+    } else {
+      res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-exports.deleteComment = async (req, res) => {
+exports.deleteReview = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (product) {
-      product.comments = product.comments.filter(c => c._id.toString() !== req.params.commentId);
+      product.reviews = product.reviews.filter(
+        (r) => r._id.toString() !== req.params.reviewId
+      );
+
+      product.numReviews = product.reviews.length;
+      if (product.numReviews > 0) {
+        product.rating =
+          product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+          product.numReviews;
+      } else {
+        product.rating = 0;
+      }
+
       await product.save();
-      res.json({ message: 'Comment removed' });
+      res.json({ message: 'Review removed' });
+    } else {
+      res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
-const commentSchema = new mongoose.Schema({
+const reviewSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true },
-  text: { type: String, required: true },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  comment: { type: String, required: false }, // Optional comment
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -39,7 +40,7 @@ const productSchema = new mongoose.Schema({
   rating: { type: Number, default: 0, index: true },
   numReviews: { type: Number, default: 0 },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  comments: [commentSchema],
+  reviews: [reviewSchema],
   isFeatured: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now, index: true }
 });

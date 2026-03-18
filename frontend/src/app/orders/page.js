@@ -72,9 +72,12 @@ export default function MyOrdersPage() {
                                                 <span className="w-1 h-1 rounded-full bg-zinc-300" />
                                                 <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</span>
                                             </div>
-                                            <h3 className="text-xl font-black uppercase tracking-tight mb-4">
+                                            <h3 className="text-xl font-black uppercase tracking-tight mb-2">
                                                 {order.orderItems.length > 1 ? `${order.orderItems[0].name} + ${order.orderItems.length - 1} more` : order.orderItems[0].name}
                                             </h3>
+                                            {order.orderItems[0]?.size && (
+                                                <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-4">Size: {order.orderItems[0].size}</p>
+                                            )}
                                             <div className="flex items-center gap-4">
                                                 {order.isDelivered ? (
                                                     <div className="flex items-center gap-2 text-emerald-600 font-black text-[10px] uppercase">

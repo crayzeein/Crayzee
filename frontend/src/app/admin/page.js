@@ -5,7 +5,7 @@ import API from '@/utils/api';
 import Navbar from '@/components/layout/Navbar';
 import {
   LayoutDashboard, Package, Users as UsersIcon, ShoppingCart,
-  MessageSquare, ShieldAlert, TrendingUp, DollarSign, Plus, Edit, Trash2, X, Check, Search, Upload, Image as ImageIcon
+  MessageSquare, ShieldAlert, TrendingUp, DollarSign, Plus, Edit, Trash2, X, Check, Search, Upload, Image as ImageIcon, Star
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,7 +28,7 @@ export default function AdminDashboard() {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [currentOrder, setCurrentOrder] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', price: '', category: 'clothing', gender: '', subCategory: '', stock: '', description: '', images: []
+    name: '', price: '', category: 'clothing', gender: '', subCategory: '', stock: '', description: '', images: [], sizes: ['S', 'M', 'L', 'XL', 'XXL']
   });
   const [uploading, setUploading] = useState(false);
 
@@ -82,15 +82,21 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (limit = 10) => {
     try {
-      const { data: prodData } = await API.get(`/products?page=${productPage}&limit=10`);
+      const { data: prodData } = await API.get(`/products?page=${productPage}&limit=${limit}`);
       setData(prev => ({ ...prev, products: prodData.products }));
       setTotalProductPages(prodData.pages);
     } catch (error) {
       console.error('Error fetching products:', error);
     }
   };
+
+  useEffect(() => {
+    if (activeTab === 'reviews') {
+      fetchProducts(100); // Fetch more for reviews tab to see all moderation items
+    }
+  }, [activeTab]);
 
   // --- PRODUCT CRUD ---
   const handleEditProduct = (product) => {
@@ -100,7 +106,8 @@ export default function AdminDashboard() {
       category: product.category || 'clothing',
       gender: product.gender || '',
       subCategory: product.subCategory || '',
-      images: product.images || []
+      images: product.images || [],
+      sizes: product.sizes && product.sizes.length > 0 ? product.sizes : ['S', 'M', 'L', 'XL', 'XXL']
     });
     setShowProductModal(true);
   };
@@ -115,7 +122,8 @@ export default function AdminDashboard() {
       subCategory: 'oversized',
       stock: '',
       description: '',
-      images: []
+      images: [],
+      sizes: ['S', 'M', 'L', 'XL', 'XXL']
     });
     setShowProductModal(true);
   };
@@ -252,18 +260,22 @@ export default function AdminDashboard() {
   };
 
   const getOrderCounts = () => ({
-    all: data.orders.length,
-    processing: data.orders.filter(o => o.status === 'Processing').length,
-    shipped: data.orders.filter(o => o.status === 'Shipped').length,
-    delivered: data.orders.filter(o => o.status === 'Delivered').length,
-    cancelled: data.orders.filter(o => o.status === 'Cancelled').length,
     history: data.orders.filter(o => o.status === 'Delivered' || o.status === 'Cancelled').length,
   });
 
-  // --- COMMENT MGMT ---
-  const deleteComment = async (productId, commentId) => {
+  const getReviewStats = () => {
+    const reviewedProducts = data.products.filter(p => p.reviews?.length > 0);
+    const totalReviews = reviewedProducts.reduce((acc, p) => acc + p.reviews.length, 0);
+    const avgSum = reviewedProducts.reduce((acc, p) => acc + p.rating, 0);
+    const globalAvg = reviewedProducts.length > 0 ? (avgSum / reviewedProducts.length).toFixed(1) : 0;
+
+    return { totalReviews, globalAvg, reviewedProductsCount: reviewedProducts.length };
+  };
+
+  // --- REVIEW MGMT ---
+  const deleteReview = async (productId, reviewId) => {
     try {
-      await API.delete(`/products/${productId}/comment/${commentId}`);
+      await API.delete(`/products/${productId}/reviews/${reviewId}`);
       fetchAllData();
     } catch (error) {
       alert('Delete failed');
@@ -275,7 +287,7 @@ export default function AdminDashboard() {
     { id: 'products', label: 'Inventory', icon: Package },
     { id: 'users', label: 'Customers', icon: UsersIcon },
     { id: 'orders', label: 'Orders', icon: ShoppingCart },
-    { id: 'comments', label: 'Vibe Checks', icon: MessageSquare }
+    { id: 'reviews', label: 'Ratings', icon: MessageSquare }
   ];
 
   if (loading && activeTab === 'overview') return <div className="min-h-screen flex items-center justify-center font-black text-2xl animate-pulse text-purple-600">LOADING CRAYZEE DATA...</div>;
@@ -542,41 +554,99 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* --- COMMENTS MODERATION --- */}
-        {activeTab === 'comments' && (
-          <div className="space-y-8">
-            {data.products.filter(p => p.comments?.length > 0).length === 0 ? (
-              <div className="bg-zinc-50 p-20 rounded-[48px] text-center">
-                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 text-zinc-200">
-                  <MessageSquare size={40} />
-                </div>
-                <h3 className="text-2xl font-black uppercase tracking-tighter mb-4">No Vibe Checks Yet</h3>
-                <p className="text-zinc-400 font-medium">When users start commenting on your gear, they'll show up here for moderation.</p>
+        {/* --- REVIEWS MODERATION --- */}
+        {activeTab === 'reviews' && (
+          <div className="space-y-12">
+            {/* Review Stats Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-zinc-950 text-white p-8 rounded-[40px] shadow-2xl">
+                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Total Community Feedback</p>
+                <h3 className="text-5xl font-black">{getReviewStats().totalReviews}</h3>
+                <p className="text-[10px] font-bold text-[#fb5607] mt-3 uppercase tracking-widest">Verified Vibe Checks</p>
               </div>
-            ) : (
-              data.products.filter(p => p.comments?.length > 0).map(product => (
-                <div key={product._id} className="bg-white border-2 border-zinc-50 rounded-[40px] p-10">
-                  <h3 className="text-xl font-black mb-6 uppercase tracking-tight flex items-center gap-4">
-                    {(product.images?.[0]?.url || product.image) ? (
-                      <img src={product.images?.[0]?.url || product.image} className="w-12 h-12 rounded-xl object-cover" alt={product.name} />
-                    ) : (
-                      <div className="w-12 h-12 bg-zinc-100 rounded-xl flex items-center justify-center text-[8px] font-black text-zinc-400 uppercase">NA</div>
-                    )}
-                    {product.name}
-                  </h3>
-                  <div className="space-y-4">
-                    {product.comments.map(c => (
-                      <div key={c._id} className="flex justify-between items-center bg-zinc-50 p-6 rounded-3xl">
-                        <div>
-                          <p className="font-black text-sm uppercase mb-1">{c.name}</p>
-                          <p className="text-zinc-600">{c.text}</p>
-                        </div>
-                        <button onClick={() => deleteComment(product._id, c._id)} className="p-3 text-[#fb5607] hover:bg-orange-50 rounded-2xl transition-colors"><Trash2 size={20} /></button>
-                      </div>
-                    ))}
+              <div className="bg-white border-2 border-zinc-50 p-8 rounded-[40px]">
+                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2">Global Vibe Rating</p>
+                <div className="flex items-center gap-4">
+                  <h3 className="text-5xl font-black">{getReviewStats().globalAvg}</h3>
+                  <div className="flex text-[#fb5607]">
+                    <Star size={24} fill="currentColor" />
                   </div>
                 </div>
-              ))
+                <p className="text-[10px] font-bold text-zinc-400 mt-3 uppercase tracking-widest">Across {getReviewStats().reviewedProductsCount} Drops</p>
+              </div>
+              <div className="bg-[#fb5607] text-white p-8 rounded-[40px] shadow-xl shadow-[#fb5607]/20">
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-2">Customer Satisfaction</p>
+                <h3 className="text-5xl font-black">{Math.round((getReviewStats().globalAvg / 5) * 100)}%</h3>
+                <div className="w-full bg-white/20 h-1.5 rounded-full mt-4 overflow-hidden">
+                  <div className="bg-white h-full" style={{ width: `${(getReviewStats().globalAvg / 5) * 100}%` }} />
+                </div>
+              </div>
+            </div>
+
+            {data.products.filter(p => p.reviews?.length > 0).length === 0 ? (
+              <div className="bg-zinc-50 p-20 rounded-[48px] text-center border-2 border-dashed border-zinc-200">
+                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 text-zinc-200 shadow-sm">
+                  <MessageSquare size={40} />
+                </div>
+                <h3 className="text-2xl font-black uppercase tracking-tighter mb-4">No Reviews Yet</h3>
+                <p className="text-zinc-400 font-medium">When users start rating your gear, they'll show up here for moderation.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                {data.products.filter(p => p.reviews?.length > 0).map(product => (
+                  <div key={product._id} className="bg-white border-2 border-zinc-50 rounded-[48px] overflow-hidden group hover:border-zinc-200 transition-all">
+                    <div className="p-8 border-b border-zinc-50 flex items-center justify-between bg-zinc-50/30">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          {(product.images?.[0]?.url || product.image) ? (
+                            <img src={product.images?.[0]?.url || product.image} className="w-16 h-20 rounded-2xl object-cover shadow-sm transition-transform group-hover:scale-105" alt={product.name} />
+                          ) : (
+                            <div className="w-16 h-20 bg-zinc-200 rounded-2xl flex items-center justify-center text-[10px] font-black text-zinc-400 uppercase">NA</div>
+                          )}
+                          <div className="absolute -top-2 -right-2 bg-black text-white w-8 h-8 rounded-full border-4 border-white flex items-center justify-center text-[10px] font-black">
+                            {product.reviews.length}
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-black uppercase tracking-tight">{product.name}</h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="flex text-[#fb5607]">
+                              <Star size={12} fill="currentColor" />
+                            </div>
+                            <span className="text-[10px] font-black text-[#fb5607] uppercase tracking-widest">{product.rating.toFixed(1)} Rating</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-6 space-y-4 max-h-[400px] overflow-y-auto">
+                      {product.reviews.map(r => (
+                        <div key={r._id} className="bg-zinc-50/50 p-6 rounded-[32px] border border-transparent hover:border-zinc-100 transition-all">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center font-black text-[10px] text-zinc-500">
+                                {r.name[0]}
+                              </div>
+                              <div>
+                                <p className="font-black text-xs uppercase text-zinc-900">{r.name}</p>
+                                <div className="flex gap-0.5 mt-0.5 mt-1">
+                                  {[1, 2, 3, 4, 5].map(s => (
+                                    <Star key={s} size={8} fill={r.rating >= s ? '#fb5607' : 'none'} className={r.rating >= s ? 'text-[#fb5607]' : 'text-zinc-200'} />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <button onClick={() => deleteReview(product._id, r._id)} className="p-2 text-zinc-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                          <p className="text-zinc-600 text-sm font-medium leading-relaxed italic">"{r.comment || "Dropped a stellar rating! 🔥"}"</p>
+                          <p className="text-[8px] font-bold text-zinc-300 uppercase tracking-widest mt-4">Posted on {new Date(r.createdAt || Date.now()).toLocaleDateString()}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}
@@ -645,6 +715,30 @@ export default function AdminDashboard() {
                           </select>
                         </div>
                       </div>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-3">Available Sizes</label>
+                      <div className="flex flex-wrap gap-2">
+                        {['S', 'M', 'L', 'XL', 'XXL'].map(size => (
+                          <button
+                            key={size}
+                            type="button"
+                            onClick={() => {
+                              const newSizes = formData.sizes.includes(size)
+                                ? formData.sizes.filter(s => s !== size)
+                                : [...formData.sizes, size];
+                              setFormData({ ...formData, sizes: newSizes });
+                            }}
+                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${formData.sizes.includes(size)
+                              ? 'bg-[#fb5607] border-[#fb5607] text-white'
+                              : 'bg-zinc-50 border-zinc-100 text-zinc-400 hover:border-[#fb5607] hover:text-[#fb5607]'
+                              }`}
+                          >
+                            {size}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mt-2">Deselect sizes that are not applicable to this drop.</p>
                     </div>
                   </div>
                   <div className="space-y-6">
@@ -740,7 +834,9 @@ export default function AdminDashboard() {
                             <img src={item.image} className="w-16 h-20 object-cover rounded-xl" alt={item.name} />
                             <div className="flex-1">
                               <p className="font-black uppercase text-sm">{item.name}</p>
-                              <p className="text-[10px] font-bold text-zinc-400">₹{item.price} × {item.qty}</p>
+                              <p className="text-[10px] font-bold text-zinc-400">
+                                {item.size ? `SIZE: ${item.size} | ` : ''}₹{item.price} × {item.qty}
+                              </p>
                             </div>
                             <p className="font-black text-lg">₹{item.price * item.qty}</p>
                           </div>

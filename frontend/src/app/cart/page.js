@@ -5,6 +5,7 @@ import { Trash2, Plus, Minus, ShoppingBag, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import API from '@/utils/api';
 
 export default function CartPage() {
@@ -72,7 +73,7 @@ export default function CartPage() {
     const currentStock = stockStatus[item._id]?.stock ?? 999;
     const newQty = item.qty + delta;
     if (newQty > 0 && newQty <= currentStock) {
-      updateCartQty(item._id, newQty);
+      updateCartQty(item.cartItemId, newQty);
     }
   };
 
@@ -104,13 +105,36 @@ export default function CartPage() {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-8">
             {cart.map((item) => (
-              <div key={item._id} className="bg-white dark:bg-zinc-900 p-8 rounded-[40px] flex flex-col sm:flex-row gap-8 items-center border border-zinc-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all">
-                <div className="w-32 h-40 relative rounded-2xl overflow-hidden shrink-0 shadow-lg">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+              <div key={item.cartItemId} className="bg-white dark:bg-zinc-900 p-8 rounded-[40px] flex flex-col sm:flex-row gap-8 items-center border border-zinc-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all">
+                <div className="w-32 h-40 relative rounded-2xl overflow-hidden shrink-0 shadow-lg bg-zinc-100 dark:bg-zinc-800">
+                  <Link href={`/product/${item._id}`}>
+                    {(item.images?.[0]?.url || item.image) ? (
+                      <Image
+                        src={item.images?.[0]?.url || item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-zinc-400 font-black uppercase text-[8px] tracking-widest">
+                        No Image
+                      </div>
+                    )}
+                  </Link>
                 </div>
                 <div className="flex-1 text-center sm:text-left">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#fb5607] mb-2 block">{item.category}</span>
-                  <h3 className="text-2xl font-black uppercase tracking-tighter mb-4 text-zinc-900 dark:text-white">{item.name}</h3>
+                  <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#fb5607]">{item.category}</span>
+                    {item.selectedSize && (
+                      <span className="text-[10px] font-black uppercase tracking-widest bg-zinc-100 dark:bg-white/10 px-2 py-0.5 rounded-md text-zinc-600 dark:text-zinc-400">
+                        Size: {item.selectedSize}
+                      </span>
+                    )}
+                  </div>
+                  <Link href={`/product/${item._id}`}>
+                    <h3 className="text-2xl font-black uppercase tracking-tighter mb-4 text-zinc-900 dark:text-white hover:text-[#fb5607] transition-colors">{item.name}</h3>
+                  </Link>
                   <div className="flex flex-col gap-4">
                     <div className="flex items-center justify-center sm:justify-start gap-4">
                       <button
@@ -140,7 +164,7 @@ export default function CartPage() {
                 <div className="text-center sm:text-right flex flex-col justify-between h-full">
                   <p className="text-3xl font-black tracking-tighter mb-6 text-zinc-900 dark:text-white">₹{item.price * item.qty}</p>
                   <button
-                    onClick={() => removeFromCart(item._id)}
+                    onClick={() => removeFromCart(item.cartItemId)}
                     className="text-zinc-400 dark:text-zinc-500 hover:text-red-500 transition-colors flex items-center gap-2 font-black text-[10px] uppercase tracking-widest"
                   >
                     <Trash2 size={16} /> REMOVE

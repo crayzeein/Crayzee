@@ -53,8 +53,9 @@ export default function CheckoutPage() {
                 orderItems: cart.map(item => ({
                     name: item.name,
                     qty: item.qty,
-                    image: item.image,
+                    image: item.images?.[0]?.url || item.image,
                     price: item.price,
+                    size: item.selectedSize,
                     product: item._id
                 })),
                 shippingAddress: {
@@ -204,13 +205,15 @@ export default function CheckoutPage() {
 
                             <div className="space-y-6 mb-8 max-h-60 overflow-y-auto pr-2 no-scrollbar">
                                 {cart.map((item) => (
-                                    <div key={item._id} className="flex gap-4 items-center">
+                                    <div key={item.cartItemId} className="flex gap-4 items-center">
                                         <div className="w-16 h-20 bg-zinc-100 dark:bg-white/5 rounded-xl overflow-hidden shrink-0">
-                                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                            <img src={item.images?.[0]?.url || item.image} alt={item.name} className="w-full h-full object-cover" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h4 className="text-xs font-black uppercase tracking-tight truncate">{item.name}</h4>
-                                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">QTY: {item.qty} × ₹{item.price}</p>
+                                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
+                                                {item.selectedSize ? `SIZE: ${item.selectedSize} | ` : ''}QTY: {item.qty} × ₹{item.price}
+                                            </p>
                                         </div>
                                     </div>
                                 ))}

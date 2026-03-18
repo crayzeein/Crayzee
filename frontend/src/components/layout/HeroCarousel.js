@@ -139,6 +139,7 @@ export default function HeroCarousel() {
                   fill
                   priority
                   className="object-cover transition-transform duration-[20s] hover:scale-110"
+                  unoptimized
                 />
               </motion.div>
 
