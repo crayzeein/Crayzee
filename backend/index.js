@@ -11,7 +11,10 @@ const app = express();
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+  origin: ['https://crayzee.in', 'https://www.crayzee.in', 'http://localhost:3000', 'http://localhost:3001'],
+  credentials: true
+}));
 app.use(helmet());
 app.use(morgan('dev'));
 
