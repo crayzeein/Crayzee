@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import ProductCard from '@/components/product/ProductCard';
@@ -8,7 +8,7 @@ import { SlidersHorizontal, ChevronDown, X, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/store/useStore';
 
-export default function DiscoveryView({
+function DiscoveryContent({
   initialCategory = 'clothing',
   initialGender = 'all',
   initialSubCategory = 'all',
@@ -19,27 +19,23 @@ export default function DiscoveryView({
   const router = useRouter();
   const { activeMainCat, activeGender, activeSubCat, setCategory } = useStore();
 
-  // URL Params
   const query = searchParams.get('q') || searchParams.get('search') || '';
   const urlCategory = searchParams.get('category') || initialCategory;
   const urlGender = searchParams.get('gender') || initialGender;
   const urlSubCat = searchParams.get('subCategory') || initialSubCategory;
 
-  // Sync URL params to global store
   useEffect(() => {
     if (urlCategory || urlGender || urlSubCat) {
       setCategory(urlCategory, urlGender, urlSubCat);
     }
   }, [urlCategory, urlGender, urlSubCat, setCategory]);
 
-  // State
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Filters state initialized from URL
   const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
@@ -58,19 +54,15 @@ export default function DiscoveryView({
     { value: 'oldest', label: 'Oldest First' }
   ];
 
-  // Sync state to URL
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
-
     if (sort !== 'newest') params.set('sort', sort); else params.delete('sort');
     if (minPrice) params.set('minPrice', minPrice); else params.delete('minPrice');
     if (maxPrice) params.set('maxPrice', maxPrice); else params.delete('maxPrice');
     if (minRating) params.set('rating', minRating); else params.delete('rating');
     if (selectedSizes.length > 0) params.set('sizes', selectedSizes.join(',')); else params.delete('sizes');
-
     const newQuery = params.toString();
     const currentQuery = searchParams.toString();
-
     if (newQuery !== currentQuery) {
       router.push(`?${newQuery}`, { scroll: false });
     }
@@ -78,14 +70,11 @@ export default function DiscoveryView({
 
   const sizesOptions = ['S', 'M', 'L', 'XL', 'XXL'];
 
-  // Update Heading Logic
   const getDynamicTitle = () => {
     if (isSearch) return query;
-
     let titleParts = [];
     if (activeGender && activeGender !== 'all') titleParts.push(activeGender.toUpperCase());
     if (activeSubCat && activeSubCat !== 'all') titleParts.push(activeSubCat.toUpperCase());
-
     if (titleParts.length === 0) return 'THE COLLECTIVE';
     return `${titleParts.join("'S ")} COLLECTION`;
   };
@@ -96,19 +85,16 @@ export default function DiscoveryView({
       if (page === 1) setProducts([]);
       try {
         let url = `/products?page=${page}&limit=12&sort=${sort}`;
-
         if (query) url += `&search=${encodeURIComponent(query)}`;
         if (activeMainCat && activeMainCat !== 'all') url += `&category=${encodeURIComponent(activeMainCat)}`;
         if (activeGender && activeGender !== 'all') url += `&gender=${encodeURIComponent(activeGender)}`;
         if (activeSubCat && activeSubCat !== 'all') url += `&subCategory=${encodeURIComponent(activeSubCat)}`;
-
         if (minPrice) url += `&minPrice=${minPrice}`;
         if (maxPrice) url += `&maxPrice=${maxPrice}`;
         if (minRating) url += `&rating=${minRating}`;
         if (selectedSizes.length > 0) url += `&sizes=${selectedSizes.join(',')}`;
 
         const { data } = await API.get(url);
-
         if (page === 1) {
           setProducts(data.products);
         } else {
@@ -119,7 +105,6 @@ export default function DiscoveryView({
             return Array.from(productMap.values());
           });
         }
-
         setTotal(data.total);
         setTotalPages(data.pages);
       } catch (error) {
@@ -128,11 +113,9 @@ export default function DiscoveryView({
         setLoading(false);
       }
     };
-
     fetchProducts();
   }, [query, activeMainCat, activeGender, activeSubCat, sort, minPrice, maxPrice, minRating, selectedSizes, page]);
 
-  // Reset page when filters change
   useEffect(() => {
     setPage(1);
   }, [query, activeMainCat, activeGender, activeSubCat, sort, minPrice, maxPrice, minRating, selectedSizes]);
@@ -146,7 +129,6 @@ export default function DiscoveryView({
   return (
     <main className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50">
       <Navbar />
-
       <div className="pt-32 pb-20 container mx-auto px-4">
         {/* Header */}
         <div className="mb-12">
@@ -200,7 +182,6 @@ export default function DiscoveryView({
           </p>
         </div>
 
-
         {/* Horizontal Subcategory Filter Tabs */}
         {activeMainCat === 'clothing' && activeGender !== 'all' && (
           <div className="flex flex-wrap items-center gap-3 mb-10 pb-6 border-b border-zinc-100 dark:border-white/5 overflow-x-auto no-scrollbar">
@@ -231,7 +212,6 @@ export default function DiscoveryView({
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
-            {/* Custom Premium Sort Dropdown */}
             <div className="relative flex-1 md:flex-none">
               <button
                 onClick={() => setIsSortOpen(!isSortOpen)}
@@ -247,11 +227,7 @@ export default function DiscoveryView({
               <AnimatePresence>
                 {isSortOpen && (
                   <>
-                    {/* Backdrop to close dropdown */}
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setIsSortOpen(false)}
-                    />
+                    <div className="fixed inset-0 z-40" onClick={() => setIsSortOpen(false)} />
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95, y: -10 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -304,21 +280,9 @@ export default function DiscoveryView({
                 <div className="space-y-6">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-[#fb5607]">Price Range</h4>
                   <div className="flex items-center gap-3">
-                    <input
-                      type="number"
-                      placeholder="Min"
-                      value={minPrice}
-                      onChange={(e) => setMinPrice(e.target.value)}
-                      className="w-full bg-white dark:bg-zinc-800 border-2 border-transparent px-4 py-3 rounded-2xl text-xs outline-none focus:border-[#fb5607]"
-                    />
+                    <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="w-full bg-white dark:bg-zinc-800 border-2 border-transparent px-4 py-3 rounded-2xl text-xs outline-none focus:border-[#fb5607]" />
                     <span className="text-zinc-400">—</span>
-                    <input
-                      type="number"
-                      placeholder="Max"
-                      value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value)}
-                      className="w-full bg-white dark:bg-zinc-800 border-2 border-transparent px-4 py-3 rounded-2xl text-xs outline-none focus:border-[#fb5607]"
-                    />
+                    <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="w-full bg-white dark:bg-zinc-800 border-2 border-transparent px-4 py-3 rounded-2xl text-xs outline-none focus:border-[#fb5607]" />
                   </div>
                 </div>
 
@@ -326,11 +290,7 @@ export default function DiscoveryView({
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-[#fb5607]">Select Sizes</h4>
                   <div className="flex flex-wrap gap-2">
                     {sizesOptions.map(size => (
-                      <button
-                        key={size}
-                        onClick={() => toggleSize(size)}
-                        className={`w-10 h-10 rounded-xl text-[10px] font-black transition-all border-2 ${selectedSizes.includes(size) ? 'bg-black text-white border-black' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-transparent hover:border-[#fb5607]'}`}
-                      >
+                      <button key={size} onClick={() => toggleSize(size)} className={`w-10 h-10 rounded-xl text-[10px] font-black transition-all border-2 ${selectedSizes.includes(size) ? 'bg-black text-white border-black' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-transparent hover:border-[#fb5607]'}`}>
                         {size}
                       </button>
                     ))}
@@ -341,11 +301,7 @@ export default function DiscoveryView({
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-[#fb5607]">Minimum Rating</h4>
                   <div className="flex items-center gap-2">
                     {[4, 3, 2, 1].map(stars => (
-                      <button
-                        key={stars}
-                        onClick={() => setMinRating(stars)}
-                        className={`flex-1 py-3 rounded-2xl text-[10px] font-black transition-all border-2 ${minRating === stars ? 'bg-[#fb5607] text-white border-[#fb5607]' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-transparent hover:border-[#fb5607]'}`}
-                      >
+                      <button key={stars} onClick={() => setMinRating(stars)} className={`flex-1 py-3 rounded-2xl text-[10px] font-black transition-all border-2 ${minRating === stars ? 'bg-[#fb5607] text-white border-[#fb5607]' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-transparent hover:border-[#fb5607]'}`}>
                         {stars}+ ⭐
                       </button>
                     ))}
@@ -354,13 +310,7 @@ export default function DiscoveryView({
 
                 <div className="flex items-end justify-end">
                   <button
-                    onClick={() => {
-                      setMinPrice('');
-                      setMaxPrice('');
-                      setMinRating(0);
-                      setSelectedSizes([]);
-                      setSort('newest');
-                    }}
+                    onClick={() => { setMinPrice(''); setMaxPrice(''); setMinRating(0); setSelectedSizes([]); setSort('newest'); }}
                     className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 hover:text-red-500 transition-all flex items-center gap-2 py-3"
                   >
                     <X size={14} /> Clear All Filters
@@ -378,19 +328,14 @@ export default function DiscoveryView({
               {products.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}
-
               {loading && [...Array(4)].map((_, i) => (
                 <div key={i} className="aspect-[3/4] bg-zinc-100 dark:bg-zinc-900 animate-pulse rounded-[40px]" />
               ))}
             </div>
 
-            {/* Load More */}
             {total > products.length && !loading && (
               <div className="flex justify-center mb-20">
-                <button
-                  onClick={() => setPage(prev => prev + 1)}
-                  className="btn-primary px-12 py-5 rounded-full text-xs font-black tracking-widest uppercase hover:scale-105 transition-all"
-                >
+                <button onClick={() => setPage(prev => prev + 1)} className="btn-primary px-12 py-5 rounded-full text-xs font-black tracking-widest uppercase hover:scale-105 transition-all">
                   Load More Vibe
                 </button>
               </div>
@@ -402,10 +347,7 @@ export default function DiscoveryView({
               <h3 className="text-4xl font-black mb-4 uppercase tracking-tighter text-zinc-900 dark:text-white">Desert Vibes 🏜️</h3>
               <p className="text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-[10px] mb-10 max-w-sm mx-auto">No products available yet.</p>
               {(activeMainCat !== 'all' || activeGender !== 'all' || activeSubCat !== 'all') && (
-                <button
-                  onClick={() => setCategory('clothing', 'all', 'all')}
-                  className="btn-primary"
-                >
+                <button onClick={() => setCategory('clothing', 'all', 'all')} className="btn-primary">
                   Clear All Filters
                 </button>
               )}
@@ -422,5 +364,13 @@ export default function DiscoveryView({
         )}
       </div>
     </main>
+  );
+}
+
+export default function DiscoveryView(props) {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white dark:bg-zinc-950" />}>
+      <DiscoveryContent {...props} />
+    </Suspense>
   );
 }

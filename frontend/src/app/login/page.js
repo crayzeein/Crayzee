@@ -1,12 +1,12 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useStore } from '@/store/useStore';
 import API from '@/utils/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -86,3 +86,12 @@ export default function LoginPage() {
     </main>
   );
 }
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen gradient-bg" />}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
