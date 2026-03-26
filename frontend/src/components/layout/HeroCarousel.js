@@ -126,19 +126,19 @@ export default function HeroCarousel() {
             </div>
 
             {/* Right Column: Visual Component */}
-            <div className="w-full md:w-1/2 h-[300px] md:h-full relative py-8 md:py-20 lg:py-32">
+            <div className="w-full md:w-1/2 h-[400px] lg:h-[600px] relative py-8 md:py-12 lg:py-16 flex items-center justify-center">
               <motion.div
                 initial={{ scale: 0.9, opacity: 0, rotate: 2 }}
                 animate={{ scale: 1, opacity: 1, rotate: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="relative h-full w-full rounded-[40px] overflow-hidden shadow-[0_40px_80px_-20px_rgba(0,0,0,0.2)]"
+                className="relative h-full w-full max-w-md lg:max-w-lg rounded-[40px] overflow-hidden shadow-[0_40px_80px_-20px_rgba(0,0,0,0.2)]"
               >
                 <Image
                   src={slides[current].image}
                   alt={slides[current].title1}
                   fill
                   priority
-                  className="object-cover transition-transform duration-[20s] hover:scale-110"
+                  className="object-cover object-top transition-transform duration-[20s] hover:scale-110"
                   unoptimized
                 />
               </motion.div>

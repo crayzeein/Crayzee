@@ -14,7 +14,7 @@ export default function AdminDashboard() {
   const { user } = useStore();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
-  const [data, setData] = useState({ products: [], users: [], orders: [] });
+  const [data, setData] = useState({ products: [], users: [], orders: [], categories: [] });
   const [loading, setLoading] = useState(true);
   const [orderTab, setOrderTab] = useState('all');
 
@@ -30,24 +30,30 @@ export default function AdminDashboard() {
   const [formData, setFormData] = useState({
     name: '', price: '', category: 'clothing', gender: '', subCategory: '', stock: '', description: '', images: [], sizes: ['S', 'M', 'L', 'XL', 'XXL']
   });
+  
+  // Category Modal
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [currentCategory, setCurrentCategory] = useState(null);
+  const [categoryFormData, setCategoryFormData] = useState({ name: '', slug: '', items: [], isActive: true });
+
   const [uploading, setUploading] = useState(false);
 
   const categoriesConfig = {
     clothing: {
-      genders: ['men', 'women'],
-      subCategories: ['oversized', 'graphic', 'anime']
+      genders: ['men', 'women', 'unisex'],
+      subCategories: ['none', 'oversized', 'graphic', 'anime', 'regular']
+    },
+    footwear: {
+      genders: ['men', 'women', 'unisex'],
+      subCategories: ['none', 'sneakers', 'slides', 'boots', 'formal']
     },
     'mobile-accessories': {
       genders: ['unisex'],
-      subCategories: ['all']
+      subCategories: ['none', 'covers', 'cables', 'chargers']
     },
     gifts: {
       genders: ['unisex'],
-      subCategories: ['all']
-    },
-    footwear: {
-      genders: ['unisex'],
-      subCategories: ['all']
+      subCategories: ['none', 'combos', 'accessories']
     }
   };
 
@@ -69,11 +75,12 @@ export default function AdminDashboard() {
     if (loading && data.users.length > 0) return; // Guard against redundant fetches if we already have data
     setLoading(true);
     try {
-      const [userRes, orderRes] = await Promise.all([
+      const [userRes, orderRes, catRes] = await Promise.all([
         API.get('/users'),
-        API.get('/orders')
+        API.get('/orders'),
+        API.get('/categories/admin')
       ]);
-      setData(prev => ({ ...prev, users: userRes.data, orders: orderRes.data }));
+      setData(prev => ({ ...prev, users: userRes.data, orders: orderRes.data, categories: catRes.data || [] }));
       await fetchProducts();
     } catch (error) {
       console.error('Error fetching admin data:', error);
@@ -219,6 +226,45 @@ export default function AdminDashboard() {
     }
   };
 
+  // --- CATEGORY CRUD ---
+  const handleEditCategory = (cat) => {
+    setCurrentCategory(cat);
+    setCategoryFormData({ ...cat });
+    setShowCategoryModal(true);
+  };
+
+  const handleAddCategory = () => {
+    setCurrentCategory(null);
+    setCategoryFormData({ name: '', slug: '', items: [], isActive: true });
+    setShowCategoryModal(true);
+  };
+
+  const saveCategory = async (e) => {
+    e.preventDefault();
+    try {
+      if (currentCategory) {
+        await API.put(`/categories/${currentCategory._id}`, categoryFormData);
+      } else {
+        await API.post('/categories', categoryFormData);
+      }
+      setShowCategoryModal(false);
+      fetchAllData();
+    } catch (error) {
+      alert('Failed to save category: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const deleteCategory = async (id) => {
+    if (confirm('Delete this category?')) {
+      try {
+        await API.delete(`/categories/${id}`);
+        fetchAllData();
+      } catch (error) {
+        alert('Delete failed');
+      }
+    }
+  };
+
   // --- USER MGMT ---
   const handleBlockUser = async (id) => {
     try {
@@ -285,6 +331,7 @@ export default function AdminDashboard() {
   const sidebarItems = [
     { id: 'overview', label: 'Admin Dash', icon: LayoutDashboard },
     { id: 'products', label: 'Inventory', icon: Package },
+    { id: 'categories', label: 'Categories', icon: TrendingUp },
     { id: 'users', label: 'Customers', icon: UsersIcon },
     { id: 'orders', label: 'Orders', icon: ShoppingCart },
     { id: 'reviews', label: 'Ratings', icon: MessageSquare }
@@ -430,6 +477,61 @@ export default function AdminDashboard() {
                   Next
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- CATEGORIES TAB --- */}
+        {activeTab === 'categories' && (
+          <div className="bg-white border-2 border-zinc-50 rounded-[48px] overflow-hidden">
+            <div className="p-10 border-b border-zinc-50 flex flex-col sm:flex-row justify-between items-center gap-6">
+              <h2 className="text-2xl font-black uppercase tracking-tight">Main Categories</h2>
+              <button
+                onClick={handleAddCategory}
+                className="bg-[#fb5607] text-white px-8 py-4 rounded-full font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-black transition-all shadow-xl w-full sm:w-auto justify-center"
+              >
+                <Plus size={20} /> Add Category
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-zinc-50/50">
+                  <tr>
+                    <th className="px-10 py-6 text-xs font-black uppercase text-zinc-400 tracking-widest">Category Name</th>
+                    <th className="px-10 py-6 text-xs font-black uppercase text-zinc-400 tracking-widest">Slug (URL)</th>
+                    <th className="px-10 py-6 text-xs font-black uppercase text-zinc-400 tracking-widest">Sub-Items</th>
+                    <th className="px-10 py-6 text-xs font-black uppercase text-zinc-400 tracking-widest">Status</th>
+                    <th className="px-10 py-6 text-xs font-black uppercase text-zinc-400 tracking-widest text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-50">
+                  {data.categories.map((cat) => (
+                    <tr key={cat._id} className="hover:bg-zinc-50/30 transition-colors">
+                      <td className="px-10 py-6 font-black text-sm uppercase leading-tight">{cat.name}</td>
+                      <td className="px-10 py-6 font-bold text-[10px] text-zinc-400">{cat.slug}</td>
+                      <td className="px-10 py-6">
+                        <div className="flex flex-wrap gap-2">
+                          {cat.items.map((it, idx) => (
+                            <span key={idx} className="text-[8px] bg-zinc-100 px-2 py-1 rounded font-bold uppercase">{it.label}</span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-10 py-6">
+                        {cat.isActive ? <span className="text-emerald-500 font-black text-[10px] uppercase">Active</span> : <span className="text-red-500 font-black text-[10px] uppercase">Hidden</span>}
+                      </td>
+                      <td className="px-10 py-6">
+                        <div className="flex justify-center gap-3">
+                          <button onClick={() => handleEditCategory(cat)} className="p-3 bg-zinc-100 rounded-xl hover:bg-black hover:text-white transition-all"><Edit size={16} /></button>
+                          <button onClick={() => deleteCategory(cat._id)} className="p-3 bg-zinc-100 rounded-xl hover:bg-[#fb5607] hover:text-white transition-all"><Trash2 size={16} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="p-8 text-center bg-orange-50/30 border-t border-zinc-50">
+              <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Categories with 0 products will automatically be hidden from normal users to prevent empty views.</p>
             </div>
           </div>
         )}
@@ -652,6 +754,76 @@ export default function AdminDashboard() {
         )}
       </section>
 
+      {/* --- CATEGORY MODAL --- */}
+      <AnimatePresence>
+        {showCategoryModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-12">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCategoryModal(false)} className="absolute inset-0 bg-zinc-950/40 backdrop-blur-md" />
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 30 }} className="relative bg-white w-full max-w-2xl rounded-[48px] shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+              <div className="p-10 md:p-14">
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-3xl font-black uppercase tracking-tighter">{currentCategory ? 'Edit Category' : 'New Category'}</h2>
+                  <button onClick={() => setShowCategoryModal(false)} className="p-4 rounded-full bg-zinc-100 hover:rotate-90 transition-all"><X size={24} /></button>
+                </div>
+                <form onSubmit={saveCategory} className="space-y-6">
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-3">Category Name</label>
+                    <input type="text" value={categoryFormData.name} onChange={e => setCategoryFormData({ ...categoryFormData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') })} className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all" required />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-3">URL Slug</label>
+                    <input type="text" value={categoryFormData.slug} onChange={e => setCategoryFormData({ ...categoryFormData, slug: e.target.value })} className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all" required />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input type="checkbox" checked={categoryFormData.isActive} onChange={e => setCategoryFormData({ ...categoryFormData, isActive: e.target.checked })} className="w-5 h-5 accent-[#fb5607]" />
+                      <span className="text-xs font-black uppercase tracking-widest text-zinc-700">Category is Active</span>
+                    </label>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-zinc-100">
+                    <div className="flex justify-between items-center mb-3">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Sub-Items (Menu Links)</label>
+                      <button type="button" onClick={() => setCategoryFormData({ ...categoryFormData, items: [...categoryFormData.items, { label: '', href: '' }] })} className="text-[10px] bg-zinc-100 px-3 py-1 rounded font-black uppercase hover:bg-zinc-200">
+                        + Add Link
+                      </button>
+                    </div>
+                    <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
+                      {categoryFormData.items.map((item, index) => (
+                        <div key={index} className="flex gap-2">
+                          <input type="text" placeholder="Label (e.g. Men)" value={item.label} onChange={e => {
+                            const newItems = [...categoryFormData.items];
+                            newItems[index].label = e.target.value;
+                            setCategoryFormData({ ...categoryFormData, items: newItems });
+                          }} className="flex-1 w-1/3 bg-zinc-50 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none focus:ring-1 focus:ring-[#fb5607]" required />
+                          <input type="text" placeholder="URL (e.g. /browse?category=...)" value={item.href} onChange={e => {
+                            const newItems = [...categoryFormData.items];
+                            newItems[index].href = e.target.value;
+                            setCategoryFormData({ ...categoryFormData, items: newItems });
+                          }} className="flex-1 bg-zinc-50 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none focus:ring-1 focus:ring-[#fb5607]" required />
+                          <button type="button" onClick={() => {
+                            const newItems = [...categoryFormData.items];
+                            newItems.splice(index, 1);
+                            setCategoryFormData({ ...categoryFormData, items: newItems });
+                          }} className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-100"><Trash2 size={14} /></button>
+                        </div>
+                      ))}
+                      {categoryFormData.items.length === 0 && <p className="text-[10px] text-zinc-400 italic">No sub-items added.</p>}
+                    </div>
+                  </div>
+
+                  <div className="pt-6">
+                    <button type="submit" className="w-full bg-[#fb5607] text-white py-5 rounded-3xl font-black uppercase tracking-[0.2em] shadow-xl hover:bg-black transition-all">
+                      Save Category
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* --- ADD/EDIT MODAL --- */}
       <AnimatePresence>
         {showProductModal && (
@@ -676,43 +848,63 @@ export default function AdminDashboard() {
                         <select
                           value={formData.category}
                           onChange={e => {
-                            const newCat = e.target.value;
                             setFormData({
                               ...formData,
-                              category: newCat,
-                              gender: categoriesConfig[newCat].genders[0],
-                              subCategory: categoriesConfig[newCat].subCategories[0]
+                              category: e.target.value
                             });
                           }}
-                          className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all appearance-none"
+                          className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all appearance-none uppercase"
                         >
-                          {Object.keys(categoriesConfig).map(cat => <option key={cat} value={cat} className="uppercase">{cat.replace('-', ' ')}</option>)}
+                          <option value="">Select Category</option>
+                          {data.categories.map(cat => <option key={cat.slug} value={cat.slug} className="uppercase">{cat.name}</option>)}
                         </select>
                       </div>
                       <div className="grid grid-cols-2 gap-6">
                         <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-3">Gender</label>
-                          <select
-                            value={formData.gender}
-                            onChange={e => setFormData({ ...formData, gender: e.target.value })}
-                            className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all appearance-none"
-                            required
-                          >
-                            <option value="">Select Gender</option>
-                            {categoriesConfig[formData.category]?.genders.map(g => <option key={g} value={g} className="uppercase">{g}</option>)}
-                          </select>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-3">Gender Label</label>
+                          {categoriesConfig[formData.category]?.genders ? (
+                            <select
+                              value={formData.gender}
+                              onChange={e => setFormData({ ...formData, gender: e.target.value })}
+                              className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all appearance-none uppercase"
+                              required
+                            >
+                              <option value="">Select Gender</option>
+                              {categoriesConfig[formData.category].genders.map(g => <option key={g} value={g} className="uppercase">{g}</option>)}
+                            </select>
+                          ) : (
+                            <input
+                              type="text"
+                              value={formData.gender}
+                              onChange={e => setFormData({ ...formData, gender: e.target.value.toLowerCase() })}
+                              className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all"
+                              required
+                              placeholder="e.g. men or unisex"
+                            />
+                          )}
                         </div>
                         <div>
                           <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-3">Sub Category</label>
-                          <select
-                            value={formData.subCategory}
-                            onChange={e => setFormData({ ...formData, subCategory: e.target.value })}
-                            className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all appearance-none"
-                            required
-                          >
-                            <option value="">Select Sub-Cat</option>
-                            {categoriesConfig[formData.category]?.subCategories.map(sub => <option key={sub} value={sub} className="uppercase">{sub}</option>)}
-                          </select>
+                          {categoriesConfig[formData.category]?.subCategories ? (
+                            <select
+                              value={formData.subCategory}
+                              onChange={e => setFormData({ ...formData, subCategory: e.target.value })}
+                              className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all appearance-none uppercase"
+                              required
+                            >
+                              <option value="">Select Sub-Cat</option>
+                              {categoriesConfig[formData.category].subCategories.map(sub => <option key={sub} value={sub} className="uppercase">{sub}</option>)}
+                            </select>
+                          ) : (
+                            <input
+                              type="text"
+                              value={formData.subCategory}
+                              onChange={e => setFormData({ ...formData, subCategory: e.target.value.toLowerCase() })}
+                              className="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all"
+                              required
+                              placeholder="e.g. oversized or limited"
+                            />
+                          )}
                         </div>
                       </div>
                     </div>

@@ -80,9 +80,10 @@ function DiscoveryContent({
   };
 
   useEffect(() => {
+    let ignore = false;
     const fetchProducts = async () => {
       setLoading(true);
-      if (page === 1) setProducts([]);
+      if (page === 1 && !ignore) setProducts([]);
       try {
         let url = `/products?page=${page}&limit=12&sort=${sort}`;
         if (query) url += `&search=${encodeURIComponent(query)}`;
@@ -95,6 +96,8 @@ function DiscoveryContent({
         if (selectedSizes.length > 0) url += `&sizes=${selectedSizes.join(',')}`;
 
         const { data } = await API.get(url);
+        if (ignore) return;
+
         if (page === 1) {
           setProducts(data.products);
         } else {
@@ -110,10 +113,11 @@ function DiscoveryContent({
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     };
     fetchProducts();
+    return () => { ignore = true; };
   }, [query, activeMainCat, activeGender, activeSubCat, sort, minPrice, maxPrice, minRating, selectedSizes, page]);
 
   useEffect(() => {

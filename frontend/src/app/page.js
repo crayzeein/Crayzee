@@ -12,7 +12,6 @@ import { ChevronRight, Zap, Flame, Crown, ArrowRight, Star, Instagram, Mail } fr
 export default function Home() {
   const [newArrivals, setNewArrivals] = useState([]);
   const [featured, setFeatured] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,23 +26,6 @@ export default function Home() {
         // Featured (Trending)
         const featuredProducts = allProducts.filter(p => p.isFeatured).slice(0, 8);
         setFeatured(featuredProducts.length > 0 ? featuredProducts : allProducts.slice(8, 16));
-
-        // Dynamic Categories from real products
-        const uniqueCats = [];
-        const catMap = new Map();
-
-        allProducts.forEach(p => {
-          if (!catMap.has(p.category)) {
-            catMap.set(p.category, {
-              name: p.category.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
-              main: p.category,
-              sub: p.subCategory,
-              img: p.image || (p.images && p.images[0]?.url)
-            });
-            uniqueCats.push(catMap.get(p.category));
-          }
-        });
-        setCategories(uniqueCats.slice(0, 7)); // Max 7 for the circle layout
 
       } catch (error) {
         console.error('Error fetching homepage data:', error);
@@ -61,49 +43,6 @@ export default function Home() {
       {/* 1️⃣ Hero Carousel */}
       <HeroCarousel />
 
-      {/* 2️⃣ Category Shortcut Section */}
-      <section className="py-16 md:py-24 bg-zinc-50 dark:bg-zinc-900/50">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white">Shop By <span className="text-[#fb5607]">Category</span></h2>
-              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-2">Discover curated collections from our latest drops</p>
-            </div>
-            <Link href="/browse" className="text-zinc-500 dark:text-zinc-400 font-bold uppercase text-[10px] tracking-widest hover:text-[#fb5607] transition-colors flex items-center gap-2">View All <ChevronRight size={14} /></Link>
-          </div>
-
-          <div className="flex md:grid md:grid-cols-4 lg:grid-cols-7 gap-8 overflow-x-auto pb-6 scrollbar-hide md:overflow-visible">
-            {loading ? (
-              [...Array(7)].map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-32 md:w-auto animate-pulse">
-                  <div className="aspect-square rounded-full bg-zinc-200 dark:bg-zinc-800 mb-4" />
-                  <div className="h-2 w-16 bg-zinc-200 dark:bg-zinc-800 rounded mx-auto" />
-                </div>
-              ))
-            ) : (
-              categories.map((cat, i) => (
-                <Link
-                  key={i}
-                  href={`/browse?category=${encodeURIComponent(cat.main)}`}
-                  className="group flex-shrink-0 w-32 md:w-auto"
-                >
-                  <div className="aspect-square rounded-full overflow-hidden mb-5 border-4 border-transparent group-hover:border-[#fb5607] transition-all shadow-xl group-hover:scale-110 duration-500 relative bg-zinc-100 dark:bg-zinc-800">
-                    {cat.img ? (
-                      <Image src={cat.img} alt={cat.name} fill className="object-cover" unoptimized />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[8px] font-black text-zinc-400 uppercase">Empty</div>
-                    )}
-                  </div>
-                  <h3 className="text-center font-black uppercase text-[11px] tracking-widest text-zinc-900 dark:text-zinc-50 group-hover:text-[#fb5607] transition-colors">{cat.name}</h3>
-                </Link>
-              ))
-            )}
-            {!loading && categories.length === 0 && (
-              <div className="col-span-full py-10 text-center text-zinc-400 font-black uppercase tracking-widest text-xs">No active categories found 🏜️</div>
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* 3️⃣ New Arrivals */}
       <section className="py-24 bg-white dark:bg-zinc-950">

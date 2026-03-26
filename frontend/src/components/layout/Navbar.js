@@ -17,7 +17,20 @@ export default function Navbar() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [categories, setCategories] = useState([]);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await API.get('/categories');
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (searchQuery.trim().length > 1) {
@@ -89,17 +102,6 @@ export default function Navbar() {
     }
   };
 
-  const categories = {
-    Clothing: {
-      items: [
-        { label: 'Men', href: '/browse?category=clothing&gender=men' },
-        { label: 'Women', href: '/browse?category=clothing&gender=women' },
-      ]
-    },
-    'Mobile Accessories': { items: [{ label: 'All', href: '/browse?category=mobile-accessories' }] },
-    Gifts: { items: [{ label: 'All', href: '/browse?category=gifts' }] },
-    Footwear: { items: [{ label: 'All', href: '/browse?category=footwear' }] }
-  };
 
   return (
     <nav className="sticky top-0 w-full z-50 bg-white dark:bg-zinc-950 shadow-sm border-b border-zinc-100 dark:border-white/5 py-3 lg:py-4 transition-all duration-300">
@@ -111,33 +113,35 @@ export default function Navbar() {
 
         {/* DESKTOP MEGA MENU */}
         <div className="hidden lg:flex items-center space-x-10">
-          {Object.keys(categories).map((mainCat) => (
-            <div key={mainCat} className="group/menu relative py-2">
-              <button className={`flex items-center gap-1 font-bold transition-colors uppercase text-[11px] tracking-[0.15em] cursor-default ${activeMainCat === mainCat.toLowerCase() ? 'text-[#fb5607]' : 'text-zinc-800 dark:text-zinc-200 hover:text-[#fb5607]'
+          {categories.map((cat) => (
+            <div key={cat._id} className="group/menu relative py-2">
+              <button suppressHydrationWarning className={`flex items-center gap-1 font-bold transition-colors uppercase text-[11px] tracking-[0.15em] cursor-default ${activeMainCat === cat.name.toLowerCase() ? 'text-[#fb5607]' : 'text-zinc-800 dark:text-zinc-200 hover:text-[#fb5607]'
                 }`}>
-                {mainCat}
+                {cat.name}
               </button>
 
               {/* MEGA MENU DROPDOWN */}
-              <div className="absolute top-full left-0 hidden group-hover/menu:block pt-2">
-                <div className="bg-white dark:bg-zinc-950 p-6 rounded-[32px] soft-shadow border border-zinc-100 dark:border-white/5 w-64 backdrop-blur-3xl">
-                  <div className="flex flex-col gap-4">
-                    {categories[mainCat].items.map((item) => (
-                      <div key={item.label}>
-                        <Link
-                          href={item.href}
-                          className={`text-xs font-black transition-all flex items-center justify-between group/link ${activeGender === item.label.toLowerCase() ? 'text-[#fb5607]' : 'text-zinc-900 dark:text-zinc-100 hover:text-[#fb5607]'
-                            }`}
-                        >
-                          {item.label}
-                          <div className={`w-1 h-1 rounded-full bg-[#fb5607] transition-opacity ${activeGender === item.label.toLowerCase() ? 'opacity-100' : 'opacity-0 group-hover/link:opacity-100'
-                            }`} />
-                        </Link>
-                      </div>
-                    ))}
+              {cat.items && cat.items.length > 0 && (
+                <div className="absolute top-full left-0 hidden group-hover/menu:block pt-2">
+                  <div className="bg-white dark:bg-zinc-950 p-6 rounded-[32px] soft-shadow border border-zinc-100 dark:border-white/5 w-64 backdrop-blur-3xl">
+                    <div className="flex flex-col gap-4">
+                      {cat.items.map((item) => (
+                        <div key={item._id || item.label}>
+                          <Link
+                            href={item.href}
+                            className={`text-xs font-black transition-all flex items-center justify-between group/link ${activeGender === item.label.toLowerCase() ? 'text-[#fb5607]' : 'text-zinc-900 dark:text-zinc-100 hover:text-[#fb5607]'
+                              }`}
+                          >
+                            {item.label}
+                            <div className={`w-1 h-1 rounded-full bg-[#fb5607] transition-opacity ${activeGender === item.label.toLowerCase() ? 'opacity-100' : 'opacity-0 group-hover/link:opacity-100'
+                              }`} />
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           ))}
         </div>
@@ -147,6 +151,7 @@ export default function Navbar() {
           <div className="relative hidden sm:block search-container">
             <div className="relative">
               <input
+                suppressHydrationWarning
                 type="text"
                 placeholder="Search gear..."
                 value={searchQuery}
@@ -363,13 +368,13 @@ export default function Navbar() {
               </div>
 
               <div className="space-y-8">
-                {Object.keys(categories).map((mainCat) => (
-                  <div key={mainCat} className="space-y-4">
-                    <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-white/5 pb-2">{mainCat}</h3>
+                {categories.map((cat) => (
+                  <div key={cat._id} className="space-y-4">
+                    <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-white/5 pb-2">{cat.name}</h3>
                     <div className="grid grid-cols-2 gap-3">
-                      {categories[mainCat].items.map((item) => (
+                      {cat.items && cat.items.map((item) => (
                         <Link
-                          key={item.label}
+                          key={item._id || item.label}
                           href={item.href}
                           onClick={() => setIsMenuOpen(false)}
                           className={`px-4 py-3 rounded-2xl text-xs font-bold transition-all text-center ${activeGender === item.label.toLowerCase() ? 'bg-[#fb5607] text-white shadow-lg shadow-[#fb5607]/20' : 'bg-zinc-50 dark:bg-white/5 text-zinc-900 dark:text-zinc-50'}`}

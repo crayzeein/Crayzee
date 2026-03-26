@@ -53,13 +53,24 @@ const generateProducts = () => {
         const variantImages = images[subCat] || images['Mens'];
         const img = variantImages[Math.floor(Math.random() * variantImages.length)];
 
+        let genderVal = 'unisex';
+        if (mainCat === 'Clothing') {
+          if (subCat === 'Womens') genderVal = 'women';
+          else if (subCat === 'Mens') genderVal = 'men';
+        }
+
         products.push({
           name: `${adj} ${noun} #${i}`,
           description: `The all-new ${subCat} ${noun.toLowerCase()} from our ${mainCat} collection. Engineered for maximum ${adj.toLowerCase()} vibes.`,
           price: Math.floor(Math.random() * (7999 - 999 + 1)) + 999,
-          image: `${img}?auto=format&fit=crop&q=80&w=800&sig=${mainCat}${subCat}${i}`,
-          mainCategory: mainCat,
+          images: [{
+            url: `${img}?auto=format&fit=crop&q=80&w=800&sig=${mainCat}${subCat}${i}`,
+            public_id: `seed_${mainCat}_${subCat}_${i}`
+          }],
+          category: mainCat,
           subCategory: subCat,
+          gender: genderVal,
+          sizes: ['S', 'M', 'L', 'XL', 'XXL'],
           stock: Math.floor(Math.random() * 50) + 5,
           isFeatured: i <= 2
         });
