@@ -68,4 +68,4 @@ Crayzee.in is a modern, full-stack e-commerce platform designed for the Gen-Z au
 - **SEO**: Meta tags and semantic HTML.
 
 ---
-Built with ❤️ by Antigravity
+
