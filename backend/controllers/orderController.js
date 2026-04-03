@@ -2,7 +2,7 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 
 exports.addOrderItems = async (req, res) => {
-  const { orderItems, shippingAddress, paymentMethod, totalPrice } = req.body;
+  const { orderItems, shippingAddress, paymentMethod, totalPrice, isPaid, paidAt, paymentResult } = req.body;
 
   if (!orderItems || orderItems.length === 0) {
     return res.status(400).json({ message: 'No order items' });
@@ -34,6 +34,9 @@ exports.addOrderItems = async (req, res) => {
       shippingAddress,
       paymentMethod,
       totalPrice,
+      isPaid: isPaid || false,
+      paidAt: isPaid ? (paidAt || Date.now()) : undefined,
+      paymentResult: paymentResult || {},
       status: 'Processing'
     });
 

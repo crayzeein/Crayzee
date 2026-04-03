@@ -4,12 +4,13 @@ import { useStore } from '@/store/useStore';
 import Navbar from '@/components/layout/Navbar';
 import { useRouter } from 'next/navigation';
 import API from '@/utils/api';
-import { MapPin, CreditCard, ChevronRight, Package, Truck, ShieldCheck, AlertCircle } from 'lucide-react';
+import { MapPin, CreditCard, ChevronRight, Package, Truck, ShieldCheck, AlertCircle, Smartphone, Banknote } from 'lucide-react';
 
 export default function CheckoutPage() {
     const { cart, user, clearCart, _hasHydrated } = useStore();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('ONLINE');
     const [formData, setFormData] = useState({
         address: '',
         city: '',
@@ -33,44 +34,64 @@ export default function CheckoutPage() {
     const shipping = subtotal > 1500 ? 0 : 99;
     const total = subtotal + shipping;
 
-    const handleSubmit = async (e) => {
+    const validateForm = () => {
+        if (!formData.address || !formData.city || !formData.postalCode) {
+            setError('Please fill all shipping details.');
+            return false;
+        }
+        return true;
+    };
+
+    const validateStock = async () => {
+        for (const item of cart) {
+            const { data: product } = await API.get(`/products/${item._id}`);
+            if (!product) {
+                throw new Error(`Product ${item.name} is no longer available.`);
+            }
+            if (product.stock < item.qty) {
+                throw new Error(`Limited stock for ${item.name}. Available: ${product.stock}. Please update your cart.`);
+            }
+        }
+    };
+
+    const placeOrder = async (payMethod, paymentResult = {}) => {
+        const orderData = {
+            orderItems: cart.map(item => ({
+                name: item.name,
+                qty: item.qty,
+                image: item.images?.[0]?.url || item.image,
+                price: item.price,
+                size: item.selectedSize,
+                product: item._id
+            })),
+            shippingAddress: {
+                address: formData.address,
+                city: formData.city,
+                postalCode: formData.postalCode,
+                country: formData.country
+            },
+            paymentMethod: payMethod,
+            totalPrice: total,
+            isPaid: payMethod === 'Razorpay',
+            paidAt: payMethod === 'Razorpay' ? new Date() : undefined,
+            paymentResult: paymentResult
+        };
+
+        const { data } = await API.post('/orders', orderData);
+        clearCart();
+        router.push(`/order/success/${data._id}`);
+    };
+
+    // COD Order
+    const handleCODOrder = async (e) => {
         e.preventDefault();
+        if (!validateForm()) return;
         setLoading(true);
+        setError('');
 
         try {
-            // Final Stock Validation
-            for (const item of cart) {
-                const { data: product } = await API.get(`/products/${item._id}`);
-                if (!product) {
-                    throw new Error(`Product ${item.name} is no longer available.`);
-                }
-                if (product.stock < item.qty) {
-                    throw new Error(`Limited stock for ${item.name}. Available: ${product.stock}. Please update your cart.`);
-                }
-            }
-
-            const orderData = {
-                orderItems: cart.map(item => ({
-                    name: item.name,
-                    qty: item.qty,
-                    image: item.images?.[0]?.url || item.image,
-                    price: item.price,
-                    size: item.selectedSize,
-                    product: item._id
-                })),
-                shippingAddress: {
-                    address: formData.address,
-                    city: formData.city,
-                    postalCode: formData.postalCode,
-                    country: formData.country
-                },
-                paymentMethod: 'COD',
-                totalPrice: total
-            };
-
-            const { data } = await API.post('/orders', orderData);
-            clearCart();
-            router.push(`/order/success/${data._id}`);
+            await validateStock();
+            await placeOrder('COD');
         } catch (error) {
             const msg = error.response?.data?.message || error.message || 'Failed to place order';
             setError(msg);
@@ -79,6 +100,92 @@ export default function CheckoutPage() {
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Online Payment via Razorpay
+    const handleOnlinePayment = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+        setLoading(true);
+        setError('');
+
+        try {
+            await validateStock();
+
+            // 1. Create Razorpay order on backend
+            const { data: razorpayOrder } = await API.post('/payment/create-order', {
+                amount: total
+            });
+
+            // 2. Open Razorpay checkout popup
+            const options = {
+                key: razorpayOrder.key,
+                amount: razorpayOrder.amount,
+                currency: razorpayOrder.currency,
+                name: 'CRAYZEE.IN',
+                description: `Order for ${cart.length} item(s)`,
+                order_id: razorpayOrder.id,
+                handler: async function (response) {
+                    try {
+                        // 3. Verify payment on backend
+                        const { data: verification } = await API.post('/payment/verify', {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        });
+
+                        if (verification.verified) {
+                            // 4. Place order with payment details
+                            await placeOrder('Razorpay', {
+                                id: response.razorpay_payment_id,
+                                status: 'completed',
+                                update_time: new Date().toISOString(),
+                                email_address: user.email
+                            });
+                        } else {
+                            setError('Payment verification failed. Please contact support.');
+                        }
+                    } catch (verifyError) {
+                        setError('Payment verification failed. If amount was deducted, please contact support.');
+                    }
+                    setLoading(false);
+                },
+                prefill: {
+                    name: user?.name || '',
+                    email: user?.email || '',
+                    contact: formData.phone || ''
+                },
+                theme: {
+                    color: '#fb5607'
+                },
+                modal: {
+                    ondismiss: function () {
+                        setLoading(false);
+                        setError('Payment was cancelled.');
+                    }
+                }
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                setLoading(false);
+                setError(`Payment failed: ${response.error.description}`);
+            });
+            rzp.open();
+
+        } catch (error) {
+            const msg = error.response?.data?.message || error.message || 'Payment failed';
+            setError(msg);
+            setLoading(false);
+        }
+    };
+
+    const handleSubmit = (e) => {
+        if (paymentMethod === 'ONLINE') {
+            handleOnlinePayment(e);
+        } else {
+            handleCODOrder(e);
         }
     };
 
@@ -111,6 +218,17 @@ export default function CheckoutPage() {
                                 </div>
 
                                 <div className="space-y-6">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-3">Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            required
+                                            placeholder="e.g. 9876543210"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                            className="w-full bg-zinc-50 dark:bg-white/5 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all"
+                                        />
+                                    </div>
                                     <div>
                                         <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-3">Street Address</label>
                                         <input
@@ -168,17 +286,57 @@ export default function CheckoutPage() {
                                     <h2 className="text-2xl font-black uppercase tracking-tighter">Payment Method</h2>
                                 </div>
 
-                                <div className="p-6 rounded-3xl border-2 border-[#fb5607] bg-[#fb5607]/5 flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-6 h-6 rounded-full bg-[#fb5607] flex items-center justify-center">
-                                            <div className="w-2 h-2 rounded-full bg-white" />
+                                <div className="space-y-4">
+                                    {/* Online Payment Option */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setPaymentMethod('ONLINE')}
+                                        className={`w-full p-6 rounded-3xl flex items-center justify-between transition-all duration-300 border-2 ${
+                                            paymentMethod === 'ONLINE'
+                                                ? 'border-[#fb5607] bg-[#fb5607]/5 shadow-lg shadow-[#fb5607]/10'
+                                                : 'border-zinc-100 dark:border-white/10 bg-white dark:bg-zinc-800 hover:border-zinc-300'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                                                paymentMethod === 'ONLINE' ? 'bg-[#fb5607]' : 'bg-zinc-200 dark:bg-zinc-600'
+                                            }`}>
+                                                {paymentMethod === 'ONLINE' && <div className="w-2 h-2 rounded-full bg-white" />}
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="font-black text-sm uppercase tracking-tight">Pay Online</p>
+                                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">UPI · Cards · Net Banking · Wallets</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-black text-sm uppercase tracking-tight">Cash on Delivery (COD)</p>
-                                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pay when you receive the gear</p>
+                                        <div className="flex items-center gap-2">
+                                            <Smartphone className="text-[#fb5607]" size={20} />
+                                            <ShieldCheck className={paymentMethod === 'ONLINE' ? 'text-[#fb5607]' : 'text-zinc-300'} size={20} />
                                         </div>
-                                    </div>
-                                    <ShieldCheck className="text-[#fb5607]" size={24} />
+                                    </button>
+
+                                    {/* COD Option */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setPaymentMethod('COD')}
+                                        className={`w-full p-6 rounded-3xl flex items-center justify-between transition-all duration-300 border-2 ${
+                                            paymentMethod === 'COD'
+                                                ? 'border-[#fb5607] bg-[#fb5607]/5 shadow-lg shadow-[#fb5607]/10'
+                                                : 'border-zinc-100 dark:border-white/10 bg-white dark:bg-zinc-800 hover:border-zinc-300'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                                                paymentMethod === 'COD' ? 'bg-[#fb5607]' : 'bg-zinc-200 dark:bg-zinc-600'
+                                            }`}>
+                                                {paymentMethod === 'COD' && <div className="w-2 h-2 rounded-full bg-white" />}
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="font-black text-sm uppercase tracking-tight">Cash on Delivery</p>
+                                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pay when you receive the gear</p>
+                                            </div>
+                                        </div>
+                                        <Banknote className={paymentMethod === 'COD' ? 'text-[#fb5607]' : 'text-zinc-300'} size={24} />
+                                    </button>
                                 </div>
                             </div>
 
@@ -193,7 +351,12 @@ export default function CheckoutPage() {
                                 disabled={loading}
                                 className="w-full py-6 rounded-3xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-black text-sm uppercase tracking-[0.2em] shadow-2xl hover:bg-[#fb5607] hover:text-white transition-all transform active:scale-95 disabled:opacity-50"
                             >
-                                {loading ? 'DEPLOYING ORDER...' : 'PLACE ORDER'}
+                                {loading
+                                    ? 'PROCESSING...'
+                                    : paymentMethod === 'ONLINE'
+                                        ? `PAY ₹${total} NOW`
+                                        : 'PLACE COD ORDER'
+                                }
                             </button>
                         </form>
                     </div>
@@ -227,6 +390,10 @@ export default function CheckoutPage() {
                                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-400">
                                     <span>Shipping</span>
                                     <span className="text-[#fb5607]">{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+                                </div>
+                                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                    <span>Payment</span>
+                                    <span className="text-emerald-500">{paymentMethod === 'ONLINE' ? 'ONLINE (UPI/CARD)' : 'COD'}</span>
                                 </div>
                                 <div className="flex justify-between items-end pt-4">
                                     <span className="text-xs font-black uppercase tracking-tighter">Total</span>

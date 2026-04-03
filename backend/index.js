@@ -56,6 +56,7 @@ const uploadRoutes = require('./routes/uploadRoutes');
 
 const bannerRoutes = require('./routes/bannerRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -65,6 +66,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

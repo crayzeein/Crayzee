@@ -13,17 +13,24 @@ export default function OrderSuccessPage({ params }) {
     const router = useRouter();
 
     useEffect(() => {
-        const fetchOrder = async () => {
-            try {
-                const { data } = await API.get(`/orders/${id}`);
-                setOrder(data);
-            } catch (error) {
-                console.error('Failed to fetch order:', error);
-            } finally {
-                setLoading(false);
+        const fetchOrder = async (retries = 3) => {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const { data } = await API.get(`/orders/${id}`);
+                    setOrder(data);
+                    return;
+                } catch (error) {
+                    console.error(`Fetch order attempt ${i + 1} failed:`, error);
+                    if (i < retries - 1) {
+                        await new Promise(r => setTimeout(r, 1500));
+                    }
+                }
             }
+            setLoading(false);
         };
-        if (id) fetchOrder();
+        if (id) {
+            fetchOrder().finally(() => setLoading(false));
+        }
     }, [id]);
 
     if (loading) return <div className="min-h-screen flex items-center justify-center font-black animate-pulse">VERIFYING DEPLOYMENT...</div>;
