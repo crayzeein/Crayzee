@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, required: false },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
   isBlocked: { type: Boolean, default: false },
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
@@ -21,6 +21,11 @@ const userSchema = new mongoose.Schema({
     postalCode: { type: String },
     country: { type: String },
   },
+  resetPasswordOtp: { type: String },
+  resetPasswordOtpExpires: { type: Date },
+  isVerified: { type: Boolean, default: false },
+  signupOtp: { type: String },
+  signupOtpExpires: { type: Date },
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -68,19 +68,22 @@ body {
   background: radial-gradient(circle at top right, #f8fafc 0%, #ffffff 100%);
 }
 
-.dark .glass {
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark .btn-outline {
-  border-color: #fff;
-  color: #fff;
-}
-
-.dark .btn-outline:hover {
-  background: #fff;
-  color: #000;
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background: rgba(10, 10, 10, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .gradient-bg {
+    background: radial-gradient(circle at top right, #171717 0%, #0a0a0a 100%);
+  }
+  .btn-outline {
+    border-color: #fff;
+    color: #fff;
+  }
+  .btn-outline:hover {
+    background: #fff;
+    color: #000;
+  }
 }
 
 @keyframes blob {

@@ -1,0 +1,23 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .hanger-hook {
+      fill: none;
+      stroke: #fb5607;
+      stroke-width: 48;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .hanger-body {
+      fill: #fb5607;
+      stroke: #fb5607;
+      stroke-width: 48;
+      stroke-linejoin: round;
+    }
+  </style>
+
+  <!-- Giant Bold Hook -->
+  <path d="M 170 190 C 170 110 220 90 256 90 C 310 90 342 130 342 180 C 342 230 256 250 256 300 L 256 340" class="hanger-hook" />
+  
+  <!-- Giant Rounded Body -->
+  <path d="M 256 310 L 46 430 L 466 430 Z" class="hanger-body" />
+</svg>
