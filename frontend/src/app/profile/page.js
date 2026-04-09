@@ -72,7 +72,7 @@ export default function ProfilePage() {
 
           {/* Sidebar Info */}
           <div className="lg:col-span-1 space-y-8">
-            <div className="bg-white dark:bg-zinc-900 p-10 rounded-[48px] shadow-xl border border-zinc-100 dark:border-white/5 text-center">
+            <div className="bg-white dark:bg-zinc-900 p-6 sm:p-10 rounded-[32px] md:rounded-[48px] shadow-xl border border-zinc-100 dark:border-white/5 text-center">
               <div className="w-32 h-32 bg-[#fb5607]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <User size={64} className="text-[#fb5607]" />
               </div>
@@ -139,7 +139,7 @@ export default function ProfilePage() {
               </Link>
             </div>
 
-            <div className="bg-white dark:bg-zinc-900 p-10 rounded-[48px] shadow-xl border border-zinc-100 dark:border-white/5">
+            <div className="bg-white dark:bg-zinc-900 p-6 sm:p-10 rounded-[32px] md:rounded-[48px] shadow-xl border border-zinc-100 dark:border-white/5">
               <div className="flex items-center gap-4 mb-10">
                 <Settings size={28} className="text-[#fb5607]" />
                 <h3 className="text-2xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white">Account Vibe</h3>
@@ -245,20 +245,20 @@ function Input({ label, value, onChange, type = 'text', full = false }) {
 
 function ActionButtons({ onCancel, loading }) {
   return (
-    <div className="flex gap-4 pt-4">
+    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
       <button
         type="submit"
         disabled={loading}
-        className="flex-1 bg-[#fb5607] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#ff6b2b] transition-all shadow-lg shadow-[#fb5607]/20 disabled:opacity-50"
+        className="flex-1 bg-[#fb5607] text-white py-3 sm:py-4 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#ff6b2b] transition-all shadow-lg shadow-[#fb5607]/20 disabled:opacity-50"
       >
-        {loading ? 'Processing...' : <><Save size={16} /> Save Changes</>}
+        {loading ? 'Processing...' : <><Save size={14} /> Save Changes</>}
       </button>
       <button
         type="button"
         onClick={onCancel}
-        className="px-8 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-all font-bold"
+        className="px-6 sm:px-8 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 py-3 sm:py-4 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-all"
       >
-        <X size={16} /> Cancel
+        <X size={14} /> Cancel
       </button>
     </div>
   );

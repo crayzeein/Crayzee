@@ -166,16 +166,16 @@ export default function HeroCarousel() {
       </AnimatePresence>
 
       {/* Navigation Controls */}
-      <div className="absolute bottom-8 right-4 md:right-12 flex items-center gap-4 z-20">
+      <div className="absolute bottom-16 sm:bottom-8 right-4 md:right-12 flex items-center gap-3 sm:gap-4 z-20">
         <button
           onClick={prevSlide}
-          className="p-4 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white hover:bg-[#fb5607] hover:text-white transition-all shadow-xl"
+          className="p-3 sm:p-4 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white hover:bg-[#fb5607] hover:text-white transition-all shadow-xl"
         >
           <ChevronLeft size={24} />
         </button>
         <button
           onClick={nextSlide}
-          className="p-4 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white hover:bg-[#fb5607] hover:text-white transition-all shadow-xl"
+          className="p-3 sm:p-4 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white hover:bg-[#fb5607] hover:text-white transition-all shadow-xl"
         >
           <ChevronRight size={24} />
         </button>

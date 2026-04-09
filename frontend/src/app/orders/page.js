@@ -49,13 +49,13 @@ export default function MyOrdersPage() {
                 </header>
 
                 {orders.length === 0 ? (
-                    <div className="bg-white dark:bg-zinc-900 p-20 rounded-[48px] text-center border border-zinc-100 dark:border-white/5">
+                    <div className="bg-white dark:bg-zinc-900 p-8 sm:p-12 md:p-20 rounded-[32px] md:rounded-[48px] text-center border border-zinc-100 dark:border-white/5">
                         <div className="w-24 h-24 bg-zinc-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8 text-zinc-200">
                             <ShoppingBag size={48} />
                         </div>
-                        <h2 className="text-3xl font-black uppercase tracking-tighter mb-4">No Drops Yet</h2>
+                        <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter mb-4">No Drops Yet</h2>
                         <p className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest mb-10">You haven't secured any gear yet. Start your mission today.</p>
-                        <Link href="/browse" className="btn-primary">Explore Drops</Link>
+                        <Link href="/browse" className="btn-primary inline-block">Explore Drops</Link>
                     </div>
                 ) : (
                     <div className="space-y-6">
@@ -94,7 +94,7 @@ export default function MyOrdersPage() {
                                     </div>
                                     <Link
                                         href={`/order/success/${order._id}`}
-                                        className="flex items-center gap-3 px-8 py-4 bg-zinc-100 dark:bg-white/5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all group-hover:bg-[#fb5607] group-hover:text-white"
+                                        className="w-full md:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-zinc-100 dark:bg-white/5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all group-hover:bg-[#fb5607] group-hover:text-white"
                                     >
                                         View Details <ChevronRight size={16} />
                                     </Link>

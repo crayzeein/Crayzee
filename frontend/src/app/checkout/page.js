@@ -240,7 +240,7 @@ export default function CheckoutPage() {
                                             className="w-full bg-zinc-50 dark:bg-white/5 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all"
                                         />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-6">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                                         <div>
                                             <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-3">City</label>
                                             <input

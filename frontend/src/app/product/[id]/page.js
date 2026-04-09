@@ -150,11 +150,11 @@ export default function ProductDetailPage({ params }) {
               <Star size={14} fill="currentColor" />
               <span>{product.rating > 0 ? `${product.rating.toFixed(1)} RATING` : 'NO RATING YET'}</span>
             </div>
-            <h1 className="text-6xl md:text-8xl font-black mb-6 leading-[0.9] tracking-tighter uppercase text-zinc-900 dark:text-white">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-black mb-6 leading-[0.9] tracking-tighter uppercase text-zinc-900 dark:text-white">
               {product.name}
             </h1>
             <div className="flex items-center gap-6 mb-8">
-              <span className="text-5xl font-black text-zinc-900 dark:text-white tracking-tighter">₹{product.price}</span>
+              <span className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white tracking-tighter">₹{product.price}</span>
             </div>
 
             <p className="text-zinc-500 dark:text-zinc-300 text-lg mb-8 leading-relaxed font-medium">
@@ -203,17 +203,13 @@ export default function ProductDetailPage({ params }) {
                         +
                       </button>
                     </div>
-                    <div>
-                      {product.stock <= 5 ? (
+                    {product.stock <= 5 && (
+                      <div>
                         <p className="text-[10px] font-black text-red-500 uppercase tracking-widest animate-pulse">
                           🔥 Only {product.stock} left in stock!
                         </p>
-                      ) : (
-                        <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">
-                          In Stock ({product.stock} available)
-                        </p>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -223,28 +219,29 @@ export default function ProductDetailPage({ params }) {
                 </div>
               )}
             </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+            {/* Action Buttons - E-commerce style */}
+            <div className="flex gap-3 mb-6">
               <button
                 onClick={() => addToCart(product, quantity, selectedSize)}
                 disabled={product.stock === 0}
-                className="flex-1 btn-primary flex items-center justify-center gap-4 text-sm tracking-widest disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+                className="flex-1 h-[52px] bg-[#fb5607] text-white rounded-xl font-black text-xs sm:text-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-[#e04e06] active:scale-[0.98] transition-all shadow-lg shadow-[#fb5607]/25 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
               >
-                <ShoppingCart size={22} strokeWidth={3} /> {product.stock > 0 ? 'ADD TO BAG' : 'OUT OF STOCK'}
+                <ShoppingCart size={18} strokeWidth={2.5} />
+                <span>{product.stock > 0 ? 'ADD TO BAG' : 'OUT OF STOCK'}</span>
               </button>
               <button
                 onClick={() => toggleWishlist(product)}
-                className={`p-5 rounded-full glass transition-all ${isWishlisted ? 'text-[#fb5607] border-[#fb5607]' : 'text-zinc-900 dark:text-white hover:text-[#fb5607]'}`}
+                className={`h-[52px] w-[52px] shrink-0 flex items-center justify-center rounded-xl border-2 transition-all active:scale-95 ${isWishlisted ? 'bg-red-50 dark:bg-red-500/10 border-[#fb5607] text-[#fb5607]' : 'border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-[#fb5607] hover:text-[#fb5607]'}`}
               >
-                <Heart size={24} className={isWishlisted ? 'fill-[#fb5607]' : ''} />
-              </button>
-              <button
-                onClick={handleShare}
-                className="p-5 rounded-full glass text-zinc-900 dark:text-white hover:text-[#fb5607] transition-all"
-              >
-                <Share2 size={24} />
+                <Heart size={20} className={isWishlisted ? 'fill-[#fb5607]' : ''} />
               </button>
             </div>
+            <button
+              onClick={handleShare}
+              className="flex items-center justify-center gap-2 text-zinc-400 hover:text-[#fb5607] transition-colors text-[10px] font-bold uppercase tracking-widest mb-12"
+            >
+              <Share2 size={14} /> Share this product
+            </button>
           </motion.div>
         </div>
 
@@ -286,7 +283,7 @@ export default function ProductDetailPage({ params }) {
 
             {/* List Reviews */}
             <div className="lg:col-span-2">
-              <div className="flex items-center justify-between mb-10">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
                 <h3 className="text-3xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white">Community Vibe Checks</h3>
                 <div className="flex items-center gap-2 px-4 py-2 bg-[#fb5607]/10 rounded-full">
                   <Star size={14} fill="#fb5607" stroke="none" />

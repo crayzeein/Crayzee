@@ -51,7 +51,7 @@ export default function OrderSuccessPage({ params }) {
                     <div className="w-24 h-24 bg-emerald-100 dark:bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-8 text-emerald-600 animate-bounce">
                         <CheckCircle2 size={48} />
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 text-zinc-900 dark:text-white">COMMAND SUCCESSFUL</h1>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter mb-4 text-zinc-900 dark:text-white">COMMAND SUCCESSFUL</h1>
                     <p className="text-zinc-500 font-bold uppercase text-xs tracking-[0.2em]">Your order #{order._id.slice(-8)} has been deployed successfully.</p>
                 </div>
 

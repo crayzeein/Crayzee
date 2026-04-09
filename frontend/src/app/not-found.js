@@ -13,7 +13,7 @@ export default function NotFound() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 100 }}
       >
-        <h1 className="text-[15rem] md:text-[25rem] font-black leading-none tracking-tighter text-zinc-950 select-none opacity-5">
+        <h1 className="text-[8rem] sm:text-[12rem] md:text-[18rem] lg:text-[25rem] font-black leading-none tracking-tighter text-zinc-950 select-none opacity-5">
           404
         </h1>
         
@@ -21,7 +21,7 @@ export default function NotFound() {
           <h2 className="text-5xl md:text-8xl font-black mb-6 uppercase tracking-tighter leading-none">
             YOU LOST <br /> THE <span className="text-[#fb5607] underline decoration-8">VIBE?</span>
           </h2>
-          <p className="text-xl md:text-2xl text-zinc-500 font-bold mb-10 uppercase tracking-widest leading-relaxed">
+          <p className="text-sm sm:text-lg md:text-2xl text-zinc-500 font-bold mb-10 uppercase tracking-widest leading-relaxed">
             This page doesn't exist in the crayzee universe. <br /> Let's get you back to reality.
           </p>
           

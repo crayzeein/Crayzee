@@ -23,16 +23,24 @@ body {
 
 /* 🔘 Buttons Design System */
 .btn-primary {
+  display: inline-block;
+  text-align: center;
   background: var(--accent);
   color: #fff;
   font-weight: 900;
-  padding: 1rem 2.5rem;
+  padding: 0.875rem 2rem;
   border-radius: 20px;
   transition: all 0.3s ease;
   box-shadow: 0 10px 20px rgba(251, 86, 7, 0.2);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .btn-primary {
+    padding: 1rem 2.5rem;
+  }
 }
 
 .btn-primary:hover {

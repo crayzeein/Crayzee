@@ -342,30 +342,31 @@ export default function AdminDashboard() {
   return (
     <main className="min-h-screen bg-white flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-full md:w-72 bg-zinc-950 text-white flex flex-col p-8 sticky top-0 md:h-screen border-r border-zinc-900">
-        <div className="text-3xl font-black mb-12 tracking-tighter text-[#fb5607] uppercase text-center md:text-left">CRAYZEE ADMIN</div>
-        <nav className="flex-1 space-y-3">
+      <aside className="w-full md:w-72 bg-zinc-950 text-white flex md:flex-col p-4 md:p-8 md:sticky md:top-0 md:h-screen border-b md:border-b-0 md:border-r border-zinc-900 overflow-x-auto md:overflow-x-visible">
+        <div className="hidden md:block text-3xl font-black mb-12 tracking-tighter text-[#fb5607] uppercase text-center md:text-left">CRAYZEE ADMIN</div>
+        <nav className="flex md:flex-col md:flex-1 gap-2 md:gap-3 min-w-max md:min-w-0">
           {sidebarItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-3xl transition-all ${activeTab === item.id ? 'bg-[#fb5607] text-white shadow-[0_0_30px_rgba(251,86,7,0.2)]' : 'hover:bg-zinc-900 text-zinc-500 hover:text-white'
+              className={`w-full flex items-center gap-2 md:gap-4 px-4 md:px-6 py-3 md:py-4 rounded-2xl md:rounded-3xl transition-all whitespace-nowrap ${activeTab === item.id ? 'bg-[#fb5607] text-white shadow-[0_0_30px_rgba(251,86,7,0.2)]' : 'hover:bg-zinc-900 text-zinc-500 hover:text-white'
                 }`}
             >
-              <item.icon size={22} strokeWidth={activeTab === item.id ? 3 : 2} />
-              <span className="font-black text-sm uppercase tracking-widest">{item.label}</span>
+              <item.icon size={20} strokeWidth={activeTab === item.id ? 3 : 2} />
+              <span className="hidden md:inline font-black text-sm uppercase tracking-widest">{item.label}</span>
+              <span className="md:hidden font-black text-[9px] uppercase tracking-wider">{item.label}</span>
             </button>
           ))}
         </nav>
-        <button onClick={() => router.push('/')} className="mt-8 flex items-center gap-4 px-6 py-4 text-zinc-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest justify-center md:justify-start">
+        <button onClick={() => router.push('/')} className="hidden md:flex mt-8 items-center gap-4 px-6 py-4 text-zinc-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest justify-center md:justify-start">
           <ShieldAlert size={20} /> Exit Dashboard
         </button>
       </aside>
 
       {/* Content */}
-      <section className="flex-1 p-10 md:p-16 overflow-y-auto">
+      <section className="flex-1 p-4 sm:p-8 md:p-16 overflow-y-auto">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
-          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none">{activeTab}</h1>
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-black uppercase tracking-tighter leading-none">{activeTab}</h1>
           <div className="flex items-center gap-4">
             <span className="bg-zinc-100 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-zinc-500">
               Session User: {user?.name}
@@ -573,7 +574,7 @@ export default function AdminDashboard() {
         {activeTab === 'orders' && (
           <div className="flex flex-col gap-8">
             {/* Order Filter Tabs */}
-            <div className="flex items-center gap-2 bg-zinc-100 p-2 rounded-[32px] w-fit">
+            <div className="flex items-center gap-2 bg-zinc-100 p-2 rounded-[32px] w-full md:w-fit overflow-x-auto no-scrollbar">
               {[
                 { id: 'all', label: 'All Orders' },
                 { id: 'processing', label: 'Processing' },

@@ -99,7 +99,7 @@ export default function CartPage() {
     <main className="min-h-screen bg-white dark:bg-zinc-950">
       <Navbar />
       <div className="pt-32 pb-20 container mx-auto px-4">
-        <h1 className="text-5xl font-black mb-12 tracking-tighter uppercase text-zinc-900 dark:text-white">YOUR <span className="text-[#fb5607]">BAG</span></h1>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-12 tracking-tighter uppercase text-zinc-900 dark:text-white">YOUR <span className="text-[#fb5607]">BAG</span></h1>
 
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Cart Items */}

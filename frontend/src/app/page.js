@@ -101,10 +101,10 @@ export default function Home() {
 
 
       {/* 7️⃣ Clean Footer */}
-      <footer className="bg-zinc-950 text-white pt-24 pb-12 rounded-t-[64px]">
+      <footer className="bg-zinc-950 text-white pt-24 pb-12 rounded-t-[32px] md:rounded-t-[64px]">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-12 mb-20">
-            <div className="col-span-1 md:col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-20">
+            <div className="col-span-1 sm:col-span-2 md:col-span-2">
               <Link href="/" className="text-4xl font-black tracking-tighter text-white mb-6 block">CRAYZEE<span className="text-[#fb5607]">.IN</span></Link>
               <p className="max-w-md text-zinc-400 font-medium leading-relaxed mb-10">
                 India's wildest streetwear label. We don't just sell clothes, we drop vibes. Built for the rebels, the dreamers, and the ones who never blend in.

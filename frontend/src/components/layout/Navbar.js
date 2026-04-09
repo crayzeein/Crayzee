@@ -106,48 +106,33 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 w-full z-50 bg-white dark:bg-zinc-950 shadow-sm border-b border-zinc-100 dark:border-white/5 py-3 lg:py-4 transition-all duration-300">
       <div className="container mx-auto px-4 flex items-center justify-between">
-        {/* LOGO */}
-        <Link href="/" className="text-2xl font-black tracking-tighter text-zinc-900 dark:text-white relative group shrink-0">
-          CRAYZEE<span className="text-[#fb5607]">.IN</span>
-        </Link>
+        {/* LEFT: LOGO + NAV LINKS */}
+        <div className="flex items-center gap-8">
+          <Link href="/" className="text-2xl font-black tracking-tighter text-zinc-900 dark:text-white relative group shrink-0">
+            CRAYZEE<span className="text-[#fb5607]">.IN</span>
+          </Link>
 
-        {/* DESKTOP MEGA MENU */}
-        <div className="hidden lg:flex items-center space-x-10">
-          {categories.map((cat) => (
-            <div key={cat._id} className="group/menu relative py-2">
-              <button suppressHydrationWarning className={`flex items-center gap-1 font-bold transition-colors uppercase text-[11px] tracking-[0.15em] cursor-default ${activeMainCat === cat.name.toLowerCase() ? 'text-[#fb5607]' : 'text-zinc-800 dark:text-zinc-200 hover:text-[#fb5607]'
-                }`}>
-                {cat.name}
-              </button>
-
-              {/* MEGA MENU DROPDOWN */}
-              {cat.items && cat.items.length > 0 && (
-                <div className="absolute top-full left-0 hidden group-hover/menu:block pt-2">
-                  <div className="bg-white dark:bg-zinc-950 p-6 rounded-[32px] soft-shadow border border-zinc-100 dark:border-white/5 w-64 backdrop-blur-3xl">
-                    <div className="flex flex-col gap-4">
-                      {cat.items.map((item) => (
-                        <div key={item._id || item.label}>
-                          <Link
-                            href={item.href}
-                            className={`text-xs font-black transition-all flex items-center justify-between group/link ${activeGender === item.label.toLowerCase() ? 'text-[#fb5607]' : 'text-zinc-900 dark:text-zinc-100 hover:text-[#fb5607]'
-                              }`}
-                          >
-                            {item.label}
-                            <div className={`w-1 h-1 rounded-full bg-[#fb5607] transition-opacity ${activeGender === item.label.toLowerCase() ? 'opacity-100' : 'opacity-0 group-hover/link:opacity-100'
-                              }`} />
-                          </Link>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+          {/* DESKTOP NAV LINKS */}
+          <div className="hidden lg:flex items-center gap-6">
+            <Link
+              href="/men"
+              className={`relative text-sm font-black uppercase tracking-wide py-1 transition-colors ${activeGender === 'men' ? 'text-[#fb5607]' : 'text-zinc-700 dark:text-zinc-200 hover:text-[#fb5607]'}`}
+            >
+              Men
+              <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#fb5607] transition-transform origin-left ${activeGender === 'men' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
+            </Link>
+            <Link
+              href="/women"
+              className={`relative text-sm font-black uppercase tracking-wide py-1 transition-colors ${activeGender === 'women' ? 'text-[#fb5607]' : 'text-zinc-700 dark:text-zinc-200 hover:text-[#fb5607]'}`}
+            >
+              Women
+              <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#fb5607] transition-transform origin-left ${activeGender === 'women' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
+            </Link>
+          </div>
         </div>
 
         {/* ACTIONS */}
-        <div className="flex items-center space-x-5">
+        <div className="flex items-center space-x-3 sm:space-x-5">
           <div className="relative hidden sm:block search-container">
             <div className="relative">
               <input
@@ -230,7 +215,7 @@ export default function Navbar() {
 
 
           <Link href="/wishlist" className="relative group text-zinc-800 dark:text-zinc-200">
-            <Heart size={22} className="group-hover:fill-[#fb5607] group-hover:text-[#fb5607] transition-all" />
+            <Heart className="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] group-hover:fill-[#fb5607] group-hover:text-[#fb5607] transition-all" />
             {wishlist.length > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-[#fb5607] text-white text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-black">
                 {wishlist.length}
@@ -239,7 +224,7 @@ export default function Navbar() {
           </Link>
 
           <Link href="/cart" className="relative group text-zinc-800 dark:text-zinc-200">
-            <ShoppingCart size={22} className="group-hover:text-[#fb5607] transition-all" />
+            <ShoppingCart className="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] group-hover:text-[#fb5607] transition-all" />
             {cart.length > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-[#fb5607] text-white text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-black">
                 {cart.reduce((total, item) => total + item.qty, 0)}
@@ -256,7 +241,7 @@ export default function Navbar() {
           )}
 
           <Link href={user ? "/profile" : "/login"} className="group flex items-center gap-2 text-zinc-800 dark:text-zinc-200">
-            <User size={22} className="group-hover:text-[#fb5607] transition-all" />
+            <User className="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] group-hover:text-[#fb5607] transition-all" />
             <span className="hidden xl:block text-[10px] font-black uppercase tracking-widest text-[#fb5607]">
               {user ? 'Account' : 'Join / Login'}
             </span>
@@ -264,13 +249,13 @@ export default function Navbar() {
 
           <button
             onClick={() => setIsMobileSearchOpen(true)}
-            className="sm:hidden p-2 text-zinc-800 dark:text-zinc-200"
+            className="sm:hidden p-1.5 text-zinc-800 dark:text-zinc-200"
           >
-            <Search size={22} />
+            <Search className="w-[18px] h-[18px]" />
           </button>
 
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-2 text-zinc-800 dark:text-zinc-200">
-            <Menu className="w-6 h-6" />
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-1.5 text-zinc-800 dark:text-zinc-200">
+            <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
       </div>
@@ -368,23 +353,36 @@ export default function Navbar() {
               </div>
 
               <div className="space-y-8">
-                {categories.map((cat) => (
-                  <div key={cat._id} className="space-y-4">
-                    <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-white/5 pb-2">{cat.name}</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {cat.items && cat.items.map((item) => (
-                        <Link
-                          key={item._id || item.label}
-                          href={item.href}
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`px-4 py-3 rounded-2xl text-xs font-bold transition-all text-center ${activeGender === item.label.toLowerCase() ? 'bg-[#fb5607] text-white shadow-lg shadow-[#fb5607]/20' : 'bg-zinc-50 dark:bg-white/5 text-zinc-900 dark:text-zinc-50'}`}
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
-                    </div>
+                <div className="space-y-4">
+                  <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-white/5 pb-2">Shop By</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link
+                      href="/men"
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`px-4 py-4 rounded-2xl text-sm font-black transition-all text-center uppercase tracking-widest ${activeGender === 'men' ? 'bg-[#fb5607] text-white shadow-lg shadow-[#fb5607]/20' : 'bg-zinc-50 dark:bg-white/5 text-zinc-900 dark:text-zinc-50'}`}
+                    >
+                      Men
+                    </Link>
+                    <Link
+                      href="/women"
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`px-4 py-4 rounded-2xl text-sm font-black transition-all text-center uppercase tracking-widest ${activeGender === 'women' ? 'bg-[#fb5607] text-white shadow-lg shadow-[#fb5607]/20' : 'bg-zinc-50 dark:bg-white/5 text-zinc-900 dark:text-zinc-50'}`}
+                    >
+                      Women
+                    </Link>
                   </div>
-                ))}
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] border-b border-zinc-100 dark:border-white/5 pb-2">Quick Links</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link href="/browse" onClick={() => setIsMenuOpen(false)} className="px-4 py-4 rounded-2xl text-sm font-black transition-all text-center uppercase tracking-widest bg-zinc-50 dark:bg-white/5 text-zinc-900 dark:text-zinc-50">
+                      All Drops
+                    </Link>
+                    <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="px-4 py-4 rounded-2xl text-sm font-black transition-all text-center uppercase tracking-widest bg-zinc-50 dark:bg-white/5 text-zinc-900 dark:text-zinc-50">
+                      Contact
+                    </Link>
+                  </div>
+                </div>
               </div>
 
               <div className="mt-12 pt-12 border-t border-zinc-100 dark:border-white/5 space-y-4">

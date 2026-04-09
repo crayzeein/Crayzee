@@ -17,8 +17,8 @@ export default function ProductCard({ product }) {
       viewport={{ once: true }}
       className="group relative bg-white dark:bg-zinc-900 rounded-[32px] overflow-hidden hover:shadow-lg transition-all duration-300 border border-zinc-100 dark:border-white/5"
     >
-      {/* Product Image */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+      {/* Product Image - Clickable to product page */}
+      <Link href={`/product/${product._id}`} className="block relative aspect-[3/4] overflow-hidden bg-zinc-100 dark:bg-zinc-800 cursor-pointer">
         {(product.images?.[0]?.url || product.image) ? (
           <Image
             src={product.images?.[0]?.url || product.image}
@@ -51,7 +51,7 @@ export default function ProductCard({ product }) {
 
         {/* Wishlist Button - Top Right */}
         <button
-          onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product); }}
           className={`absolute top-4 right-4 p-2.5 rounded-full backdrop-blur-md transition-all ${isWishlisted ? 'bg-[#fb5607] text-white' : 'glass text-zinc-900 dark:text-white hover:scale-110'}`}
         >
           <Heart size={16} className={isWishlisted ? 'fill-white' : ''} />
@@ -60,7 +60,7 @@ export default function ProductCard({ product }) {
         {/* Rapid Add to Cart - Bottom Left */}
         <div className="absolute bottom-4 left-4 right-4 translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
           <button
-            onClick={(e) => { e.preventDefault(); if (product.stock > 0) addToCart(product, 1); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (product.stock > 0) addToCart(product, 1); }}
             disabled={product.stock === 0}
             className={`w-full py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-2xl transition-all ${product.stock === 0
               ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
@@ -70,7 +70,7 @@ export default function ProductCard({ product }) {
             <ShoppingBag size={14} /> {product.stock === 0 ? 'Sold Out' : 'Instant Bag'}
           </button>
         </div>
-      </div>
+      </Link>
 
       {/* Product info */}
       <div className="p-5">
