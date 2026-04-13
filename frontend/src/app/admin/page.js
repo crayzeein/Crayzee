@@ -340,19 +340,19 @@ export default function AdminDashboard() {
   if (loading && activeTab === 'overview') return <div className="min-h-screen flex items-center justify-center font-black text-2xl animate-pulse text-purple-600">LOADING CRAYZEE DATA...</div>;
 
   return (
-    <main className="min-h-screen bg-white flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <aside className="w-full md:w-72 bg-zinc-950 text-white flex md:flex-col p-4 md:p-8 md:sticky md:top-0 md:h-screen border-b md:border-b-0 md:border-r border-zinc-900 overflow-x-auto md:overflow-x-visible">
+    <main className="min-h-screen bg-white flex flex-col md:flex-row overflow-x-hidden">
+      {/* Sidebar - Desktop: vertical sidebar | Mobile: horizontal tab bar */}
+      <aside className="w-full md:w-72 bg-zinc-950 text-white flex md:flex-col md:p-8 md:sticky md:top-0 md:h-screen border-b md:border-b-0 md:border-r border-zinc-900">
         <div className="hidden md:block text-3xl font-black mb-12 tracking-tighter text-[#fb5607] uppercase text-center md:text-left">CRAYZEE ADMIN</div>
-        <nav className="flex md:flex-col md:flex-1 gap-2 md:gap-3 min-w-max md:min-w-0">
+        <nav className="flex md:flex-col md:flex-1 gap-1 md:gap-3 w-full overflow-x-auto no-scrollbar px-2 py-2 md:px-0 md:py-0">
           {sidebarItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-2 md:gap-4 px-4 md:px-6 py-3 md:py-4 rounded-2xl md:rounded-3xl transition-all whitespace-nowrap ${activeTab === item.id ? 'bg-[#fb5607] text-white shadow-[0_0_30px_rgba(251,86,7,0.2)]' : 'hover:bg-zinc-900 text-zinc-500 hover:text-white'
+              className={`flex items-center gap-1.5 md:gap-4 px-3 md:px-6 py-2.5 md:py-4 rounded-xl md:rounded-3xl transition-all whitespace-nowrap shrink-0 ${activeTab === item.id ? 'bg-[#fb5607] text-white shadow-[0_0_30px_rgba(251,86,7,0.2)]' : 'hover:bg-zinc-900 text-zinc-500 hover:text-white'
                 }`}
             >
-              <item.icon size={20} strokeWidth={activeTab === item.id ? 3 : 2} />
+              <item.icon size={16} className="md:w-5 md:h-5" strokeWidth={activeTab === item.id ? 3 : 2} />
               <span className="hidden md:inline font-black text-sm uppercase tracking-widest">{item.label}</span>
               <span className="md:hidden font-black text-[9px] uppercase tracking-wider">{item.label}</span>
             </button>
@@ -364,14 +364,15 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Content */}
-      <section className="flex-1 p-4 sm:p-8 md:p-16 overflow-y-auto">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-black uppercase tracking-tighter leading-none">{activeTab}</h1>
-          <div className="flex items-center gap-4">
-            <span className="bg-zinc-100 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-zinc-500">
-              Session User: {user?.name}
-            </span>
+      <section className="flex-1 p-4 sm:p-8 md:p-12 lg:p-16 overflow-y-auto overflow-x-hidden">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 md:mb-10 gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 capitalize">{activeTab === 'overview' ? 'Dashboard Overview' : activeTab}</h1>
+            <p className="text-xs text-zinc-400 font-medium mt-1">Manage your store from here</p>
           </div>
+          <span className="bg-zinc-100 px-4 py-2 rounded-xl text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+            {user?.name}
+          </span>
         </header>
 
         {/* --- OVERVIEW TAB --- */}

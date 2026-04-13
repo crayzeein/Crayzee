@@ -52,7 +52,7 @@ export default function Home() {
               <div className="flex items-center gap-2 text-[#fb5607] font-black text-[10px] uppercase tracking-widest mb-4">
                 <Zap size={14} className="fill-[#fb5607]" /> Fresh Out the Lab
               </div>
-              <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white leading-[0.9]">New <span className="text-[#fb5607]">Arrivals</span></h2>
+              <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-tight">New <span className="text-[#fb5607]">Arrivals</span></h2>
             </div>
             <Link href="/browse?sort=newest" className="group flex items-center gap-3 text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-black transition-all">
               See the full drop <div className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center group-hover:bg-[#fb5607] group-hover:text-white group-hover:border-[#fb5607] transition-all"><ArrowRight size={16} /></div>
@@ -81,7 +81,7 @@ export default function Home() {
               <div className="flex items-center gap-2 text-[#fb5607] font-black text-[10px] uppercase tracking-widest mb-4">
                 <Flame size={14} className="fill-[#fb5607]" /> Top Rated Vibe
               </div>
-              <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white leading-[0.9]">Trending <span className="text-[#fb5607]">Drops</span></h2>
+              <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-tight">Trending <span className="text-[#fb5607]">Drops</span></h2>
             </div>
           </div>
 

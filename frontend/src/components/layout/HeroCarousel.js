@@ -74,7 +74,7 @@ export default function HeroCarousel() {
         >
           <div className="container mx-auto px-4 h-full flex flex-col md:flex-row items-center">
             {/* Left Column: Text Content */}
-            <div className="w-full md:w-1/2 pt-12 pb-8 md:py-0 z-10 text-center md:text-left">
+            <div className="w-full md:w-1/2 pt-12 pb-8 md:py-0 z-10 text-center md:text-left md:pr-12">
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -89,10 +89,11 @@ export default function HeroCarousel() {
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-4xl sm:text-6xl lg:text-8xl font-black text-zinc-900 dark:text-white leading-[0.9] tracking-tighter mb-6"
+                className="text-4xl sm:text-5xl lg:text-7xl font-black text-zinc-900 dark:text-white leading-[0.95] tracking-tight mb-6"
+                style={{ textTransform: 'capitalize' }}
               >
-                {slides[current].title1} <br />
-                <span className="text-[#fb5607]">{slides[current].title2}</span>
+                {slides[current].title1.toLowerCase()} <br />
+                <span className="text-[#fb5607]">{slides[current].title2.toLowerCase()}</span>
               </motion.h1>
 
               <motion.p
@@ -112,13 +113,13 @@ export default function HeroCarousel() {
               >
                 <Link
                   href={slides[current].link}
-                  className="bg-[#fb5607] text-white px-10 py-5 rounded-[18px] font-black text-xs uppercase tracking-[0.1em] hover:bg-black hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#fb5607]/20 flex items-center gap-3 group"
+                  className="bg-[#fb5607] text-white px-8 py-3.5 rounded-2xl font-bold text-sm tracking-wide hover:bg-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#fb5607]/20 flex items-center gap-2 group"
                 >
-                  Explore Collection <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  Explore Collection <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/browse"
-                  className="bg-white dark:bg-white/5 text-zinc-950 dark:text-white px-10 py-5 rounded-[18px] border border-zinc-200 dark:border-white/10 font-bold text-xs uppercase tracking-[0.1em] hover:bg-zinc-50 dark:hover:bg-white/10 transition-all active:scale-95"
+                  className="bg-white dark:bg-white/5 text-zinc-950 dark:text-white px-8 py-3.5 rounded-2xl border border-zinc-200 dark:border-white/10 font-bold text-sm tracking-wide hover:bg-zinc-50 dark:hover:bg-white/10 transition-all active:scale-95"
                 >
                   View All Drops
                 </Link>
@@ -141,24 +142,6 @@ export default function HeroCarousel() {
                   className="object-cover object-top transition-transform duration-[20s] hover:scale-110"
                   unoptimized
                 />
-              </motion.div>
-
-              {/* Floating Badge */}
-              <motion.div
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="absolute -bottom-4 md:bottom-24 -left-4 md:-left-12 bg-white dark:bg-zinc-900 p-6 rounded-[24px] shadow-2xl border border-zinc-100 dark:border-white/5 z-20 hidden sm:block"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#fb5607] rounded-xl flex items-center justify-center text-white">
-                    <ArrowRight size={24} />
-                  </div>
-                  <div>
-                    <h4 className="font-black text-sm uppercase tracking-tighter">Fast Drops</h4>
-                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">New Styles Daily</p>
-                  </div>
-                </div>
               </motion.div>
             </div>
           </div>
