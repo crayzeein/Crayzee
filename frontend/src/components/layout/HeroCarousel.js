@@ -72,7 +72,7 @@ export default function HeroCarousel() {
           transition={{ duration: 0.5, ease: 'easeInOut' }}
           className="h-full w-full"
         >
-          <div className="container mx-auto px-4 h-full flex flex-col md:flex-row items-center">
+          <div className="w-full max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 xl:px-16 h-full flex flex-col md:flex-row items-center">
             {/* Left Column: Text Content */}
             <div className="w-full md:w-1/2 pt-12 pb-8 md:py-0 z-10 text-center md:text-left md:pr-12">
               <motion.div

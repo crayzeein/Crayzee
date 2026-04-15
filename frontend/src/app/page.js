@@ -46,7 +46,7 @@ export default function Home() {
 
       {/* 3️⃣ New Arrivals */}
       <section className="py-24 bg-white dark:bg-zinc-950">
-        <div className="container mx-auto px-4">
+        <div className="w-full max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 xl:px-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div>
               <div className="flex items-center gap-2 text-[#fb5607] font-black text-[10px] uppercase tracking-widest mb-4">
@@ -75,7 +75,7 @@ export default function Home() {
 
       {/* 4️⃣ Trending Featured Section */}
       <section className="py-24 bg-zinc-50 dark:bg-zinc-900/40 relative overflow-hidden">
-        <div className="container mx-auto px-4">
+        <div className="w-full max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 xl:px-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div>
               <div className="flex items-center gap-2 text-[#fb5607] font-black text-[10px] uppercase tracking-widest mb-4">
@@ -102,7 +102,7 @@ export default function Home() {
 
       {/* 7️⃣ Clean Footer */}
       <footer className="bg-zinc-950 text-white pt-24 pb-12 rounded-t-[32px] md:rounded-t-[64px]">
-        <div className="container mx-auto px-4">
+        <div className="w-full max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 xl:px-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-20">
             <div className="col-span-1 sm:col-span-2 md:col-span-2">
               <Link href="/" className="text-4xl font-black tracking-tighter text-white mb-6 block">CRAYZEE<span className="text-[#fb5607]">.IN</span></Link>

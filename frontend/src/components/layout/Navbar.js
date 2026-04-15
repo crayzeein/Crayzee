@@ -105,7 +105,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 w-full z-50 bg-white dark:bg-zinc-950 shadow-sm border-b border-zinc-100 dark:border-white/5 py-3 lg:py-4 transition-all duration-300">
-      <div className="container mx-auto px-4 flex items-center justify-between">
+      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 xl:px-16 flex items-center justify-between">
         {/* LEFT: LOGO + NAV LINKS */}
         <div className="flex items-center gap-8">
           <Link href="/" className="text-2xl font-black tracking-tighter text-zinc-900 dark:text-white relative group shrink-0">

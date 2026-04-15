@@ -33,7 +33,7 @@ export default function OrderSuccessPage({ params }) {
         }
     }, [id]);
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center font-black animate-pulse">VERIFYING DEPLOYMENT...</div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center font-black text-2xl animate-pulse text-purple-600">VERIFYING DEPLOYMENT...</div>;
 
     if (!order) return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">

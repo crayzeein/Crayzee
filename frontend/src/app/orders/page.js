@@ -35,7 +35,7 @@ export default function MyOrdersPage() {
         fetchOrders();
     }, [user, router]);
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center font-black animate-pulse">LOCATING DROPS...</div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center font-black text-2xl animate-pulse text-purple-600">LOCATING DROPS...</div>;
 
     return (
         <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
