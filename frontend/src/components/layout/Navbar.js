@@ -104,26 +104,36 @@ export default function Navbar() {
 
 
   return (
-    <nav className="sticky top-0 w-full z-50 bg-white dark:bg-zinc-950 shadow-sm border-b border-zinc-100 dark:border-white/5 py-3 lg:py-4 transition-all duration-300">
-      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 xl:px-16 flex items-center justify-between">
+    <nav className="sticky top-0 w-full z-50 bg-white dark:bg-[#0a0a0a] shadow-sm border-b border-zinc-100 dark:border-white/5 transition-all duration-300" style={{ padding: 'clamp(8px, 1vw, 16px) 0' }}>
+      <div className="w-full max-w-[1920px] mx-auto flex items-center justify-between" style={{ paddingLeft: 'clamp(12px, 3vw, 64px)', paddingRight: 'clamp(12px, 3vw, 64px)' }}>
         {/* LEFT: LOGO + NAV LINKS */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="text-2xl font-black tracking-tighter text-zinc-900 dark:text-white relative group shrink-0">
-            CRAYZEE<span className="text-[#fb5607]">.IN</span>
+          <Link href="/" className="shrink-0 flex items-center" style={{ gap: 'clamp(4px, 0.5vw, 8px)' }}>
+            <img
+              src="/logo.png"
+              alt="CRAYZEE.IN"
+              className="dark:invert dark:hue-rotate-180"
+              style={{ height: 'clamp(24px, 2.5vw, 40px)', width: 'auto' }}
+            />
+            <span className="font-black tracking-tighter text-zinc-900 dark:text-white" style={{ fontSize: 'clamp(14px, 1.6vw, 28px)' }}>
+              CRAYZEE<span className="text-[#fb5607]">.IN</span>
+            </span>
           </Link>
 
           {/* DESKTOP NAV LINKS */}
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden md:flex items-center" style={{ gap: 'clamp(12px, 1.5vw, 24px)' }}>
             <Link
               href="/men"
-              className={`relative text-sm font-black uppercase tracking-wide py-1 transition-colors ${activeGender === 'men' ? 'text-[#fb5607]' : 'text-zinc-700 dark:text-zinc-200 hover:text-[#fb5607]'}`}
+              className={`relative font-black uppercase tracking-wide py-1 transition-colors ${activeGender === 'men' ? 'text-[#fb5607]' : 'text-zinc-700 dark:text-zinc-200 hover:text-[#fb5607]'}`}
+              style={{ fontSize: 'clamp(12px, 1.1vw, 16px)' }}
             >
               Men
               <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#fb5607] transition-transform origin-left ${activeGender === 'men' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
             </Link>
             <Link
               href="/women"
-              className={`relative text-sm font-black uppercase tracking-wide py-1 transition-colors ${activeGender === 'women' ? 'text-[#fb5607]' : 'text-zinc-700 dark:text-zinc-200 hover:text-[#fb5607]'}`}
+              className={`relative font-black uppercase tracking-wide py-1 transition-colors ${activeGender === 'women' ? 'text-[#fb5607]' : 'text-zinc-700 dark:text-zinc-200 hover:text-[#fb5607]'}`}
+              style={{ fontSize: 'clamp(12px, 1.1vw, 16px)' }}
             >
               Women
               <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#fb5607] transition-transform origin-left ${activeGender === 'women' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
@@ -132,7 +142,7 @@ export default function Navbar() {
         </div>
 
         {/* ACTIONS */}
-        <div className="flex items-center space-x-3 sm:space-x-5">
+        <div className="flex items-center" style={{ gap: 'clamp(8px, 1vw, 20px)' }}>
           <div className="relative hidden sm:block search-container">
             <div className="relative">
               <input
@@ -146,9 +156,10 @@ export default function Navbar() {
                 }}
                 onKeyDown={handleSearch}
                 onFocus={() => setIsSearchFocused(true)}
-                className="pl-10 pr-4 py-2 bg-zinc-50 dark:bg-white/10 border border-zinc-200 dark:border-white/5 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#fb5607] w-40 xl:w-64 text-zinc-900 dark:text-white transition-all"
+                className="bg-zinc-50 dark:bg-white/10 border border-zinc-200 dark:border-white/5 rounded-full focus:outline-none focus:ring-2 focus:ring-[#fb5607] text-zinc-900 dark:text-white transition-all"
+                style={{ paddingLeft: 'clamp(28px, 2.5vw, 40px)', paddingRight: 'clamp(10px, 1vw, 16px)', paddingTop: 'clamp(4px, 0.5vw, 8px)', paddingBottom: 'clamp(4px, 0.5vw, 8px)', fontSize: 'clamp(9px, 0.85vw, 14px)', width: 'clamp(100px, 14vw, 256px)' }}
               />
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400" />
+              <Search className="absolute text-zinc-400" style={{ left: 'clamp(8px, 0.7vw, 12px)', top: '50%', transform: 'translateY(-50%)', width: 'clamp(12px, 1vw, 16px)', height: 'clamp(12px, 1vw, 16px)' }} />
             </div>
 
             {/* Suggestions Dropdown */}
@@ -215,7 +226,7 @@ export default function Navbar() {
 
 
           <Link href="/wishlist" className="relative group text-zinc-800 dark:text-zinc-200">
-            <Heart className="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] group-hover:fill-[#fb5607] group-hover:text-[#fb5607] transition-all" />
+            <Heart className="group-hover:fill-[#fb5607] group-hover:text-[#fb5607] transition-all" style={{ width: 'clamp(14px, 1.4vw, 22px)', height: 'clamp(14px, 1.4vw, 22px)' }} />
             {wishlist.length > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-[#fb5607] text-white text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-black">
                 {wishlist.length}
@@ -224,7 +235,7 @@ export default function Navbar() {
           </Link>
 
           <Link href="/cart" className="relative group text-zinc-800 dark:text-zinc-200">
-            <ShoppingCart className="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] group-hover:text-[#fb5607] transition-all" />
+            <ShoppingCart className="group-hover:text-[#fb5607] transition-all" style={{ width: 'clamp(14px, 1.4vw, 22px)', height: 'clamp(14px, 1.4vw, 22px)' }} />
             {cart.length > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-[#fb5607] text-white text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-black">
                 {cart.reduce((total, item) => total + item.qty, 0)}
@@ -241,7 +252,7 @@ export default function Navbar() {
           )}
 
           <Link href={user ? "/profile" : "/login"} className="group flex items-center gap-2 text-zinc-800 dark:text-zinc-200">
-            <User className="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] group-hover:text-[#fb5607] transition-all" />
+            <User className="group-hover:text-[#fb5607] transition-all" style={{ width: 'clamp(14px, 1.4vw, 22px)', height: 'clamp(14px, 1.4vw, 22px)' }} />
             <span className="hidden xl:block text-[10px] font-black uppercase tracking-widest text-[#fb5607]">
               {user ? 'Account' : 'Join / Login'}
             </span>
@@ -254,7 +265,7 @@ export default function Navbar() {
             <Search className="w-[18px] h-[18px]" />
           </button>
 
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-1.5 text-zinc-800 dark:text-zinc-200">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-1.5 text-zinc-800 dark:text-zinc-200">
             <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
