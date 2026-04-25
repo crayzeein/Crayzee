@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import API from '@/utils/api';
+import BrandLoader from '@/components/ui/BrandLoader';
 
 export default function CartPage() {
   const { cart, removeFromCart, updateCartQty, setCart, user, _hasHydrated } = useStore();
@@ -79,34 +80,49 @@ export default function CartPage() {
 
   if (!user) return null;
 
+  if (validating) return (
+    <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+      <Navbar />
+      <div className="pt-32 flex items-center justify-center"><BrandLoader size="lg" /></div>
+    </main>
+  );
+
   if (cart.length === 0) {
     return (
-      <main className="min-h-screen bg-white dark:bg-zinc-950">
+      <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
         <Navbar />
-        <div className="pt-40 container mx-auto px-4 text-center">
-          <div className="w-24 h-24 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-            <ShoppingBag size={40} className="text-[#fb5607]" />
+        <div className="w-full max-w-[1920px] mx-auto pt-28 pb-20" style={{ paddingLeft: 'clamp(16px, 4vw, 64px)', paddingRight: 'clamp(16px, 4vw, 64px)' }}>
+          <div className="max-w-md mx-auto text-center py-16">
+            <div className="w-20 h-20 bg-white dark:bg-zinc-900 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-zinc-100 dark:border-zinc-800">
+              <ShoppingBag size={32} className="text-[#fb5607]" />
+            </div>
+            <h2 className="text-2xl font-bold mb-3 text-zinc-900 dark:text-white">Your bag is empty</h2>
+            <p className="text-zinc-400 text-sm mb-8">Looks like you haven't added anything yet.</p>
+            <Link href="/browse" className="inline-block bg-[#fb5607] text-white px-8 py-3 rounded-xl font-semibold text-sm hover:bg-[#e04e06] transition-all">
+              Start Shopping
+            </Link>
           </div>
-          <h2 className="text-3xl font-black mb-4 uppercase tracking-tighter text-zinc-900 dark:text-white">Your bag is empty!</h2>
-          <p className="text-zinc-500 dark:text-zinc-400 font-bold mb-10 max-w-sm mx-auto uppercase text-xs tracking-widest">Add some high-heat trendiness to your collection.</p>
-          <Link href="/browse" className="btn-primary">Start Shopping</Link>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-white dark:bg-zinc-950">
+    <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <Navbar />
-      <div className="pt-32 pb-20 container mx-auto px-4">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-12 tracking-tighter uppercase text-zinc-900 dark:text-white">YOUR <span className="text-[#fb5607]">BAG</span></h1>
+      <div className="w-full max-w-[1920px] mx-auto pt-24 pb-20" style={{ paddingLeft: 'clamp(16px, 4vw, 64px)', paddingRight: 'clamp(16px, 4vw, 64px)' }}>
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">Shopping Bag</h1>
+          <p className="text-sm text-zinc-400 mt-1">{cart.length} {cart.length === 1 ? 'item' : 'items'}</p>
+        </div>
 
-        <div className="grid lg:grid-cols-3 gap-12">
+        <div className="grid lg:grid-cols-3 gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-4">
             {cart.map((item) => (
-              <div key={item.cartItemId} className="bg-white dark:bg-zinc-900 p-8 rounded-[40px] flex flex-col sm:flex-row gap-8 items-center border border-zinc-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all">
-                <div className="w-32 h-40 relative rounded-2xl overflow-hidden shrink-0 shadow-lg bg-zinc-100 dark:bg-zinc-800">
+              <div key={item.cartItemId} className="bg-white dark:bg-zinc-900 p-4 sm:p-5 rounded-2xl flex gap-4 sm:gap-5 items-start border border-zinc-100 dark:border-zinc-800 hover:shadow-md transition-shadow">
+                <div className="w-24 h-28 sm:w-28 sm:h-32 relative rounded-xl overflow-hidden shrink-0 bg-zinc-100 dark:bg-zinc-800">
                   <Link href={`/product/${item._id}`}>
                     {(item.images?.[0]?.url || item.image) ? (
                       <Image
@@ -117,94 +133,85 @@ export default function CartPage() {
                         unoptimized
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-zinc-400 font-black uppercase text-[8px] tracking-widest">
+                      <div className="w-full h-full flex items-center justify-center text-zinc-400 text-[10px]">
                         No Image
                       </div>
                     )}
                   </Link>
                 </div>
-                <div className="flex-1 text-center sm:text-left">
-                  <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#fb5607]">{item.category}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <Link href={`/product/${item._id}`}>
+                      <h3 className="text-sm sm:text-base font-semibold text-zinc-900 dark:text-white hover:text-[#fb5607] transition-colors capitalize line-clamp-2">{item.name}</h3>
+                    </Link>
+                  </div>
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    {item.category && <span className="text-[10px] font-medium text-zinc-400 uppercase">{item.category}</span>}
                     {item.selectedSize && (
-                      <span className="text-[10px] font-black uppercase tracking-widest bg-zinc-100 dark:bg-white/10 px-2 py-0.5 rounded-md text-zinc-600 dark:text-zinc-400">
+                      <span className="text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded text-zinc-500">
                         Size: {item.selectedSize}
                       </span>
                     )}
                   </div>
-                  <Link href={`/product/${item._id}`}>
-                    <h3 className="text-2xl font-black uppercase tracking-tighter mb-4 text-zinc-900 dark:text-white hover:text-[#fb5607] transition-colors">{item.name}</h3>
-                  </Link>
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-center sm:justify-start gap-4">
-                      <button
-                        onClick={() => updateQty(item, -1)}
-                        disabled={item.qty <= 1}
-                        className="w-10 h-10 flex items-center justify-center bg-zinc-100 dark:bg-white/5 rounded-xl hover:bg-[#fb5607] hover:text-white transition-all border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white disabled:opacity-20"
-                      >
-                        <Minus size={16} />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-0">
+                      <button onClick={() => updateQty(item, -1)} disabled={item.qty <= 1}
+                        className="w-8 h-8 flex items-center justify-center rounded-l-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-20">
+                        <Minus size={14} />
                       </button>
-                      <span className="font-black text-xl w-8 text-center text-zinc-900 dark:text-white">{item.qty}</span>
-                      <button
-                        onClick={() => updateQty(item, 1)}
-                        disabled={item.qty >= (stockStatus[item._id]?.stock ?? 0)}
-                        className="w-10 h-10 flex items-center justify-center bg-zinc-100 dark:bg-white/5 rounded-xl hover:bg-[#fb5607] hover:text-white transition-all border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-white disabled:opacity-20"
-                      >
-                        <Plus size={16} />
+                      <span className="w-10 h-8 flex items-center justify-center border-t border-b border-zinc-200 dark:border-zinc-700 font-semibold text-sm">{item.qty}</span>
+                      <button onClick={() => updateQty(item, 1)} disabled={item.qty >= (stockStatus[item._id]?.stock ?? 0)}
+                        className="w-8 h-8 flex items-center justify-center rounded-r-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-20">
+                        <Plus size={14} />
                       </button>
                     </div>
-                    {stockStatus[item._id]?.message && (
-                      <div className="flex items-center gap-2 text-[#fb5607] font-black text-[10px] uppercase tracking-widest">
-                        <AlertCircle size={14} />
-                        {stockStatus[item._id].message}
-                      </div>
-                    )}
+                    <span className="text-lg font-bold text-zinc-900 dark:text-white">₹{item.price * item.qty}</span>
                   </div>
+                  {stockStatus[item._id]?.message && (
+                    <div className="flex items-center gap-1.5 mt-2 text-[#fb5607] text-[10px] font-semibold">
+                      <AlertCircle size={12} /> {stockStatus[item._id].message}
+                    </div>
+                  )}
                 </div>
-                <div className="text-center sm:text-right flex flex-col justify-between h-full">
-                  <p className="text-3xl font-black tracking-tighter mb-6 text-zinc-900 dark:text-white">₹{item.price * item.qty}</p>
-                  <button
-                    onClick={() => removeFromCart(item.cartItemId)}
-                    className="text-zinc-400 dark:text-zinc-500 hover:text-red-500 transition-colors flex items-center gap-2 font-black text-[10px] uppercase tracking-widest"
-                  >
-                    <Trash2 size={16} /> REMOVE
-                  </button>
-                </div>
+                <button onClick={() => removeFromCart(item.cartItemId)}
+                  className="text-zinc-300 dark:text-zinc-600 hover:text-red-500 transition-colors shrink-0 mt-1">
+                  <Trash2 size={16} />
+                </button>
               </div>
             ))}
           </div>
 
           {/* Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-black text-white p-12 rounded-[48px] sticky top-32 shadow-2xl">
-              <h2 className="text-3xl font-black mb-10 uppercase tracking-tighter">Summary</h2>
-              <div className="space-y-6 mb-10">
-                <div className="flex justify-between text-zinc-400 font-bold uppercase text-xs tracking-widest">
-                  <span>Subtotal</span>
-                  <span className="text-white">₹{subtotal}</span>
+            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl sticky top-24 border border-zinc-100 dark:border-zinc-800">
+              <h2 className="text-lg font-bold mb-6 text-zinc-900 dark:text-white">Order Summary</h2>
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-sm">
+                  <span className="text-zinc-500">Subtotal</span>
+                  <span className="font-semibold text-zinc-900 dark:text-white">₹{subtotal}</span>
                 </div>
-                <div className="flex justify-between text-zinc-400 font-bold uppercase text-xs tracking-widest">
-                  <span>Shipping</span>
-                  <span className="text-[#fb5607]">{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+                <div className="flex justify-between text-sm">
+                  <span className="text-zinc-500">Shipping</span>
+                  <span className={`font-semibold ${shipping === 0 ? 'text-green-500' : 'text-zinc-900 dark:text-white'}`}>
+                    {shipping === 0 ? 'FREE' : `₹${shipping}`}
+                  </span>
                 </div>
-                <hr className="border-white/10" />
-                <div className="flex justify-between items-end">
-                  <span className="text-zinc-500 font-black uppercase text-sm tracking-tighter">Total Amount</span>
-                  <span className="text-4xl font-black tracking-tighter text-[#fb5607]">₹{total}</span>
+                {shipping > 0 && (
+                  <p className="text-[10px] text-zinc-400">Free shipping on orders above ₹1500</p>
+                )}
+                <hr className="border-zinc-100 dark:border-zinc-800" />
+                <div className="flex justify-between items-baseline">
+                  <span className="text-sm text-zinc-500">Total</span>
+                  <span className="text-2xl font-bold text-[#fb5607]">₹{total}</span>
                 </div>
               </div>
               <button
                 onClick={() => router.push('/checkout')}
                 disabled={isCartInvalid || validating || cart.length === 0}
-                className="w-full py-5 rounded-3xl bg-[#fb5607] text-white font-black text-sm uppercase tracking-[0.2em] shadow-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+                className="w-full py-3.5 rounded-xl bg-[#fb5607] text-white font-semibold text-sm uppercase tracking-wider hover:bg-[#e04e06] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {validating ? 'CHECKING VIBES...' : isCartInvalid ? 'STOCK ERROR' : 'Safe Checkout'}
+                {validating ? 'Checking...' : isCartInvalid ? 'Stock Issue' : 'Proceed to Checkout'}
               </button>
-              <div className="flex items-center justify-center gap-4 mt-8 opacity-20 invert grayscale">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" className="h-4" />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" className="h-4" />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" className="h-4" />
-              </div>
             </div>
           </div>
         </div>

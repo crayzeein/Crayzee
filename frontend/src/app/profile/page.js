@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
-import { User, Package, Heart, LogOut, Settings, ChevronRight, LayoutDashboard, Save, X, MapPin, ShieldCheck, Lock } from 'lucide-react';
+import { User, Package, Heart, LogOut, Settings, ChevronRight, LayoutDashboard, Save, X, Lock } from 'lucide-react';
 import Link from 'next/link';
 import API from '@/utils/api';
 
@@ -11,7 +11,7 @@ export default function ProfilePage() {
   const { user, setUser, logout, _hasHydrated } = useStore();
   const router = useRouter();
 
-  // Edit mode: null | 'personal' | 'address' | 'security'
+  // Edit mode: null | 'personal' | 'security'
   const [editMode, setEditMode] = useState(null);
 
   const [personalData, setPersonalData] = useState({ name: '', email: '' });
@@ -67,176 +67,143 @@ export default function ProfilePage() {
     <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <Navbar />
 
-      <div className="pt-32 pb-20 container mx-auto px-4 max-w-6xl">
-        <div className="grid lg:grid-cols-3 gap-8">
-
-          {/* Sidebar Info */}
-          <div className="lg:col-span-1 space-y-8">
-            <div className="bg-white dark:bg-zinc-900 p-6 sm:p-10 rounded-[32px] md:rounded-[48px] shadow-xl border border-zinc-100 dark:border-white/5 text-center">
-              <div className="w-32 h-32 bg-[#fb5607]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <User size={64} className="text-[#fb5607]" />
-              </div>
-              <h1 className="text-3xl font-black uppercase tracking-tighter mb-2 text-zinc-900 dark:text-white">{user.name}</h1>
-              <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm mb-8 uppercase tracking-widest">{user.email}</p>
-
-              <button
-                onClick={() => { logout(); router.push('/'); }}
-                className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-black text-xs uppercase tracking-widest hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
-              >
-                <LogOut size={16} /> Logout Profile
-              </button>
-            </div>
-
-            {message.text && (
-              <div className={`p-4 rounded-2xl font-bold text-xs uppercase tracking-widest text-center animate-in fade-in zoom-in duration-300 ${message.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                {message.text}
-              </div>
-            )}
+      <div className="w-full max-w-[1920px] mx-auto pt-24 pb-20" style={{ paddingLeft: 'clamp(16px, 4vw, 64px)', paddingRight: 'clamp(16px, 4vw, 64px)' }}>
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">My Account</h1>
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {user?.role === 'admin' && (
-                <Link href="/admin" className="bg-black text-white p-8 rounded-[40px] shadow-lg group hover:scale-[1.02] transition-all">
-                  <div className="w-14 h-14 bg-[#fb5607] rounded-2xl flex items-center justify-center mb-6">
-                    <LayoutDashboard size={28} className="text-white" />
-                  </div>
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <h3 className="text-xl font-black uppercase tracking-tighter mb-1">Control Center</h3>
-                      <p className="text-[#fb5607] text-[10px] font-black uppercase tracking-widest">Admin Dashboard</p>
-                    </div>
-                    <ChevronRight size={20} className="text-white/20 group-hover:text-white transition-colors" />
-                  </div>
-                </Link>
+          <div className="grid lg:grid-cols-3 gap-6">
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1 space-y-4">
+              <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 text-center">
+                <div className="w-20 h-20 bg-[#fb5607]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <User size={36} className="text-[#fb5607]" />
+                </div>
+                <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-0.5">{user.name}</h2>
+                <p className="text-zinc-400 text-sm mb-5">{user.email}</p>
+
+                <button
+                  onClick={() => { logout(); router.push('/'); }}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 text-zinc-500 text-sm font-medium hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 transition-all"
+                >
+                  <LogOut size={15} /> Sign out
+                </button>
+              </div>
+
+              {message.text && (
+                <div className={`p-3 rounded-xl text-sm font-medium text-center ${message.type === 'success' ? 'bg-green-50 dark:bg-green-500/10 text-green-600' : 'bg-red-50 dark:bg-red-500/10 text-red-500'}`}>
+                  {message.text}
+                </div>
               )}
-
-              <Link href="/orders" className="bg-white dark:bg-zinc-900 p-8 rounded-[40px] shadow-lg border border-zinc-100 dark:border-white/5 group hover:border-[#fb5607] transition-all">
-                <div className="w-14 h-14 bg-blue-50 dark:bg-white/5 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Package size={28} className="text-blue-500" />
-                </div>
-                <div className="flex justify-between items-end">
-                  <div>
-                    <h3 className="text-xl font-black uppercase tracking-tighter mb-1 text-zinc-900 dark:text-white group-hover:text-[#fb5607] transition-colors">My Orders</h3>
-                    <p className="text-zinc-400 dark:text-zinc-500 text-[10px] font-black uppercase tracking-widest">Track your drops</p>
-                  </div>
-                  <ChevronRight size={20} className="text-zinc-300 dark:text-zinc-600 group-hover:text-[#fb5607] transition-colors" />
-                </div>
-              </Link>
-
-              <Link href="/wishlist" className="bg-white dark:bg-zinc-900 p-8 rounded-[40px] shadow-lg border border-zinc-100 dark:border-white/5 group hover:border-[#fb5607] transition-all">
-                <div className="w-14 h-14 bg-red-50 dark:bg-white/5 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Heart size={28} className="text-red-500" />
-                </div>
-                <div className="flex justify-between items-end">
-                  <div>
-                    <h3 className="text-xl font-black uppercase tracking-tighter mb-1 text-zinc-900 dark:text-white group-hover:text-[#fb5607] transition-colors">Wishlist</h3>
-                    <p className="text-zinc-400 dark:text-zinc-500 text-[10px] font-black uppercase tracking-widest">Saved Vibes</p>
-                  </div>
-                  <ChevronRight size={20} className="text-zinc-300 dark:text-zinc-600 group-hover:text-[#fb5607] transition-colors" />
-                </div>
-              </Link>
             </div>
 
-            <div className="bg-white dark:bg-zinc-900 p-6 sm:p-10 rounded-[32px] md:rounded-[48px] shadow-xl border border-zinc-100 dark:border-white/5">
-              <div className="flex items-center gap-4 mb-10">
-                <Settings size={28} className="text-[#fb5607]" />
-                <h3 className="text-2xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white">Account Vibe</h3>
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* Quick Links */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {user?.role === 'admin' && (
+                  <Link href="/admin" className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 p-5 rounded-2xl group hover:shadow-lg transition-all">
+                    <LayoutDashboard size={22} className="mb-3 text-[#fb5607]" />
+                    <p className="text-sm font-semibold">Admin Panel</p>
+                    <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">Manage store</p>
+                  </Link>
+                )}
+                <Link href="/orders" className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 group hover:border-[#fb5607]/30 hover:shadow-md transition-all">
+                  <Package size={22} className="mb-3 text-blue-500" />
+                  <p className="text-sm font-semibold text-zinc-900 dark:text-white">My Orders</p>
+                  <p className="text-[10px] text-zinc-400 mt-0.5">Track orders</p>
+                </Link>
+                <Link href="/wishlist" className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 group hover:border-[#fb5607]/30 hover:shadow-md transition-all">
+                  <Heart size={22} className="mb-3 text-red-500" />
+                  <p className="text-sm font-semibold text-zinc-900 dark:text-white">Wishlist</p>
+                  <p className="text-[10px] text-zinc-400 mt-0.5">Saved items</p>
+                </Link>
               </div>
 
-              <div className="space-y-6">
-                {/* Personal Details Section */}
-                <SectionItem
-                  label="Personal Details"
-                  val="Update name & email"
-                  isActive={editMode === 'personal'}
-                  onEdit={() => setEditMode('personal')}
-                >
-                  <form onSubmit={(e) => handleUpdate(e, 'personal')} className="space-y-6 mt-6 pb-6 border-b border-zinc-100 dark:border-white/5">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <Input
-                        label="Full Name"
-                        value={personalData.name}
-                        onChange={(val) => setPersonalData({ ...personalData, name: val })}
-                      />
-                      <Input
-                        label="Email Address"
-                        value={personalData.email}
-                        onChange={(val) => setPersonalData({ ...personalData, email: val })}
-                      />
-                    </div>
-                    <ActionButtons onCancel={() => setEditMode(null)} loading={loading} />
-                  </form>
-                </SectionItem>
+              {/* Account Settings */}
+              <div className="bg-white dark:bg-zinc-900 p-5 sm:p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+                <div className="flex items-center gap-2.5 mb-5">
+                  <Settings size={18} className="text-[#fb5607]" />
+                  <h3 className="text-base font-bold text-zinc-900 dark:text-white">Account Settings</h3>
+                </div>
 
+                <div className="space-y-1">
+                  {/* Personal Details */}
+                  <SectionItem
+                    label="Personal Details"
+                    val="Name & email"
+                    isActive={editMode === 'personal'}
+                    onEdit={() => setEditMode('personal')}
+                  >
+                    <form onSubmit={(e) => handleUpdate(e, 'personal')} className="space-y-4 mt-4 pb-4 border-b border-zinc-100 dark:border-zinc-800">
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <Input label="Full Name" value={personalData.name} onChange={(val) => setPersonalData({ ...personalData, name: val })} />
+                        <Input label="Email" value={personalData.email} onChange={(val) => setPersonalData({ ...personalData, email: val })} />
+                      </div>
+                      <ActionButtons onCancel={() => setEditMode(null)} loading={loading} />
+                    </form>
+                  </SectionItem>
 
-                {/* Security Section */}
-                <SectionItem
-                  label="Security"
-                  val="Passcodes & Keys"
-                  isActive={editMode === 'security'}
-                  onEdit={() => setEditMode('security')}
-                >
-                  <form onSubmit={(e) => handleUpdate(e, 'security')} className="space-y-6 mt-6 pb-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <Input
-                        label="New Password"
-                        type="password"
-                        value={securityData.password}
-                        onChange={(val) => setSecurityData({ ...securityData, password: val })}
-                      />
-                      <Input
-                        label="Confirm Password"
-                        type="password"
-                        value={securityData.confirmPassword}
-                        onChange={(val) => setSecurityData({ ...securityData, confirmPassword: val })}
-                      />
-                    </div>
-                    <ActionButtons onCancel={() => setEditMode(null)} loading={loading} />
-                  </form>
-                </SectionItem>
+                  {/* Security */}
+                  <SectionItem
+                    label="Security"
+                    val="Change password"
+                    isActive={editMode === 'security'}
+                    onEdit={() => setEditMode('security')}
+                  >
+                    <form onSubmit={(e) => handleUpdate(e, 'security')} className="space-y-4 mt-4 pb-4">
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <Input label="New Password" type="password" value={securityData.password} onChange={(val) => setSecurityData({ ...securityData, password: val })} />
+                        <Input label="Confirm Password" type="password" value={securityData.confirmPassword} onChange={(val) => setSecurityData({ ...securityData, confirmPassword: val })} />
+                      </div>
+                      <ActionButtons onCancel={() => setEditMode(null)} loading={loading} />
+                    </form>
+                  </SectionItem>
+                </div>
               </div>
             </div>
+
           </div>
-
         </div>
       </div>
     </main>
   );
 }
 
-// Subcomponents for cleaner code
+// Subcomponents
 function SectionItem({ label, val, isActive, onEdit, children }) {
   return (
-    <div className={`transition-all ${isActive ? 'bg-zinc-50/50 dark:bg-white/5 -mx-4 px-4 rounded-3xl' : ''}`}>
+    <div className={`transition-all rounded-xl ${isActive ? 'bg-zinc-50 dark:bg-zinc-800/50 p-4' : ''}`}>
       <div
         onClick={!isActive ? onEdit : undefined}
-        className={`flex justify-between items-center py-6 border-b border-zinc-50 dark:border-white/5 last:border-0 group ${!isActive ? 'cursor-pointer hover:bg-zinc-50 dark:hover:bg-white/5 -mx-4 px-4 rounded-3xl' : 'border-none'}`}
+        className={`flex justify-between items-center py-3 group ${!isActive ? 'cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 px-3 -mx-3 rounded-xl' : ''}`}
       >
         <div>
-          <h4 className={`font-black uppercase text-sm mb-1 transition-colors ${isActive ? 'text-[#fb5607]' : 'text-zinc-800 dark:text-zinc-100 group-hover:text-[#fb5607]'}`}>
+          <h4 className={`font-semibold text-sm transition-colors ${isActive ? 'text-[#fb5607]' : 'text-zinc-800 dark:text-zinc-100 group-hover:text-[#fb5607]'}`}>
             {label}
           </h4>
-          <p className="text-zinc-400 dark:text-zinc-500 text-xs font-bold uppercase tracking-widest">{val}</p>
+          <p className="text-zinc-400 text-xs mt-0.5">{val}</p>
         </div>
-        {!isActive && <ChevronRight size={18} className="text-zinc-200 dark:text-zinc-700 group-hover:translate-x-1 transition-all" />}
+        {!isActive && <ChevronRight size={16} className="text-zinc-300 dark:text-zinc-600 group-hover:translate-x-0.5 transition-all" />}
       </div>
       {isActive && children}
     </div>
   );
 }
 
-function Input({ label, value, onChange, type = 'text', full = false }) {
+function Input({ label, value, onChange, type = 'text' }) {
   return (
-    <div className={`space-y-2 ${full ? 'w-full' : ''}`}>
-      <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-4">{label}</label>
+    <div>
+      <label className="block text-[11px] font-semibold text-zinc-500 mb-1.5 uppercase tracking-wider">{label}</label>
       <input
         type={type}
         required={type !== 'password'}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-white dark:bg-zinc-800 border-none rounded-2xl px-6 py-4 text-sm font-bold shadow-sm focus:ring-2 focus:ring-[#fb5607] transition-all outline-none"
+        className="w-full px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm outline-none focus:border-[#fb5607] focus:ring-1 focus:ring-[#fb5607] transition-all text-zinc-900 dark:text-white"
         placeholder={label}
       />
     </div>
@@ -245,19 +212,13 @@ function Input({ label, value, onChange, type = 'text', full = false }) {
 
 function ActionButtons({ onCancel, loading }) {
   return (
-    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
-      <button
-        type="submit"
-        disabled={loading}
-        className="flex-1 bg-[#fb5607] text-white py-3 sm:py-4 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#ff6b2b] transition-all shadow-lg shadow-[#fb5607]/20 disabled:opacity-50"
-      >
-        {loading ? 'Processing...' : <><Save size={14} /> Save Changes</>}
+    <div className="flex gap-3 pt-2">
+      <button type="submit" disabled={loading}
+        className="flex-1 bg-[#fb5607] text-white py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-[#e04e06] transition-all disabled:opacity-50">
+        {loading ? 'Saving...' : <><Save size={14} /> Save</>}
       </button>
-      <button
-        type="button"
-        onClick={onCancel}
-        className="px-6 sm:px-8 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 py-3 sm:py-4 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-all"
-      >
+      <button type="button" onClick={onCancel}
+        className="px-5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 py-2.5 rounded-xl font-medium text-sm flex items-center justify-center gap-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all">
         <X size={14} /> Cancel
       </button>
     </div>

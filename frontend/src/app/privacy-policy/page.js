@@ -1,12 +1,12 @@
 'use client';
 import Navbar from '@/components/layout/Navbar';
 import Link from 'next/link';
-import { Shield, Lock, Eye, Database, UserCheck, Mail } from 'lucide-react';
+import { Shield, Lock, Eye, Database, UserCheck, Mail, ArrowLeft } from 'lucide-react';
 
 export default function PrivacyPolicyPage() {
     const sections = [
         {
-            icon: <Database size={20} />,
+            icon: <Database size={18} />,
             title: 'Information We Collect',
             content: [
                 'When you create an account, we collect your name, email address, and password (stored securely using encryption).',
@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage() {
             ]
         },
         {
-            icon: <Eye size={20} />,
+            icon: <Eye size={18} />,
             title: 'How We Use Your Information',
             content: [
                 'To process and deliver your orders efficiently.',
@@ -25,7 +25,7 @@ export default function PrivacyPolicyPage() {
             ]
         },
         {
-            icon: <Lock size={20} />,
+            icon: <Lock size={18} />,
             title: 'Data Security',
             content: [
                 'We use industry-standard security measures including SSL encryption and secure password hashing to protect your personal data.',
@@ -34,7 +34,7 @@ export default function PrivacyPolicyPage() {
             ]
         },
         {
-            icon: <UserCheck size={20} />,
+            icon: <UserCheck size={18} />,
             title: 'Your Rights',
             content: [
                 'You can access, update, or delete your personal information at any time through your account settings.',
@@ -43,7 +43,7 @@ export default function PrivacyPolicyPage() {
             ]
         },
         {
-            icon: <Shield size={20} />,
+            icon: <Shield size={18} />,
             title: 'Cookies',
             content: [
                 'We use cookies and similar technologies to keep you logged in, remember your preferences, and analyze site traffic.',
@@ -51,7 +51,7 @@ export default function PrivacyPolicyPage() {
             ]
         },
         {
-            icon: <Mail size={20} />,
+            icon: <Mail size={18} />,
             title: 'Contact Us',
             content: [
                 'If you have any questions about this Privacy Policy, please contact us at crayzee.in@gmail.com.',
@@ -61,50 +61,36 @@ export default function PrivacyPolicyPage() {
     ];
 
     return (
-        <main className="bg-white dark:bg-zinc-950 min-h-screen">
+        <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
             <Navbar />
 
-            {/* Hero */}
-            <section className="pt-32 pb-16 md:pt-40 md:pb-24">
-                <div className="container mx-auto px-4">
-                    <div className="max-w-3xl mx-auto text-center">
-                        <div className="inline-flex items-center gap-2 text-[#fb5607] font-black text-[10px] uppercase tracking-widest mb-6">
-                            <Shield size={14} className="fill-[#fb5607]" /> Legal
-                        </div>
-                        <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white mb-6">
-                            Privacy <span className="text-[#fb5607]">Policy</span>
-                        </h1>
-                        <p className="text-zinc-500 dark:text-zinc-400 font-medium text-sm md:text-base max-w-xl mx-auto">
-                            Your privacy matters to us. Here's how we collect, use, and protect your information at Crayzee.in.
+            <div className="w-full max-w-[1920px] mx-auto pt-24 pb-20" style={{ paddingLeft: 'clamp(16px, 4vw, 64px)', paddingRight: 'clamp(16px, 4vw, 64px)' }}>
+                <div className="max-w-3xl mx-auto">
+                    {/* Header */}
+                    <div className="mb-8">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">Privacy Policy</h1>
+                        <p className="text-zinc-400 text-sm mt-1">
+                            Your privacy matters. Here's how we handle your information.
                         </p>
-                        <p className="text-zinc-400 dark:text-zinc-600 font-bold text-[10px] uppercase tracking-widest mt-6">
-                            Last updated: March 2026
-                        </p>
+                        <p className="text-zinc-300 dark:text-zinc-600 text-[11px] mt-2">Last updated: March 2026</p>
                     </div>
-                </div>
-            </section>
 
-            {/* Sections */}
-            <section className="pb-24">
-                <div className="container mx-auto px-4">
-                    <div className="max-w-3xl mx-auto space-y-8">
+                    {/* Sections */}
+                    <div className="space-y-4">
                         {sections.map((section, i) => (
-                            <div
-                                key={i}
-                                className="bg-zinc-50 dark:bg-zinc-900/60 rounded-3xl p-8 md:p-10 border border-zinc-100 dark:border-zinc-800/50"
-                            >
-                                <div className="flex items-center gap-4 mb-6">
-                                    <div className="w-10 h-10 rounded-2xl bg-[#fb5607]/10 text-[#fb5607] flex items-center justify-center">
+                            <div key={i} className="bg-white dark:bg-zinc-900 rounded-2xl p-5 sm:p-6 border border-zinc-100 dark:border-zinc-800">
+                                <div className="flex items-center gap-2.5 mb-4">
+                                    <div className="w-9 h-9 rounded-xl bg-[#fb5607]/10 text-[#fb5607] flex items-center justify-center">
                                         {section.icon}
                                     </div>
-                                    <h2 className="text-lg md:text-xl font-black uppercase tracking-tight text-zinc-900 dark:text-white">
+                                    <h2 className="text-base font-bold text-zinc-900 dark:text-white">
                                         {section.title}
                                     </h2>
                                 </div>
-                                <ul className="space-y-4">
+                                <ul className="space-y-2.5 pl-[46px]">
                                     {section.content.map((item, j) => (
-                                        <li key={j} className="flex gap-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                            <span className="text-[#fb5607] font-black mt-1 shrink-0">→</span>
+                                        <li key={j} className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed flex gap-2">
+                                            <span className="text-[#fb5607] shrink-0 mt-0.5">•</span>
                                             <span>{item}</span>
                                         </li>
                                     ))}
@@ -114,16 +100,13 @@ export default function PrivacyPolicyPage() {
                     </div>
 
                     {/* Back link */}
-                    <div className="max-w-3xl mx-auto mt-12 text-center">
-                        <Link
-                            href="/"
-                            className="text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-[#fb5607] transition-colors"
-                        >
-                            ← Back to Home
+                    <div className="mt-6">
+                        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-[#fb5607] transition-colors font-medium">
+                            <ArrowLeft size={14} /> Back to Home
                         </Link>
                     </div>
                 </div>
-            </section>
+            </div>
         </main>
     );
 }

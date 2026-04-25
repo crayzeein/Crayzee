@@ -54,84 +54,99 @@ export default function ForgotPasswordPage() {
     }
   };
 
+  const titles = {
+    1: { heading: 'Reset password', sub: 'Enter your email to receive a reset code' },
+    2: { heading: 'Enter OTP', sub: 'Check your email for the 6-digit code' },
+    3: { heading: 'New password', sub: 'Create a strong password for your account' },
+  };
+
   return (
-    <main className="min-h-screen gradient-bg">
+    <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <Navbar />
-      <div className="pt-32 pb-20 container mx-auto px-4 flex justify-center">
-        <div className="w-full max-w-md glass p-10 rounded-[40px] shadow-2xl">
-          <h2 className="text-4xl font-black mb-2 text-zinc-900 dark:text-white uppercase tracking-tighter">
-            {step === 1 ? 'Forgot Password?' : step === 2 ? 'Enter OTP' : 'New Password'}
-          </h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mb-8 font-bold uppercase text-xs tracking-widest">
-            {step === 1
-              ? 'Enter your email to get a reset code.'
-              : step === 2
-              ? 'Check your email for the 6-digit code.'
-              : 'Secure your account with a strong password.'}
-          </p>
-
-          {step === 1 && (
-            <form onSubmit={handleSendOTP} className="space-y-6">
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest text-[#fb5607] mb-2">Email Address</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-6 py-4 bg-zinc-100 dark:bg-white/5 border-2 border-transparent focus:border-[#fb5607] rounded-2xl outline-none transition-all text-zinc-900 dark:text-white"
-                  placeholder="you@example.com"
-                  required
-                />
-              </div>
-              <button disabled={loading} className="w-full btn-primary disabled:opacity-50">
-                {loading ? 'Sending...' : 'Send OTP'}
-              </button>
-            </form>
-          )}
-
-          {step === 2 && (
-            <form onSubmit={handleVerifyOTP} className="space-y-6">
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest text-[#fb5607] mb-2">6-Digit OTP</label>
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="w-full px-6 py-4 bg-zinc-100 dark:bg-white/5 border-2 border-transparent focus:border-[#fb5607] rounded-2xl outline-none transition-all text-zinc-900 dark:text-white tracking-[0.5em] text-center font-black"
-                  placeholder="000000"
-                  maxLength={6}
-                  required
-                />
-              </div>
-              <button disabled={loading} className="w-full btn-primary disabled:opacity-50">
-                {loading ? 'Verifying...' : 'Verify OTP'}
-              </button>
-            </form>
-          )}
-
-          {step === 3 && (
-            <form onSubmit={handleResetPassword} className="space-y-6">
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest text-[#fb5607] mb-2">New Password (Min 8 Chars)</label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-6 py-4 bg-zinc-100 dark:bg-white/5 border-2 border-transparent focus:border-[#fb5607] rounded-2xl outline-none transition-all text-zinc-900 dark:text-white"
-                  placeholder="Make it strong"
-                  minLength={8}
-                  required
-                />
-              </div>
-              <button disabled={loading} className="w-full btn-primary disabled:opacity-50">
-                {loading ? 'Resetting...' : 'Reset Password'}
-              </button>
-            </form>
-          )}
-
-          <div className="mt-8 text-center text-zinc-500 dark:text-zinc-400 font-bold text-xs uppercase tracking-widest">
-            Remember your password? <Link href="/login" className="text-[#fb5607] font-black hover:underline transition-all">Go back to login</Link>
+      <div className="pt-28 pb-20 flex items-center justify-center px-4">
+        <div className="w-full max-w-[420px]">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <img src="/logo.png" alt="Crayzee" className="w-12 h-12 mx-auto mb-4 object-contain" />
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">{titles[step].heading}</h2>
+            <p className="text-zinc-400 text-sm mt-1">{titles[step].sub}</p>
           </div>
+
+          {/* Steps indicator */}
+          <div className="flex items-center justify-center gap-2 mb-6">
+            {[1, 2, 3].map((s) => (
+              <div key={s} className={`h-1 rounded-full transition-all ${s <= step ? 'w-8 bg-[#fb5607]' : 'w-4 bg-zinc-200 dark:bg-zinc-700'}`} />
+            ))}
+          </div>
+
+          <div className="bg-white dark:bg-zinc-900 p-7 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+            {step === 1 && (
+              <form onSubmit={handleSendOTP} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-semibold text-zinc-500 mb-1.5 uppercase tracking-wider">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 focus:border-[#fb5607] focus:ring-1 focus:ring-[#fb5607] rounded-xl outline-none transition-all text-sm text-zinc-900 dark:text-white"
+                    placeholder="you@example.com"
+                    required
+                  />
+                </div>
+                <button disabled={loading}
+                  className="w-full py-3 rounded-xl bg-[#fb5607] text-white font-semibold text-sm hover:bg-[#e04e06] transition-all disabled:opacity-50">
+                  {loading ? 'Sending...' : 'Send Code'}
+                </button>
+              </form>
+            )}
+
+            {step === 2 && (
+              <form onSubmit={handleVerifyOTP} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-semibold text-zinc-500 mb-1.5 uppercase tracking-wider">Verification Code</label>
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 focus:border-[#fb5607] focus:ring-1 focus:ring-[#fb5607] rounded-xl outline-none transition-all text-sm text-zinc-900 dark:text-white tracking-[0.3em] text-center font-semibold"
+                    placeholder="000000"
+                    maxLength={6}
+                    required
+                  />
+                </div>
+                <button disabled={loading}
+                  className="w-full py-3 rounded-xl bg-[#fb5607] text-white font-semibold text-sm hover:bg-[#e04e06] transition-all disabled:opacity-50">
+                  {loading ? 'Verifying...' : 'Verify Code'}
+                </button>
+              </form>
+            )}
+
+            {step === 3 && (
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-semibold text-zinc-500 mb-1.5 uppercase tracking-wider">New Password (Min 8 chars)</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 focus:border-[#fb5607] focus:ring-1 focus:ring-[#fb5607] rounded-xl outline-none transition-all text-sm text-zinc-900 dark:text-white"
+                    placeholder="Create a strong password"
+                    minLength={8}
+                    required
+                  />
+                </div>
+                <button disabled={loading}
+                  className="w-full py-3 rounded-xl bg-[#fb5607] text-white font-semibold text-sm hover:bg-[#e04e06] transition-all disabled:opacity-50">
+                  {loading ? 'Resetting...' : 'Reset Password'}
+                </button>
+              </form>
+            )}
+          </div>
+
+          <p className="text-center text-sm text-zinc-400 mt-6">
+            Remember your password?{' '}
+            <Link href="/login" className="text-[#fb5607] font-semibold hover:underline">Sign in</Link>
+          </p>
         </div>
       </div>
     </main>
