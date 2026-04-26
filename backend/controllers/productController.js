@@ -1,6 +1,23 @@
 const Product = require('../models/Product');
 const { cloudinary } = require('../utils/cloudinary');
 
+// Get unique subcategories for a given category/gender
+exports.getSubCategories = async (req, res) => {
+  try {
+    const { category, gender } = req.query;
+    const filter = {};
+    if (category && category !== 'all') filter.category = category;
+    if (gender && gender !== 'all') filter.gender = gender;
+
+    const subcats = await Product.distinct('subCategory', filter);
+    // Filter out empty/null values
+    const cleaned = subcats.filter(s => s && s.trim() !== '');
+    res.json(cleaned);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.getSuggestions = async (req, res) => {
   try {
     const { q } = req.query;
@@ -138,6 +155,46 @@ exports.getProductById = async (req, res) => {
     } else {
       res.status(404).json({ message: 'Product not found' });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getSimilarProducts = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    // Try: same gender + same subCategory, excluding current product
+    let similar = await Product.find({
+      _id: { $ne: product._id },
+      gender: product.gender,
+      subCategory: product.subCategory
+    })
+      .limit(12)
+      .select('name price images category subCategory gender stock rating numReviews')
+      .lean();
+
+    // Fallback: if less than 4, also pull from same gender + category
+    if (similar.length < 4) {
+      const moreIds = similar.map(s => s._id);
+      const more = await Product.find({
+        _id: { $ne: product._id, $nin: moreIds },
+        gender: product.gender,
+        category: product.category
+      })
+        .limit(12 - similar.length)
+        .select('name price images category subCategory gender stock rating numReviews')
+        .lean();
+      similar = [...similar, ...more];
+    }
+
+    const formatted = similar.map(p => ({
+      ...p,
+      image: p.images && p.images[0] ? p.images[0].url : ''
+    }));
+
+    res.json(formatted);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

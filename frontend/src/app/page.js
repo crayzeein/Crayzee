@@ -90,32 +90,42 @@ export default function Home() {
               </h2>
             </div>
             <div className="flex items-center" style={{ gap: 'clamp(8px, 0.8vw, 14px)' }}>
-              <button onClick={() => scroll(scrollRef1, 'left')} className="hidden md:flex items-center justify-center rounded-full border border-zinc-200 dark:border-zinc-700 hover:bg-[#fb5607] hover:text-white hover:border-[#fb5607] text-zinc-500 transition-all" style={{ width: 'clamp(32px, 2.5vw, 40px)', height: 'clamp(32px, 2.5vw, 40px)' }}>
-                <ChevronLeft style={{ width: 'clamp(14px, 1vw, 18px)', height: 'clamp(14px, 1vw, 18px)' }} />
-              </button>
-              <button onClick={() => scroll(scrollRef1, 'right')} className="hidden md:flex items-center justify-center rounded-full border border-zinc-200 dark:border-zinc-700 hover:bg-[#fb5607] hover:text-white hover:border-[#fb5607] text-zinc-500 transition-all" style={{ width: 'clamp(32px, 2.5vw, 40px)', height: 'clamp(32px, 2.5vw, 40px)' }}>
-                <ChevronRight style={{ width: 'clamp(14px, 1vw, 18px)', height: 'clamp(14px, 1vw, 18px)' }} />
-              </button>
-              <Link href="/browse?sort=newest" className="group flex items-center text-zinc-500 hover:text-[#fb5607] transition-all" style={{ gap: 'clamp(6px, 0.6vw, 10px)', fontSize: 'clamp(10px, 0.8vw, 13px)', fontWeight: 600, marginLeft: 'clamp(4px, 0.5vw, 8px)' }}>
+              <Link href="/browse?sort=newest" className="group flex items-center text-zinc-500 hover:text-[#fb5607] transition-all" style={{ gap: 'clamp(6px, 0.6vw, 10px)', fontSize: 'clamp(10px, 0.8vw, 13px)', fontWeight: 600 }}>
                 View All
                 <ArrowRight className="group-hover:translate-x-1 transition-transform" style={{ width: 'clamp(12px, 1vw, 16px)', height: 'clamp(12px, 1vw, 16px)' }} />
               </Link>
             </div>
           </div>
 
-          {/* Horizontal Scroll */}
-          <div ref={scrollRef1} className="scroll-strip">
-            {loading ? (
-              [...Array(8)].map((_, i) => (
-                <div key={i} className="aspect-[3/4] bg-zinc-100 dark:bg-zinc-900 animate-pulse rounded-lg" style={{ width: 'clamp(180px, 20vw, 300px)' }} />
-              ))
-            ) : (
-              newArrivals.map((product) => (
-                <div key={product._id} style={{ width: 'clamp(180px, 20vw, 300px)' }}>
-                  <ProductCard product={product} />
-                </div>
-              ))
-            )}
+          {/* Horizontal Scroll with Side Arrows */}
+          <div className="relative group/scroll">
+            {/* Left Arrow */}
+            <button onClick={() => scroll(scrollRef1, 'left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 shadow-lg hover:bg-[#fb5607] hover:text-white hover:border-[#fb5607] active:scale-90 transition-all"
+              style={{ marginLeft: '-4px' }}>
+              <ChevronLeft size={18} />
+            </button>
+
+            {/* Right Arrow */}
+            <button onClick={() => scroll(scrollRef1, 'right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 shadow-lg hover:bg-[#fb5607] hover:text-white hover:border-[#fb5607] active:scale-90 transition-all"
+              style={{ marginRight: '-4px' }}>
+              <ChevronRight size={18} />
+            </button>
+
+            <div ref={scrollRef1} className="scroll-strip">
+              {loading ? (
+                [...Array(8)].map((_, i) => (
+                  <div key={i} className="aspect-[3/4] bg-zinc-100 dark:bg-zinc-900 animate-pulse rounded-lg" style={{ width: 'clamp(180px, 20vw, 300px)' }} />
+                ))
+              ) : (
+                newArrivals.map((product) => (
+                  <div key={product._id} style={{ width: 'clamp(180px, 20vw, 300px)' }}>
+                    <ProductCard product={product} />
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </section>

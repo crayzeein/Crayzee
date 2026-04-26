@@ -12,7 +12,7 @@ export default function BrandLoader({ size = 'md' }) {
       animate={{ opacity: 1, y: [-8, 8, -8] }}
       exit={{ opacity: 0 }}
       transition={{ y: { duration: 0.6, repeat: Infinity, ease: 'easeInOut' }, opacity: { duration: 0.2 } }}
-      className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl flex items-center justify-center"
+      className="bg-white rounded-2xl shadow-xl flex items-center justify-center"
       style={{ width: box, height: box }}
     >
       <img src="/logo.png" alt="" style={{ width: s, height: s }} className="object-contain" />

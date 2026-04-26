@@ -46,32 +46,30 @@ function DiscoveryContent({
   const [openSections, setOpenSections] = useState({ sizes: true, rating: true });
   const [subCategories, setSubCategories] = useState([]);
 
-  // Fetch subcategories from the categories API
+  // Fetch subcategories directly from products
+  const mainCat = activeMainCat || 'all';
+  const gender = activeGender || 'all';
   useEffect(() => {
     const fetchSubCategories = async () => {
       try {
-        const { data } = await API.get('/categories');
-        // Find items for current gender/category
-        if (data && data.length > 0) {
-          // Collect all unique subcategory items from categories
-          const allItems = [];
-          data.forEach(cat => {
-            if (cat.items && cat.items.length > 0) {
-              cat.items.forEach(item => {
-                if (!allItems.find(i => i.label === item.label)) {
-                  allItems.push(item);
-                }
-              });
-            }
-          });
-          setSubCategories(allItems);
-        }
+        const params = new URLSearchParams();
+        if (mainCat && mainCat !== 'all') params.set('category', mainCat);
+        if (gender && gender !== 'all') params.set('gender', gender);
+        const { data } = await API.get(`/products/subcategories?${params.toString()}`);
+        // Normalize: if API returns objects like {label, href}, extract label; if strings, keep as-is
+        const normalized = (data || []).map(item => {
+          if (typeof item === 'string') return item;
+          if (item && typeof item === 'object' && item.label) return item.label;
+          return String(item);
+        }).filter(s => s && s.trim() !== '');
+        setSubCategories(normalized);
       } catch (error) {
         console.error('Error fetching subcategories:', error);
+        setSubCategories([]);
       }
     };
     fetchSubCategories();
-  }, []);
+  }, [mainCat, gender]);
 
   const toggleSection = (section) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -161,10 +159,27 @@ function DiscoveryContent({
     setSelectedSizes(prev => prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]);
   };
 
-  const activeFilterCount = [minRating > 0, selectedSizes.length > 0].filter(Boolean).length;
-  const clearAllFilters = () => { setMinRating(0); setSelectedSizes([]); };
+  const [draftMinRating, setDraftMinRating] = useState(minRating);
+  const [draftSelectedSizes, setDraftSelectedSizes] = useState(selectedSizes);
 
-  const FilterContent = () => (
+  useEffect(() => {
+    if (showFilters) {
+      setDraftMinRating(minRating);
+      setDraftSelectedSizes(selectedSizes);
+    }
+  }, [showFilters, minRating, selectedSizes]);
+
+  const toggleDraftSize = (size) => {
+    setDraftSelectedSizes(prev => prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]);
+  };
+
+  const activeFilterCount = [minRating > 0, selectedSizes.length > 0].filter(Boolean).length;
+  const draftFilterCount = [draftMinRating > 0, draftSelectedSizes.length > 0].filter(Boolean).length;
+  
+  const clearAllFilters = () => { setMinRating(0); setSelectedSizes([]); };
+  const clearDraftFilters = () => { setDraftMinRating(0); setDraftSelectedSizes([]); };
+
+  const FilterContent = ({ currentRating, setRating, currentSizes, toggleSizeHandler }) => (
     <div className="space-y-5">
       <div>
         <button onClick={() => toggleSection('sizes')} className="w-full flex items-center justify-between mb-3 focus:outline-none">
@@ -174,8 +189,8 @@ function DiscoveryContent({
         <div className={`overflow-hidden transition-all duration-300 ${openSections.sizes ? 'max-h-[200px] opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="flex flex-wrap gap-2">
             {sizesOptions.map(size => (
-              <button key={size} onClick={() => toggleSize(size)}
-                className={`w-10 h-10 rounded-lg text-[11px] font-semibold border transition-all duration-200 flex items-center justify-center ${selectedSizes.includes(size)
+              <button key={size} onClick={() => toggleSizeHandler(size)}
+                className={`w-10 h-10 rounded-lg text-[11px] font-semibold border transition-all duration-200 flex items-center justify-center ${currentSizes.includes(size)
                   ? 'bg-[#fb5607] border-[#fb5607] text-white' : 'border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-zinc-400'}`}>
                 {size}
               </button>
@@ -192,12 +207,12 @@ function DiscoveryContent({
         <div className={`overflow-hidden transition-all duration-300 ${openSections.rating ? 'max-h-[250px] opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="flex flex-col gap-1.5">
             {[4, 3, 2, 1].map(stars => (
-              <button key={stars} onClick={() => setMinRating(minRating === stars ? 0 : stars)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200 ${minRating === stars ? 'bg-[#fb5607]/8 ring-1 ring-[#fb5607]/20' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/40'}`}>
+              <button key={stars} onClick={() => setRating(currentRating === stars ? 0 : stars)}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200 ${currentRating === stars ? 'bg-[#fb5607]/8 ring-1 ring-[#fb5607]/20' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/40'}`}>
                 <div className="flex gap-0.5">
                   {[1,2,3,4,5].map(i => <Star key={i} size={13} className={i <= stars ? 'text-amber-400 fill-amber-400' : 'text-zinc-200 dark:text-zinc-700'} />)}
                 </div>
-                <span className={`text-[11px] font-medium ${minRating === stars ? 'text-[#fb5607]' : 'text-zinc-400'}`}>& up</span>
+                <span className={`text-[11px] font-medium ${currentRating === stars ? 'text-[#fb5607]' : 'text-zinc-400'}`}>& up</span>
               </button>
             ))}
           </div>
@@ -230,13 +245,41 @@ function DiscoveryContent({
           </div>
 
           {/* Title + Count row */}
-          <div className="flex items-baseline justify-between pt-4 pb-2">
+          <div className="flex items-baseline justify-between pt-4 pb-1">
             <h1 className="text-[22px] sm:text-[26px] md:text-[30px] font-bold tracking-tight text-zinc-900 dark:text-white leading-none">
               {displayTitle}
             </h1>
             <span className="text-[11px] text-zinc-400 font-medium shrink-0 ml-4">{total} products</span>
           </div>
 
+          {/* Subcategory Tabs */}
+          {subCategories.length > 0 && (
+            <div className="flex items-center gap-2 pb-3 pt-2 overflow-x-auto no-scrollbar">
+              <button
+                onClick={() => setCategory(activeMainCat, activeGender, 'all')}
+                className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-semibold transition-all border ${
+                  activeSubCat === 'all'
+                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-900 dark:border-white'
+                    : 'bg-white dark:bg-zinc-900 text-zinc-500 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+                }`}
+              >
+                All
+              </button>
+              {subCategories.map((sub, idx) => (
+                <button
+                  key={`subcat-${idx}-${sub}`}
+                  onClick={() => setCategory(activeMainCat, activeGender, sub)}
+                  className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-semibold transition-all border capitalize ${
+                    activeSubCat === sub
+                      ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-900 dark:border-white'
+                      : 'bg-white dark:bg-zinc-900 text-zinc-500 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
+                  }`}
+                >
+                  {sub}
+                </button>
+              ))}
+            </div>
+          )}
 
         </div>
       </div>
@@ -266,13 +309,19 @@ function DiscoveryContent({
               <div className="sticky top-0 bg-white dark:bg-zinc-900 flex items-center justify-between p-4 border-b border-zinc-100 dark:border-zinc-800">
                 <h3 className="font-bold text-sm text-zinc-900 dark:text-white">Filters</h3>
                 <div className="flex items-center gap-4">
-                  {activeFilterCount > 0 && <button onClick={clearAllFilters} className="text-[11px] text-[#fb5607] font-semibold">Clear All</button>}
+                  {draftFilterCount > 0 && <button onClick={clearDraftFilters} className="text-[11px] text-[#fb5607] font-semibold">Clear All</button>}
                   <button onClick={() => setShowFilters(false)} className="text-zinc-400 text-lg">✕</button>
                 </div>
               </div>
-              <div className="p-5"><FilterContent /></div>
+              <div className="p-5">
+                <FilterContent currentRating={draftMinRating} setRating={setDraftMinRating} currentSizes={draftSelectedSizes} toggleSizeHandler={toggleDraftSize} />
+              </div>
               <div className="sticky bottom-0 p-4 bg-white dark:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-800">
-                <button onClick={() => setShowFilters(false)} className="w-full bg-[#fb5607] text-white py-3 rounded-xl font-semibold text-[12px] tracking-wide">Apply Filters</button>
+                <button onClick={() => {
+                  setMinRating(draftMinRating);
+                  setSelectedSizes(draftSelectedSizes);
+                  setShowFilters(false);
+                }} className="w-full bg-[#fb5607] text-white py-3 rounded-xl font-semibold text-[12px] tracking-wide">Apply Filters</button>
               </div>
             </motion.div>
           </>)}
@@ -318,7 +367,7 @@ function DiscoveryContent({
                 {activeFilterCount > 0 && <button onClick={clearAllFilters} className="text-[10px] text-[#fb5607] font-semibold hover:underline">Clear All</button>}
               </div>
               <div className="mt-5 max-h-[calc(100vh-200px)] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                <FilterContent />
+                <FilterContent currentRating={minRating} setRating={setMinRating} currentSizes={selectedSizes} toggleSizeHandler={toggleSize} />
               </div>
             </div>
           </aside>

@@ -3,7 +3,9 @@ const router = express.Router();
 const {
   getProducts,
   getSuggestions,
+  getSubCategories,
   getProductById,
+  getSimilarProducts,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -15,6 +17,8 @@ const { protect, admin } = require('../middleware/auth');
 
 router.get('/', getProducts);
 router.get('/suggestions', getSuggestions);
+router.get('/subcategories', getSubCategories);
+router.get('/:id/similar', getSimilarProducts);
 router.get('/:id', getProductById);
 router.post('/', protect, admin, createProduct);
 router.put('/:id', protect, admin, updateProduct);
