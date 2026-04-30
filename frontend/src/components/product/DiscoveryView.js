@@ -9,6 +9,70 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/store/useStore';
 import BrandLoader, { BrandLoaderOverlay } from '@/components/ui/BrandLoader';
 
+// When no products are found, show popular products instead of a dead end
+function NoResultsSection({ query, isSearch, clearAllFilters, activeFilterCount, activeSubCat }) {
+  const [popular, setPopular] = useState([]);
+  const [loadingPopular, setLoadingPopular] = useState(true);
+
+  useEffect(() => {
+    const fetchPopular = async () => {
+      try {
+        const { data } = await API.get('/products?limit=12&sort=popular');
+        setPopular(data.products || []);
+      } catch (e) {
+        console.error('Error fetching popular products:', e);
+      } finally {
+        setLoadingPopular(false);
+      }
+    };
+    fetchPopular();
+  }, []);
+
+  const getMessage = () => {
+    if (isSearch && query) {
+      if (activeSubCat && activeSubCat !== 'all') {
+        return `No results found for "${query}" in ${activeSubCat}`;
+      } else if (activeFilterCount > 0) {
+        return `No results found for "${query}" with your applied filters`;
+      }
+      return `We couldn't find results for "${query}"`;
+    }
+    return 'No products match your current filters';
+  };
+
+  return (
+    <div className="mb-12">
+      {/* Subtle message */}
+      <div className="text-center mb-8">
+        <p className="text-sm text-zinc-400 mb-3">
+          {getMessage()}
+        </p>
+        {(activeFilterCount > 0 || (activeSubCat && activeSubCat !== 'all')) && (
+          <button onClick={clearAllFilters} className="text-[#fb5607] text-xs font-semibold hover:underline">
+            Clear all filters
+          </button>
+        )}
+      </div>
+
+      {/* Show popular products */}
+      {popular.length > 0 && (
+        <div>
+          <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-4">Popular Right Now</h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+            {popular.map((product) => <ProductCard key={product._id} product={product} />)}
+          </div>
+        </div>
+      )}
+
+      {loadingPopular && (
+        <div className="flex items-center justify-center py-16">
+          <BrandLoader size="md" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function DiscoveryContent({
   initialCategory = 'clothing',
   initialGender = 'all',
@@ -45,6 +109,7 @@ function DiscoveryContent({
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [openSections, setOpenSections] = useState({ sizes: true, rating: true });
   const [subCategories, setSubCategories] = useState([]);
+  const [popularProducts, setPopularProducts] = useState([]);
 
   // Fetch subcategories directly from products
   const mainCat = activeMainCat || 'all';
@@ -106,7 +171,7 @@ function DiscoveryContent({
   };
 
   const getDynamicTitle = () => {
-    if (isSearch) return `Results for "${query}"`;
+    if (isSearch && query) return query;
     let genderLabel = '';
     let subCatLabel = '';
     if (activeGender && activeGender !== 'all') genderLabel = toTitleCase(activeGender);
@@ -416,12 +481,7 @@ function DiscoveryContent({
                 </>
               ) : (
                 !loading && (
-                  <div className="py-20 text-center bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 mb-12">
-                    <div className="text-3xl mb-3 opacity-40">🔍</div>
-                    <h3 className="text-sm font-bold mb-1 text-zinc-900 dark:text-white">No Products Found</h3>
-                    <p className="text-[12px] text-zinc-500 mb-5 max-w-xs mx-auto">Try adjusting your filters or search.</p>
-                    {activeFilterCount > 0 && <button onClick={clearAllFilters} className="bg-[#fb5607] text-white px-6 py-2 rounded-lg text-[11px] font-semibold">Clear Filters</button>}
-                  </div>
+                  <NoResultsSection query={query} isSearch={isSearch} clearAllFilters={() => { clearAllFilters(); setCategory(activeMainCat, activeGender, 'all'); }} activeFilterCount={activeFilterCount} activeSubCat={activeSubCat} />
                 )
               )}
               {loading && products.length === 0 && (

@@ -18,31 +18,67 @@ exports.getSubCategories = async (req, res) => {
   }
 };
 
+// Common stop words to ignore in search
+const STOP_WORDS = new Set([
+  'for', 'the', 'a', 'an', 'in', 'on', 'of', 'and', 'or', 'to', 'is', 'it',
+  'with', 'by', 'at', 'from', 'as', 'into', 'this', 'that', 'my', 'me',
+  'buy', 'best', 'top', 'new', 'good', 'nice', 'cheap', 'online', 'price'
+]);
+
 exports.getSuggestions = async (req, res) => {
   try {
     const { q } = req.query;
-    if (!q) return res.json([]);
+    if (!q || q.trim().length < 1) return res.json([]);
 
-    const regex = new RegExp(q, 'i');
-    const suggestions = await Product.find({
-      $or: [
-        { name: regex },
-        { category: regex },
-        { subCategory: regex },
-        { gender: regex }
-      ]
-    })
-      .limit(8)
-      .select('name price images category subCategory gender')
+    const cleanQ = q.trim();
+
+    // Find matching products (for extracting unique search terms)
+    const keywords = cleanQ.split(/\s+/).filter(w => w.length > 0 && !STOP_WORDS.has(w.toLowerCase()));
+    if (keywords.length === 0) return res.json([]);
+
+    // Build a flexible OR query matching any keyword
+    const orConditions = keywords.map(kw => {
+      const regex = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      return { $or: [{ name: regex }, { category: regex }, { subCategory: regex }, { gender: regex }, { description: regex }] };
+    });
+
+    const products = await Product.find({ $and: orConditions })
+      .limit(50)
+      .select('name category subCategory gender')
       .lean();
 
-    // Map images to return first image url for suggestions
-    const formatted = suggestions.map(s => ({
-      ...s,
-      image: s.images && s.images[0] ? s.images[0].url : ''
-    }));
+    // Generate smart query suggestions from actual product data
+    const suggestionSet = new Set();
 
-    res.json(formatted);
+    products.forEach(p => {
+      // Add the product name as a suggestion
+      if (p.name) suggestionSet.add(p.name);
+
+      // Add combinations: "query + gender"
+      if (p.gender) suggestionSet.add(`${cleanQ} for ${p.gender}`);
+
+      // Add combinations: "query + subcategory"
+      if (p.subCategory) suggestionSet.add(`${cleanQ} ${p.subCategory}`);
+
+      // Add: "subcategory + gender"
+      if (p.subCategory && p.gender) suggestionSet.add(`${p.subCategory} for ${p.gender}`);
+    });
+
+    // Filter suggestions that actually contain the query text
+    const queryLower = cleanQ.toLowerCase();
+    let results = Array.from(suggestionSet)
+      .filter(s => s.toLowerCase().includes(queryLower) || queryLower.split(/\s+/).some(w => s.toLowerCase().includes(w)))
+      .sort((a, b) => {
+        // Prioritize exact prefix matches
+        const aStarts = a.toLowerCase().startsWith(queryLower) ? 0 : 1;
+        const bStarts = b.toLowerCase().startsWith(queryLower) ? 0 : 1;
+        if (aStarts !== bStarts) return aStarts - bStarts;
+        return a.length - b.length;
+      })
+      .slice(0, 8);
+
+    // Return as array of { text } objects
+    res.json(results.map(text => ({ text })));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -74,9 +110,9 @@ exports.getProducts = async (req, res) => {
 
     if (search) {
       // Clean query: remove common punctuation but keep alphanumeric and spaces
-      // This helps with queries like "blu," or "shirt!"
       const cleanSearch = search.replace(/[.,!?;:]/g, ' ').trim();
-      const keywords = cleanSearch.split(/\s+/).filter(word => word.length > 0);
+      // Filter out stop words so "blue shirt for men" becomes ["blue", "shirt", "men"]
+      const keywords = cleanSearch.split(/\s+/).filter(word => word.length > 0 && !STOP_WORDS.has(word.toLowerCase()));
 
       if (keywords.length > 0) {
         // Build a query where EACH keyword must match at least one of the fields

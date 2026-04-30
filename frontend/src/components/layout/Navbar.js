@@ -5,7 +5,7 @@ import { ShoppingCart, Heart, User, Search, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import API from '@/utils/api';
 
 export default function Navbar() {
@@ -19,6 +19,10 @@ export default function Navbar() {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [categories, setCategories] = useState([]);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isMenActive = pathname.startsWith('/men');
+  const isWomenActive = pathname.startsWith('/women');
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -83,7 +87,7 @@ export default function Navbar() {
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
       if (selectedIndex >= 0 && suggestions[selectedIndex]) {
-        router.push(`/product/${suggestions[selectedIndex]._id}`);
+        router.push(`/search?q=${encodeURIComponent(suggestions[selectedIndex].text)}`);
         setSearchQuery('');
         setIsSearchFocused(false);
       } else if (searchQuery.trim()) {
@@ -124,19 +128,19 @@ export default function Navbar() {
           <div className="hidden md:flex items-center" style={{ gap: 'clamp(12px, 1.5vw, 24px)' }}>
             <Link
               href="/men"
-              className={`relative font-black uppercase tracking-wide py-1 transition-colors ${activeGender === 'men' ? 'text-[#fb5607]' : 'text-zinc-700 dark:text-zinc-200 hover:text-[#fb5607]'}`}
+              className={`relative font-black uppercase tracking-wide py-1 transition-colors ${isMenActive ? 'text-[#fb5607]' : 'text-zinc-700 dark:text-zinc-200 hover:text-[#fb5607]'}`}
               style={{ fontSize: 'clamp(12px, 1.1vw, 16px)' }}
             >
               Men
-              <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#fb5607] transition-transform origin-left ${activeGender === 'men' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
+              <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#fb5607] transition-transform origin-left ${isMenActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
             </Link>
             <Link
               href="/women"
-              className={`relative font-black uppercase tracking-wide py-1 transition-colors ${activeGender === 'women' ? 'text-[#fb5607]' : 'text-zinc-700 dark:text-zinc-200 hover:text-[#fb5607]'}`}
+              className={`relative font-black uppercase tracking-wide py-1 transition-colors ${isWomenActive ? 'text-[#fb5607]' : 'text-zinc-700 dark:text-zinc-200 hover:text-[#fb5607]'}`}
               style={{ fontSize: 'clamp(12px, 1.1vw, 16px)' }}
             >
               Women
-              <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#fb5607] transition-transform origin-left ${activeGender === 'women' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
+              <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#fb5607] transition-transform origin-left ${isWomenActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
             </Link>
           </div>
         </div>
@@ -169,55 +173,46 @@ export default function Navbar() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full right-0 mt-2 w-[350px] bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-zinc-100 dark:border-white/5 overflow-hidden z-[60]"
+                  className="absolute top-full right-0 mt-2 w-[320px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-100 dark:border-white/5 overflow-hidden z-[60]"
                 >
-                  <div className="p-2">
+                  <div className="py-1">
                     {suggestions.length > 0 ? (
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col">
                         {suggestions.map((item, idx) => (
                           <button
-                            key={item._id}
+                            key={idx}
                             onMouseEnter={() => setSelectedIndex(idx)}
                             onClick={() => {
-                              router.push(`/product/${item._id}`);
+                              router.push(`/search?q=${encodeURIComponent(item.text)}`);
                               setSearchQuery('');
                               setIsSearchFocused(false);
                             }}
-                            className={`flex items-center gap-3 p-3 rounded-2xl transition-all text-left ${selectedIndex === idx ? 'bg-zinc-50 dark:bg-white/5' : ''}`}
+                            className={`flex items-center gap-3 px-4 py-2.5 transition-all text-left ${selectedIndex === idx ? 'bg-zinc-50 dark:bg-white/5' : ''}`}
                           >
-                            <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-zinc-100 dark:border-white/5">
-                              {(item.images?.[0]?.url || item.image) ? (
-                                <img src={item.images?.[0]?.url || item.image} alt={item.name} className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-zinc-100 dark:bg-white/5 text-[8px] font-black text-zinc-400">
-                                  NA
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-xs font-black uppercase truncate tracking-tight">{item.name}</h4>
-                              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{item.subCategory}</p>
-                              <p className="text-xs font-black text-[#fb5607] mt-0.5">₹{item.price}</p>
-                            </div>
+                            <Search size={14} className="text-zinc-300 shrink-0" />
+                            <span className="text-sm text-zinc-700 dark:text-zinc-200 truncate flex-1">{item.text}</span>
                           </button>
                         ))}
                       </div>
                     ) : searchQuery.length > 2 && (
-                      <div className="p-4 text-center">
-                        <p className="text-xs font-bold text-txt-muted uppercase tracking-widest">No exact matches found</p>
+                      <div className="px-4 py-3 text-center">
+                        <p className="text-xs text-zinc-400">No suggestions found</p>
                       </div>
                     )}
 
-                    <button
-                      onClick={() => {
-                        router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-                        setIsSearchFocused(false);
-                        setSearchQuery('');
-                      }}
-                      className="w-full p-3 mt-1 border-t border-zinc-50 dark:border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-[#fb5607] transition-colors flex items-center justify-center gap-2"
-                    >
-                      View all results for "{searchQuery}"
-                    </button>
+                    {searchQuery.trim().length > 1 && (
+                      <button
+                        onClick={() => {
+                          router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+                          setIsSearchFocused(false);
+                          setSearchQuery('');
+                        }}
+                        className="w-full px-4 py-2.5 border-t border-zinc-100 dark:border-white/5 text-[11px] font-semibold text-[#fb5607] hover:bg-[#fb5607]/5 transition-colors flex items-center gap-2"
+                      >
+                        <Search size={12} />
+                        Search for "{searchQuery}"
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -311,22 +306,19 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Suggestions */}
-            <div className="flex flex-col gap-2">
-              {suggestions.map(item => (
+            <div className="flex flex-col">
+              {suggestions.map((item, idx) => (
                 <button
-                  key={item._id}
+                  key={idx}
                   onClick={() => {
-                    router.push(`/product/${item._id}`);
+                    router.push(`/search?q=${encodeURIComponent(item.text)}`);
                     setIsMobileSearchOpen(false);
                     setSearchQuery('');
                   }}
-                  className="flex items-center gap-4 p-4 bg-zinc-50 dark:bg-white/5 rounded-3xl text-left"
+                  className="flex items-center gap-3 px-2 py-3 border-b border-zinc-100 dark:border-white/5 text-left"
                 >
-                  <img src={item.image} className="w-16 h-16 object-cover rounded-2xl" />
-                  <div>
-                    <h4 className="font-black uppercase tracking-tight text-sm">{item.name}</h4>
-                    <p className="text-[#fb5607] font-black text-xs mt-1">₹{item.price}</p>
-                  </div>
+                  <Search size={16} className="text-zinc-300 shrink-0" />
+                  <span className="text-sm text-zinc-700 dark:text-zinc-200 flex-1">{item.text}</span>
                 </button>
               ))}
               {searchQuery.trim().length > 2 && (
@@ -336,9 +328,9 @@ export default function Navbar() {
                     setIsMobileSearchOpen(false);
                     setSearchQuery('');
                   }}
-                  className="w-full py-5 rounded-3xl bg-black text-white font-black uppercase tracking-widest text-xs mt-4"
+                  className="w-full py-4 mt-4 rounded-2xl bg-[#fb5607] text-white font-semibold text-sm text-center"
                 >
-                  See all matches
+                  Search for "{searchQuery}"
                 </button>
               )}
             </div>
@@ -412,7 +404,7 @@ export default function Navbar() {
                       <line x1="42" y1="16" x2="42" y2="12"/>
                     </svg>
                   </div>
-                  <span className={`text-[15px] font-bold ${activeGender === 'men' ? 'text-[#fb5607]' : 'text-zinc-800 dark:text-zinc-100 group-hover:text-[#fb5607]'} transition-colors`}>
+                  <span className={`text-[15px] font-bold ${isMenActive ? 'text-[#fb5607]' : 'text-zinc-800 dark:text-zinc-100 group-hover:text-[#fb5607]'} transition-colors`}>
                     Men
                   </span>
                 </Link>
@@ -431,7 +423,7 @@ export default function Navbar() {
                       <path d="M26 30c0 0 2 3 6 3s6-3 6-3"/>
                     </svg>
                   </div>
-                  <span className={`text-[15px] font-bold ${activeGender === 'women' ? 'text-[#fb5607]' : 'text-zinc-800 dark:text-zinc-100 group-hover:text-[#fb5607]'} transition-colors`}>
+                  <span className={`text-[15px] font-bold ${isWomenActive ? 'text-[#fb5607]' : 'text-zinc-800 dark:text-zinc-100 group-hover:text-[#fb5607]'} transition-colors`}>
                     Women
                   </span>
                 </Link>
