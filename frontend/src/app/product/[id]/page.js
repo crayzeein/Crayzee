@@ -151,13 +151,13 @@ export default function ProductDetailPage({ params }) {
       <div className="w-full max-w-[1920px] mx-auto pt-20 sm:pt-24 pb-24 sm:pb-20" style={{ paddingLeft: 'clamp(12px, 4vw, 64px)', paddingRight: 'clamp(12px, 4vw, 64px)' }}>
 
         {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 mb-4 overflow-x-auto whitespace-nowrap no-scrollbar">
+        <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 mb-5 overflow-x-auto whitespace-nowrap no-scrollbar">
           <Link href="/" className="hover:text-[#fb5607] transition-colors">Home</Link>
-          <ChevronRight size={9} className="text-zinc-300" />
+          <ChevronRight size={10} className="text-zinc-300" />
           <Link href={`/${product.gender}`} className="hover:text-[#fb5607] transition-colors capitalize">{product.gender}</Link>
           {product.subCategory && (<>
-            <ChevronRight size={9} className="text-zinc-300" />
-            <span className="text-zinc-500 font-medium capitalize">{product.subCategory}</span>
+            <ChevronRight size={10} className="text-zinc-300" />
+            <span className="text-zinc-600 dark:text-zinc-300 font-medium capitalize">{product.subCategory}</span>
           </>)}
         </div>
 
@@ -229,10 +229,12 @@ export default function ProductDetailPage({ params }) {
                 </h1>
 
                 {/* Price */}
-                <div className="flex items-baseline gap-2 mb-5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#fb5607]">₹{product.price}</span>
-                  <span className="text-[11px] text-zinc-400 font-medium">Inclusive of all taxes</span>
+                <div className="flex items-baseline gap-3 mb-1">
+                  <span className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">₹{product.price}</span>
+                  {product.price < 2000 && <span className="text-base text-zinc-300 dark:text-zinc-600 line-through">₹{Math.round(product.price * 1.4)}</span>}
+                  {product.price < 2000 && <span className="text-xs font-semibold text-green-600 bg-green-50 dark:bg-green-500/10 px-2 py-0.5 rounded-md">40% OFF</span>}
                 </div>
+                <p className="text-[11px] text-zinc-400 mb-5">Inclusive of all taxes</p>
 
                 {/* Divider */}
                 <div className="h-px bg-zinc-100 dark:bg-zinc-800 mb-5" />

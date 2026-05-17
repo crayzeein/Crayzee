@@ -1,7 +1,7 @@
 'use client';
 import { useStore } from '@/store/useStore';
 import Navbar from '@/components/layout/Navbar';
-import { Trash2, Plus, Minus, ShoppingBag, AlertCircle } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, AlertCircle, ShieldCheck, RotateCcw, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -212,6 +212,22 @@ export default function CartPage() {
               >
                 {validating ? 'Checking...' : isCartInvalid ? 'Stock Issue' : 'Proceed to Checkout'}
               </button>
+
+              {/* Trust Indicators */}
+              <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-2.5">
+                <div className="flex items-center gap-2 text-[11px] text-zinc-400">
+                  <ShieldCheck size={14} className="text-green-500 shrink-0" />
+                  <span>100% Secure Checkout</span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-zinc-400">
+                  <RotateCcw size={14} className="text-green-500 shrink-0" />
+                  <span>Easy 7-Day Returns</span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-zinc-400">
+                  <Truck size={14} className="text-green-500 shrink-0" />
+                  <span>Free delivery above ₹1500</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

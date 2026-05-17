@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import ProductCard from '@/components/product/ProductCard';
 import API from '@/utils/api';
-import { SlidersHorizontal, ChevronDown, Check, ChevronRight, Star, ArrowDownUp } from 'lucide-react';
+import { SlidersHorizontal, ChevronDown, Check, ChevronRight, Star, ArrowDownUp, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/store/useStore';
 import BrandLoader, { BrandLoaderOverlay } from '@/components/ui/BrandLoader';
@@ -299,7 +299,12 @@ function DiscoveryContent({
           {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 dark:text-zinc-600 pt-4 overflow-x-auto whitespace-nowrap no-scrollbar">
             <a href="/" className="hover:text-[#fb5607] transition-colors">Home</a>
-            {!isSearch && (
+            {isSearch ? (
+              <>
+                <ChevronRight size={9} className="text-zinc-300 dark:text-zinc-700" />
+                <span className="text-zinc-500 dark:text-zinc-400 font-medium">Search Results</span>
+              </>
+            ) : (
               <>
                 <ChevronRight size={9} className="text-zinc-300 dark:text-zinc-700" />
                 <span>{toTitleCase(activeMainCat === 'all' ? 'Products' : activeMainCat)}</span>
@@ -310,15 +315,26 @@ function DiscoveryContent({
           </div>
 
           {/* Title + Count row */}
-          <div className="flex items-baseline justify-between pt-4 pb-1">
-            <h1 className="text-[22px] sm:text-[26px] md:text-[30px] font-bold tracking-tight text-zinc-900 dark:text-white leading-none">
-              {displayTitle}
-            </h1>
-            <span className="text-[11px] text-zinc-400 font-medium shrink-0 ml-4">{total} products</span>
-          </div>
+          {isSearch && query ? (
+            <div className="flex items-center gap-3 pt-3 pb-1">
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] sm:text-[14px] text-zinc-500 dark:text-zinc-400">
+                  Showing <span className="font-semibold text-zinc-800 dark:text-zinc-200">{total}</span> results for{' '}
+                  <span className="font-semibold text-zinc-800 dark:text-white">&ldquo;{query}&rdquo;</span>
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-baseline justify-between pt-4 pb-1">
+              <h1 className="text-[22px] sm:text-[26px] md:text-[30px] font-bold tracking-tight text-zinc-900 dark:text-white leading-none">
+                {displayTitle}
+              </h1>
+              <span className="text-[11px] text-zinc-400 font-medium shrink-0 ml-4">{total} products</span>
+            </div>
+          )}
 
-          {/* Subcategory Tabs */}
-          {subCategories.length > 0 && (
+          {/* Subcategory Tabs — only on category pages, NOT on search */}
+          {!isSearch && subCategories.length > 0 && (
             <div className="flex items-center gap-2 pb-3 pt-2 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setCategory(activeMainCat, activeGender, 'all')}
@@ -352,7 +368,8 @@ function DiscoveryContent({
       {/* MAIN CONTENT */}
       <div className="w-full max-w-[1920px] mx-auto pb-20 pt-5" style={{ paddingLeft: 'clamp(16px, 4vw, 64px)', paddingRight: 'clamp(16px, 4vw, 64px)' }}>
 
-        {/* MOBILE: Sticky Filter + Sort Bar */}
+        {/* MOBILE: Sticky Filter + Sort Bar — hide when 0 products */}
+        {(products.length > 0 || loading) && (
         <div className="lg:hidden sticky top-[57px] z-30 bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 rounded-xl mb-4 overflow-hidden">
           <div className="flex">
             <button onClick={() => { setShowFilters(!showFilters); setIsSortOpen(false); }}
@@ -365,7 +382,7 @@ function DiscoveryContent({
             </button>
           </div>
         </div>
-
+        )}
         {/* MOBILE: Filter Bottom Sheet */}
         <AnimatePresence>
           {showFilters && (<>
@@ -421,7 +438,8 @@ function DiscoveryContent({
             {loading && products.length > 0 && <BrandLoaderOverlay />}
           </AnimatePresence>
 
-          {/* DESKTOP SIDEBAR */}
+          {/* DESKTOP SIDEBAR — hide when 0 products on search */}
+          {(products.length > 0 || loading) && (
           <aside className="hidden lg:block w-[220px] flex-shrink-0 lg:sticky top-24 z-10">
             <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 p-5">
               <div className="flex items-center justify-between mb-1">
@@ -436,6 +454,7 @@ function DiscoveryContent({
               </div>
             </div>
           </aside>
+          )}
 
           {/* MAIN CONTENT */}
           <div className="flex-1 w-full relative">

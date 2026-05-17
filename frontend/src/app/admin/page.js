@@ -329,81 +329,100 @@ export default function AdminDashboard() {
   };
 
   const sidebarItems = [
-    { id: 'overview', label: 'Admin Dash', icon: LayoutDashboard },
-    { id: 'products', label: 'Inventory', icon: Package },
+    { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'products', label: 'Products', icon: Package },
     { id: 'categories', label: 'Categories', icon: TrendingUp },
     { id: 'users', label: 'Customers', icon: UsersIcon },
     { id: 'orders', label: 'Orders', icon: ShoppingCart },
-    { id: 'reviews', label: 'Ratings', icon: MessageSquare }
+    { id: 'reviews', label: 'Reviews', icon: MessageSquare }
   ];
 
-  if (loading && activeTab === 'overview') return <div className="min-h-screen flex items-center justify-center font-black text-2xl animate-pulse text-purple-600">LOADING CRAYZEE DATA...</div>;
+  if (loading && activeTab === 'overview') return <div className="min-h-screen flex items-center justify-center font-semibold text-lg animate-pulse text-zinc-400">Loading dashboard...</div>;
 
   return (
-    <main className="min-h-screen bg-white dark:bg-zinc-950 dark:text-zinc-100 flex flex-col overflow-x-hidden pb-20 md:pb-0">
-      {/* Sidebar - Desktop: FIXED vertical sidebar | Mobile: HIDDEN (bottom bar replaces) */}
-      <aside className="hidden md:flex w-72 bg-zinc-950 text-white flex-col p-8 fixed top-0 left-0 h-screen border-r border-zinc-900 z-40 overflow-y-auto thin-scrollbar">
-        <div className="text-3xl font-black mb-12 tracking-tighter text-[#fb5607] uppercase text-left">CRAYZEE ADMIN</div>
-        <nav className="flex flex-col flex-1 gap-3">
+    <main className="min-h-screen bg-[#f8f9fa] dark:bg-zinc-950 dark:text-zinc-100 flex flex-col overflow-x-hidden pb-20 md:pb-0">
+      {/* Sidebar */}
+      <aside className="hidden md:flex w-[260px] bg-white dark:bg-zinc-900 flex-col fixed top-0 left-0 h-screen border-r border-zinc-200 dark:border-zinc-800 z-40 overflow-y-auto thin-scrollbar">
+        <div className="px-7 pt-8 pb-6 border-b border-zinc-100 dark:border-zinc-800">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-[#fb5607] rounded-xl flex items-center justify-center">
+              <ShieldAlert size={18} className="text-white" />
+            </div>
+            <div>
+              <p className="text-[15px] font-bold text-zinc-900 dark:text-white leading-tight">Crayzee</p>
+              <p className="text-[10px] text-zinc-400 font-medium">Admin Panel</p>
+            </div>
+          </div>
+        </div>
+        <nav className="flex flex-col flex-1 px-4 pt-4 gap-0.5">
+          <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider px-3 mb-2">Menu</p>
           {sidebarItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex items-center gap-4 px-6 py-4 rounded-3xl transition-all whitespace-nowrap ${activeTab === item.id ? 'bg-[#fb5607] text-white shadow-[0_0_30px_rgba(251,86,7,0.2)]' : 'hover:bg-zinc-900 text-zinc-500 hover:text-white'
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left ${activeTab === item.id ? 'bg-[#fb5607]/10 text-[#fb5607]' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white'
                 }`}
             >
-              <item.icon size={20} strokeWidth={activeTab === item.id ? 3 : 2} />
-              <span className="font-black text-sm uppercase tracking-widest">{item.label}</span>
+              <item.icon size={18} strokeWidth={activeTab === item.id ? 2.5 : 1.8} />
+              <span className="text-[13px] font-semibold">{item.label}</span>
             </button>
           ))}
         </nav>
-        <button onClick={() => router.push('/')} className="flex mt-8 items-center gap-4 px-6 py-4 text-zinc-600 hover:text-white transition-all font-black text-xs uppercase tracking-widest justify-start">
-          <ShieldAlert size={20} /> Exit Dashboard
-        </button>
+        <div className="px-4 pb-6 mt-auto">
+          <button onClick={() => router.push('/')} className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all">
+            <ShieldAlert size={18} />
+            <span className="text-[13px] font-semibold">Exit Dashboard</span>
+          </button>
+        </div>
       </aside>
 
-      {/* Mobile Bottom Navigation Bar - fixed at bottom like real apps */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950 border-t border-zinc-800 flex justify-around items-center px-1 py-2 safe-area-pb">
+      {/* Mobile Bottom Nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 flex justify-around items-center px-1 py-1.5 safe-area-pb">
         {sidebarItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`flex flex-col items-center gap-1 px-2 py-1.5 rounded-xl transition-all min-w-0 ${activeTab === item.id ? 'text-[#fb5607]' : 'text-zinc-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all min-w-0 ${activeTab === item.id ? 'text-[#fb5607]' : 'text-zinc-400'}`}
           >
             <item.icon size={18} strokeWidth={activeTab === item.id ? 2.5 : 1.5} />
-            <span className="text-[8px] font-bold uppercase tracking-wider truncate">{item.label}</span>
+            <span className="text-[9px] font-medium truncate">{item.label}</span>
           </button>
         ))}
       </nav>
 
       {/* Content */}
-      <section className="flex-1 md:ml-72 p-4 sm:p-8 md:p-12 lg:p-16 overflow-y-auto overflow-x-hidden">
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-10 gap-3">
+      <section className="flex-1 md:ml-[260px] p-4 sm:p-6 md:p-8 lg:p-10 overflow-y-auto overflow-x-hidden">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-3">
           <div>
-            <h1 className="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 capitalize">{activeTab === 'overview' ? 'Dashboard Overview' : activeTab}</h1>
-            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium mt-0.5">Manage your store from here</p>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 capitalize">{activeTab === 'overview' ? 'Dashboard' : activeTab}</h1>
+            <p className="text-[12px] text-zinc-400 dark:text-zinc-500 font-normal mt-0.5">Welcome back, manage your store</p>
           </div>
-          <span className="bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-            {user?.name}
-          </span>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#fb5607]/10 rounded-full flex items-center justify-center text-[#fb5607] text-[11px] font-bold">
+              {user?.name?.[0]?.toUpperCase()}
+            </div>
+            <span className="text-[12px] font-medium text-zinc-600 dark:text-zinc-400">{user?.name}</span>
+          </div>
         </header>
 
         {/* --- OVERVIEW TAB --- */}
         {activeTab === 'overview' && (
-          <div className="space-y-8">
-            <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6">
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
               {[
-                { label: 'Total Revenue', val: `₹${data.orders.reduce((t, o) => t + (o.isPaid ? o.totalPrice : 0), 0)}`, icon: DollarSign, color: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600' },
-                { label: 'Active Orders', val: data.orders.length, icon: ShoppingCart, color: 'bg-[#fb5607]/10 text-[#fb5607]' },
-                { label: 'Total Users', val: data.users.length, icon: UsersIcon, color: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100' },
-                { label: 'Inventory', val: data.products.length, icon: Package, color: 'bg-orange-50 dark:bg-orange-950/40 text-orange-600' }
+                { label: 'Total Revenue', val: `₹${data.orders.reduce((t, o) => t + (o.isPaid ? o.totalPrice : 0), 0).toLocaleString()}`, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-950/30' },
+                { label: 'Active Orders', val: data.orders.length, icon: ShoppingCart, color: 'text-[#fb5607]', bg: 'bg-[#fb5607]/10' },
+                { label: 'Total Users', val: data.users.length, icon: UsersIcon, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-950/30' },
+                { label: 'Products', val: data.products.length, icon: Package, color: 'text-violet-600', bg: 'bg-violet-50 dark:bg-violet-950/30' }
               ].map((stat, i) => (
-                <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-4 sm:p-8 rounded-2xl sm:rounded-[40px] hover:border-zinc-200 dark:hover:border-zinc-700 transition-all group">
-                  <div className={`${stat.color} w-10 h-10 sm:w-16 sm:h-16 rounded-xl sm:rounded-3xl flex items-center justify-center mb-3 sm:mb-6 group-hover:scale-110 transition-transform`}>
-                    <stat.icon className="w-5 h-5 sm:w-8 sm:h-8" />
+                <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-5 rounded-2xl hover:shadow-md transition-all">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`${stat.bg} w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center`}>
+                      <stat.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.color}`} />
+                    </div>
                   </div>
-                  <p className="text-zinc-400 dark:text-zinc-500 text-[8px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-[0.2em] mb-1">{stat.label}</p>
-                  <h3 className="text-xl sm:text-4xl font-black leading-none">{stat.val}</h3>
+                  <p className="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium mb-0.5">{stat.label}</p>
+                  <h3 className="text-xl sm:text-2xl font-bold leading-none text-zinc-900 dark:text-white">{stat.val}</h3>
                 </div>
               ))}
             </div>
@@ -412,14 +431,14 @@ export default function AdminDashboard() {
 
         {/* --- PRODUCTS TAB --- */}
         {activeTab === 'products' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-4">
-              <h2 className="text-lg sm:text-2xl font-black uppercase tracking-tight">Crayzee Inventory</h2>
+          <div className="space-y-5">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+              <h2 className="text-lg sm:text-xl font-bold">All Products</h2>
               <button
                 onClick={handleAddProduct}
-                className="bg-zinc-950 dark:bg-zinc-800 text-white px-5 py-3 sm:px-8 sm:py-4 rounded-full font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-[#fb5607] transition-all shadow-xl justify-center"
+                className="bg-[#fb5607] text-white px-5 py-2.5 rounded-xl font-semibold text-[12px] flex items-center gap-2 hover:bg-[#e04d06] transition-all justify-center"
               >
-                <Plus size={16} /> Add New Drop
+                <Plus size={16} /> Add Product
               </button>
             </div>
 
@@ -465,12 +484,12 @@ export default function AdminDashboard() {
                 <table className="w-full text-left">
                   <thead className="bg-zinc-50 dark:bg-zinc-800/50">
                     <tr>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Product</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Category</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Gender</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Sub-Cat</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Price</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest text-center">Actions</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Product</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Category</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Gender</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Sub-Cat</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Price</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -513,7 +532,7 @@ export default function AdminDashboard() {
 
             {/* Pagination */}
             <div className="flex items-center justify-between px-1 sm:px-4">
-              <p className="text-[9px] sm:text-[10px] font-black uppercase text-zinc-400 tracking-widest">Page {productPage} of {totalProductPages}</p>
+              <p className="text-[9px] sm:text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Page {productPage} of {totalProductPages}</p>
               <div className="flex gap-2">
                 <button disabled={productPage === 1} onClick={() => setProductPage(prev => prev - 1)} className="px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl font-bold text-[10px] uppercase disabled:opacity-30">Prev</button>
                 <button disabled={productPage === totalProductPages} onClick={() => setProductPage(prev => prev + 1)} className="px-4 py-2 bg-zinc-950 dark:bg-zinc-800 text-white rounded-xl font-bold text-[10px] uppercase disabled:opacity-30">Next</button>
@@ -525,9 +544,9 @@ export default function AdminDashboard() {
         {/* --- CATEGORIES TAB --- */}
         {activeTab === 'categories' && (
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-4">
-              <h2 className="text-lg sm:text-2xl font-black uppercase tracking-tight">Main Categories</h2>
-              <button onClick={handleAddCategory} className="bg-[#fb5607] text-white px-5 py-3 sm:px-8 sm:py-4 rounded-full font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-black transition-all shadow-xl justify-center">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+              <h2 className="text-lg sm:text-xl font-bold">Categories</h2>
+              <button onClick={handleAddCategory} className="bg-[#fb5607] text-white px-5 py-2.5 rounded-xl font-semibold text-[12px] flex items-center gap-2 hover:bg-[#e04d06] transition-all justify-center">
                 <Plus size={16} /> Add Category
               </button>
             </div>
@@ -566,11 +585,11 @@ export default function AdminDashboard() {
                 <table className="w-full text-left">
                   <thead className="bg-zinc-50 dark:bg-zinc-800/50">
                     <tr>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Category Name</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Slug (URL)</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Sub-Items</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Status</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest text-center">Actions</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Category Name</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Slug (URL)</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Sub-Items</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Status</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -607,7 +626,7 @@ export default function AdminDashboard() {
         {/* --- USERS TAB --- */}
         {activeTab === 'users' && (
           <div className="space-y-4">
-            <h2 className="text-lg sm:text-2xl font-black uppercase tracking-tight mb-4">All Customers</h2>
+            <h2 className="text-lg sm:text-xl font-bold mb-4">All Customers</h2>
 
             {/* Mobile: Card Layout */}
             <div className="md:hidden space-y-3">
@@ -640,10 +659,10 @@ export default function AdminDashboard() {
               <table className="w-full text-left">
                 <thead className="bg-zinc-50 dark:bg-zinc-800/50">
                   <tr>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">User Profile</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Role</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Status</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest text-center">Security</th>
+                    <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">User Profile</th>
+                    <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Role</th>
+                    <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Status</th>
+                    <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 text-center">Security</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -742,11 +761,11 @@ export default function AdminDashboard() {
                 <table className="w-full text-left">
                   <thead className="bg-zinc-50 dark:bg-zinc-800/50">
                     <tr>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Order Details</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Customer</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Pricing</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest">Status</th>
-                      <th className="px-6 py-4 text-[10px] font-black uppercase text-zinc-400 tracking-widest text-center">Lifecycle</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Order Details</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Customer</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Pricing</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Status</th>
+                      <th className="px-6 py-4 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 text-center">Lifecycle</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -798,26 +817,26 @@ export default function AdminDashboard() {
 
         {/* --- REVIEWS MODERATION --- */}
         {activeTab === 'reviews' && (
-          <div className="space-y-6 sm:space-y-12">
-            {/* Review Stats Summary */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-8">
-              <div className="bg-zinc-900 dark:bg-zinc-800 text-white p-5 sm:p-8 rounded-2xl sm:rounded-[40px] shadow-2xl border border-zinc-800 dark:border-zinc-700">
-                <p className="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1">Total Feedback</p>
-                <h3 className="text-3xl sm:text-5xl font-black">{getReviewStats().totalReviews}</h3>
-                <p className="text-[9px] font-bold text-[#fb5607] mt-2 uppercase tracking-widest">Verified Reviews</p>
+          <div className="space-y-6">
+            {/* Review Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl">
+                <p className="text-[11px] text-zinc-400 font-medium mb-1">Total Reviews</p>
+                <h3 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">{getReviewStats().totalReviews}</h3>
+                <p className="text-[10px] text-[#fb5607] font-medium mt-1">Verified Feedback</p>
               </div>
-              <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 sm:p-8 rounded-2xl sm:rounded-[40px]">
-                <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">Avg Rating</p>
-                <div className="flex items-center gap-3">
-                  <h3 className="text-3xl sm:text-5xl font-black">{getReviewStats().globalAvg}</h3>
-                  <Star size={20} fill="#fb5607" className="text-[#fb5607]" />
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl">
+                <p className="text-[11px] text-zinc-400 font-medium mb-1">Average Rating</p>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">{getReviewStats().globalAvg}</h3>
+                  <Star size={18} fill="#fb5607" className="text-[#fb5607]" />
                 </div>
-                <p className="text-[9px] font-bold text-zinc-400 mt-2 uppercase tracking-widest">Across {getReviewStats().reviewedProductsCount} Drops</p>
+                <p className="text-[10px] text-zinc-400 font-medium mt-1">Across {getReviewStats().reviewedProductsCount} products</p>
               </div>
-              <div className="bg-[#fb5607] text-white p-5 sm:p-8 rounded-2xl sm:rounded-[40px] shadow-xl shadow-[#fb5607]/20">
-                <p className="text-[9px] font-black uppercase tracking-widest opacity-60 mb-1">Satisfaction</p>
-                <h3 className="text-3xl sm:text-5xl font-black">{Math.round((getReviewStats().globalAvg / 5) * 100)}%</h3>
-                <div className="w-full bg-white/20 h-1.5 rounded-full mt-3 overflow-hidden">
+              <div className="bg-[#fb5607] text-white p-5 rounded-2xl">
+                <p className="text-[11px] font-medium opacity-70 mb-1">Satisfaction</p>
+                <h3 className="text-2xl sm:text-3xl font-bold">{Math.round((getReviewStats().globalAvg / 5) * 100)}%</h3>
+                <div className="w-full bg-white/20 h-1.5 rounded-full mt-2 overflow-hidden">
                   <div className="bg-white h-full rounded-full" style={{ width: `${(getReviewStats().globalAvg / 5) * 100}%` }} />
                 </div>
               </div>
@@ -893,15 +912,15 @@ export default function AdminDashboard() {
         {showCategoryModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-12">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCategoryModal(false)} className="absolute inset-0 bg-zinc-950 dark:bg-zinc-900/40 backdrop-blur-md" />
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 30 }} className="relative bg-white dark:bg-zinc-950 dark:text-zinc-100 w-full max-w-2xl rounded-[48px] shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
-              <div className="p-10 md:p-14">
-                <div className="flex justify-between items-center mb-8">
-                  <h2 className="text-3xl font-black uppercase tracking-tighter">{currentCategory ? 'Edit Category' : 'New Category'}</h2>
-                  <button onClick={() => setShowCategoryModal(false)} className="p-4 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:rotate-90 transition-all"><X size={24} /></button>
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 30 }} className="relative bg-white dark:bg-zinc-950 dark:text-zinc-100 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+              <div className="p-6 md:p-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold">{currentCategory ? 'Edit Category' : 'New Category'}</h2>
+                  <button onClick={() => setShowCategoryModal(false)} className="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 transition-all"><X size={18} /></button>
                 </div>
-                <form onSubmit={saveCategory} className="space-y-6">
+                <form onSubmit={saveCategory} className="space-y-5">
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 block mb-3">Category Name</label>
+                    <label className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 block mb-2">Category Name</label>
                     <input type="text" value={categoryFormData.name} onChange={e => setCategoryFormData({ ...categoryFormData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') })} className="w-full bg-zinc-50 dark:bg-zinc-900 dark:bg-zinc-800 border-none rounded-2xl px-6 py-4 font-bold outline-none focus:ring-2 focus:ring-[#fb5607] transition-all" required />
                   </div>
                   <div>
@@ -963,11 +982,11 @@ export default function AdminDashboard() {
         {showProductModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-12">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowProductModal(false)} className="absolute inset-0 bg-zinc-950 dark:bg-zinc-900/40 backdrop-blur-md" />
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 30 }} className="relative bg-white dark:bg-zinc-950 dark:text-zinc-100 w-full max-w-4xl rounded-[48px] shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
-              <div className="p-10 md:p-14">
-                <div className="flex justify-between items-center mb-12">
-                  <h2 className="text-4xl font-black uppercase tracking-tighter">{currentProduct ? 'Update Drop' : 'New Drop Leak'}</h2>
-                  <button onClick={() => setShowProductModal(false)} className="p-4 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:rotate-90 transition-all"><X size={24} /></button>
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 30 }} className="relative bg-white dark:bg-zinc-950 dark:text-zinc-100 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+              <div className="p-6 md:p-8">
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-xl font-bold">{currentProduct ? 'Edit Product' : 'Add Product'}</h2>
+                  <button onClick={() => setShowProductModal(false)} className="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 transition-all"><X size={18} /></button>
                 </div>
                 <form onSubmit={saveProduct} className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-6">
@@ -1120,14 +1139,14 @@ export default function AdminDashboard() {
         {showOrderModal && currentOrder && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-12">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowOrderModal(false)} className="absolute inset-0 bg-zinc-950 dark:bg-zinc-900/40 backdrop-blur-md" />
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 30 }} className="relative bg-white dark:bg-zinc-950 dark:text-zinc-100 w-full max-w-5xl rounded-[48px] shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
-              <div className="p-10 md:p-14">
-                <div className="flex justify-between items-center mb-12">
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 30 }} className="relative bg-white dark:bg-zinc-950 dark:text-zinc-100 w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+              <div className="p-6 md:p-8">
+                <div className="flex justify-between items-center mb-8">
                   <div>
-                    <h2 className="text-4xl font-black uppercase tracking-tighter">Order Details</h2>
-                    <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-2">ID: #{currentOrder._id}</p>
+                    <h2 className="text-xl font-bold">Order Details</h2>
+                    <p className="text-[11px] text-zinc-400 font-medium mt-1">#{currentOrder._id}</p>
                   </div>
-                  <button onClick={() => setShowOrderModal(false)} className="p-4 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:rotate-90 transition-all"><X size={24} /></button>
+                  <button onClick={() => setShowOrderModal(false)} className="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 transition-all"><X size={18} /></button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12">

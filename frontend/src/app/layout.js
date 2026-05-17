@@ -1,11 +1,12 @@
-import { Space_Grotesk } from "next/font/google";
+import { Inter } from "next/font/google";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import GlobalProviders from "@/components/layout/GlobalProviders";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const inter = Inter({
   variable: "--font-main",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata = {
@@ -16,10 +17,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${spaceGrotesk.variable} antialiased`}>
+      <body className={`${inter.variable} antialiased`}>
         <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
-          {children}
+          <GlobalProviders>
+            {children}
+          </GlobalProviders>
         </GoogleOAuthProvider>
       </body>
     </html>

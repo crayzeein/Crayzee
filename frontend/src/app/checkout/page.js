@@ -197,9 +197,29 @@ export default function CheckoutPage() {
             <Navbar />
             <div className="w-full max-w-[1920px] mx-auto pt-24 pb-20" style={{ paddingLeft: 'clamp(16px, 4vw, 64px)', paddingRight: 'clamp(16px, 4vw, 64px)' }}>
                 <div className="max-w-5xl mx-auto">
-                    {/* Header */}
+                    {/* Step Progress */}
                     <div className="mb-8">
-                        <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">Checkout</h1>
+                        <div className="flex items-center justify-center gap-0 max-w-md mx-auto mb-6">
+                            {[
+                                { step: 1, label: 'Bag', done: true },
+                                { step: 2, label: 'Address', done: false },
+                                { step: 3, label: 'Payment', done: false },
+                            ].map((item, i) => (
+                                <div key={item.step} className="flex items-center">
+                                    <div className="flex flex-col items-center">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                                            item.done ? 'bg-green-500 text-white' : i === 1 ? 'bg-[#fb5607] text-white' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-500'
+                                        }`}>
+                                            {item.done ? '✓' : item.step}
+                                        </div>
+                                        <span className={`text-[10px] mt-1.5 font-medium ${i === 1 ? 'text-[#fb5607]' : 'text-zinc-400'}`}>{item.label}</span>
+                                    </div>
+                                    {i < 2 && <div className={`w-16 sm:w-24 h-[2px] mx-2 mb-5 ${item.done ? 'bg-green-500' : 'bg-zinc-200 dark:bg-zinc-700'}`} />}
+                                </div>
+                            ))}
+                        </div>
+                        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">Shipping & Payment</h1>
+                        <p className="text-[12px] text-zinc-400 mt-1">Complete your order details below</p>
                     </div>
 
                     <div className="flex flex-col lg:flex-row gap-6">
@@ -314,13 +334,30 @@ export default function CheckoutPage() {
                                             : 'Place COD Order'
                                     }
                                 </button>
+
+                                {/* Trust Strip */}
+                                <div className="flex items-center justify-center gap-4 sm:gap-6 mt-4 py-3">
+                                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+                                        <ShieldCheck size={13} className="text-green-500" />
+                                        <span>Secure Payment</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+                                        <Package size={13} className="text-green-500" />
+                                        <span>100% Genuine</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+                                        <Truck size={13} className="text-green-500" />
+                                        <span>Easy Returns</span>
+                                    </div>
+                                </div>
                             </form>
                         </div>
 
                         {/* Right: Summary */}
                         <div className="w-full lg:w-[340px]">
                             <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl sticky top-24 border border-zinc-100 dark:border-zinc-800">
-                                <h2 className="text-base font-bold mb-5 text-zinc-900 dark:text-white">Order Summary</h2>
+                                <h2 className="text-base font-bold mb-1 text-zinc-900 dark:text-white">Order Summary</h2>
+                                <p className="text-[11px] text-zinc-400 mb-4">{cart.length} {cart.length === 1 ? 'item' : 'items'} in your bag</p>
 
                                 <div className="space-y-4 mb-5 max-h-52 overflow-y-auto pr-1 no-scrollbar">
                                     {cart.map((item) => (

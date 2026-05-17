@@ -32,7 +32,7 @@ exports.getSuggestions = async (req, res) => {
 
     const cleanQ = q.trim();
 
-    // Find matching products (for extracting unique search terms)
+    // Filter out stop words to get meaningful keywords
     const keywords = cleanQ.split(/\s+/).filter(w => w.length > 0 && !STOP_WORDS.has(w.toLowerCase()));
     if (keywords.length === 0) return res.json([]);
 
@@ -44,41 +44,56 @@ exports.getSuggestions = async (req, res) => {
 
     const products = await Product.find({ $and: orConditions })
       .limit(50)
-      .select('name category subCategory gender')
+      .select('name category subCategory gender images')
       .lean();
 
-    // Generate smart query suggestions from actual product data
-    const suggestionSet = new Set();
+    if (products.length === 0) return res.json([]);
+
+    // Build suggestion map: text -> { text, image, categoryLabel }
+    const suggestionMap = new Map();
+
+    const addSuggestion = (text, product) => {
+      if (suggestionMap.has(text)) return;
+      const image = product.images && product.images[0] ? product.images[0].url : '';
+      // Build Flipkart-style category label like "in Women's Graphic"
+      let categoryLabel = '';
+      if (product.gender && product.subCategory) {
+        categoryLabel = `in ${product.gender}'s ${product.subCategory}`;
+      } else if (product.subCategory) {
+        categoryLabel = `in ${product.subCategory}`;
+      } else if (product.gender) {
+        categoryLabel = `in ${product.gender}'s ${product.category || 'Collection'}`;
+      }
+      suggestionMap.set(text, { text, image, categoryLabel });
+    };
 
     products.forEach(p => {
-      // Add the product name as a suggestion
-      if (p.name) suggestionSet.add(p.name);
+      // Add product name as suggestion (with its own image & category)
+      if (p.name) addSuggestion(p.name, p);
 
-      // Add combinations: "query + gender"
-      if (p.gender) suggestionSet.add(`${cleanQ} for ${p.gender}`);
+      // Add "query for gender" combinations
+      if (p.gender) addSuggestion(`${cleanQ} for ${p.gender}`, p);
 
-      // Add combinations: "query + subcategory"
-      if (p.subCategory) suggestionSet.add(`${cleanQ} ${p.subCategory}`);
+      // Add "query subcategory" combinations
+      if (p.subCategory) addSuggestion(`${cleanQ} ${p.subCategory}`, p);
 
-      // Add: "subcategory + gender"
-      if (p.subCategory && p.gender) suggestionSet.add(`${p.subCategory} for ${p.gender}`);
+      // Add "subcategory for gender"
+      if (p.subCategory && p.gender) addSuggestion(`${p.subCategory} for ${p.gender}`, p);
     });
 
-    // Filter suggestions that actually contain the query text
+    // Filter and sort suggestions
     const queryLower = cleanQ.toLowerCase();
-    let results = Array.from(suggestionSet)
-      .filter(s => s.toLowerCase().includes(queryLower) || queryLower.split(/\s+/).some(w => s.toLowerCase().includes(w)))
+    let results = Array.from(suggestionMap.values())
+      .filter(s => s.text.toLowerCase().includes(queryLower) || queryLower.split(/\s+/).some(w => s.text.toLowerCase().includes(w)))
       .sort((a, b) => {
-        // Prioritize exact prefix matches
-        const aStarts = a.toLowerCase().startsWith(queryLower) ? 0 : 1;
-        const bStarts = b.toLowerCase().startsWith(queryLower) ? 0 : 1;
+        const aStarts = a.text.toLowerCase().startsWith(queryLower) ? 0 : 1;
+        const bStarts = b.text.toLowerCase().startsWith(queryLower) ? 0 : 1;
         if (aStarts !== bStarts) return aStarts - bStarts;
-        return a.length - b.length;
+        return a.text.length - b.text.length;
       })
       .slice(0, 8);
 
-    // Return as array of { text } objects
-    res.json(results.map(text => ({ text })));
+    res.json(results);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

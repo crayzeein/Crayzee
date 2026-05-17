@@ -9,6 +9,8 @@ export const useStore = create(
       token: null,
       cart: [],
       wishlist: [],
+      cartToast: null,
+      wishlistToast: null,
       _hasHydrated: false,
 
       setHasHydrated: (state) => set({ _hasHydrated: state }),
@@ -23,18 +25,29 @@ export const useStore = create(
         const cartItemId = size ? `${product._id}-${size}` : product._id;
         const itemIndex = state.cart.findIndex((item) => item.cartItemId === cartItemId);
 
+        const toastData = {
+          name: product.name,
+          image: product.images?.[0]?.url || product.image || '',
+          price: product.price,
+          size: size,
+          qty: qty
+        };
+
         if (itemIndex > -1) {
           const newCart = [...state.cart];
           const potentialQty = newCart[itemIndex].qty + qty;
           newCart[itemIndex].qty = product.stock !== undefined ? Math.min(potentialQty, product.stock) : potentialQty;
-          return { cart: newCart };
+          return { cart: newCart, cartToast: toastData };
         }
 
         const finalQty = product.stock !== undefined ? Math.min(qty, product.stock) : qty;
         return {
-          cart: [...state.cart, { ...product, cartItemId, qty: finalQty, selectedSize: size }]
+          cart: [...state.cart, { ...product, cartItemId, qty: finalQty, selectedSize: size }],
+          cartToast: toastData
         };
       }),
+
+      clearCartToast: () => set({ cartToast: null }),
 
       updateCartQty: (cartItemId, qty) => set((state) => ({
         cart: state.cart.map((item) =>
@@ -55,13 +68,22 @@ export const useStore = create(
         const isInWishlist = state.wishlist.find((item) => item._id === product._id);
 
         let newWishlist;
+        const added = !isInWishlist;
         if (isInWishlist) {
           newWishlist = state.wishlist.filter((item) => item._id !== product._id);
         } else {
           newWishlist = [...state.wishlist, product];
         }
 
-        set({ wishlist: newWishlist });
+        set({
+          wishlist: newWishlist,
+          wishlistToast: {
+            name: product.name,
+            image: product.images?.[0]?.url || product.image || '',
+            price: product.price,
+            added: added
+          }
+        });
 
         // If user is logged in, sync with backend
         if (state.user) {
@@ -72,6 +94,8 @@ export const useStore = create(
           }
         }
       },
+
+      clearWishlistToast: () => set({ wishlistToast: null }),
 
       // Category State
       activeMainCat: 'all',

@@ -79,11 +79,16 @@ export default function ProfilePage() {
             {/* Sidebar */}
             <div className="lg:col-span-1 space-y-4">
               <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 text-center">
-                <div className="w-20 h-20 bg-[#fb5607]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <User size={36} className="text-[#fb5607]" />
+                <div className="w-20 h-20 bg-[#fb5607] rounded-2xl flex items-center justify-center mx-auto mb-4 text-white text-3xl font-bold shadow-lg shadow-[#fb5607]/20">
+                  {user.name?.[0]?.toUpperCase()}
                 </div>
                 <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-0.5">{user.name}</h2>
-                <p className="text-zinc-400 text-sm mb-5">{user.email}</p>
+                <p className="text-zinc-400 text-sm">{user.email}</p>
+                <p className="text-[10px] text-zinc-400 mt-1 font-medium">
+                  Member since {new Date(user.createdAt || Date.now()).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
+                </p>
+
+                <div className="h-px bg-zinc-100 dark:bg-zinc-800 my-4" />
 
                 <button
                   onClick={() => { logout(); router.push('/'); }}
@@ -112,12 +117,16 @@ export default function ProfilePage() {
                   </Link>
                 )}
                 <Link href="/orders" className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 group hover:border-[#fb5607]/30 hover:shadow-md transition-all">
-                  <Package size={22} className="mb-3 text-blue-500" />
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mb-3">
+                    <Package size={18} className="text-blue-500" />
+                  </div>
                   <p className="text-sm font-semibold text-zinc-900 dark:text-white">My Orders</p>
-                  <p className="text-[10px] text-zinc-400 mt-0.5">Track orders</p>
+                  <p className="text-[10px] text-zinc-400 mt-0.5">Track & manage</p>
                 </Link>
                 <Link href="/wishlist" className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 group hover:border-[#fb5607]/30 hover:shadow-md transition-all">
-                  <Heart size={22} className="mb-3 text-red-500" />
+                  <div className="w-10 h-10 rounded-xl bg-[#fb5607]/10 flex items-center justify-center mb-3">
+                    <Heart size={18} className="text-[#fb5607]" />
+                  </div>
                   <p className="text-sm font-semibold text-zinc-900 dark:text-white">Wishlist</p>
                   <p className="text-[10px] text-zinc-400 mt-0.5">Saved items</p>
                 </Link>

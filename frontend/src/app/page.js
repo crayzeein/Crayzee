@@ -82,10 +82,10 @@ export default function Home() {
           {/* Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between" style={{ marginBottom: 'clamp(16px, 2vw, 28px)', gap: 'clamp(8px, 1vw, 16px)' }}>
             <div>
-              <div className="flex items-center text-[#fb5607] font-bold uppercase tracking-[0.2em]" style={{ gap: 'clamp(6px, 0.5vw, 10px)', fontSize: 'clamp(9px, 0.7vw, 11px)', marginBottom: 'clamp(8px, 1vw, 14px)' }}>
-                <Zap className="fill-[#fb5607]" style={{ width: 'clamp(11px, 0.9vw, 14px)', height: 'clamp(11px, 0.9vw, 14px)' }} /> Fresh Out the Lab
+              <div className="flex items-center text-[#fb5607] font-semibold uppercase tracking-[0.15em]" style={{ gap: 'clamp(6px, 0.5vw, 10px)', fontSize: 'clamp(9px, 0.7vw, 11px)', marginBottom: 'clamp(6px, 0.8vw, 10px)' }}>
+                <Zap className="fill-[#fb5607]" style={{ width: 'clamp(11px, 0.9vw, 14px)', height: 'clamp(11px, 0.9vw, 14px)' }} /> Just Dropped
               </div>
-              <h2 className="font-bold tracking-tight text-zinc-900 dark:text-white leading-[1.05]" style={{ fontSize: 'clamp(26px, 3.5vw, 52px)' }}>
+              <h2 className="font-bold tracking-tight text-zinc-900 dark:text-white leading-[1.1]" style={{ fontSize: 'clamp(22px, 2.5vw, 40px)' }}>
                 New <span className="text-[#fb5607]">Arrivals</span>
               </h2>
             </div>
@@ -135,11 +135,11 @@ export default function Home() {
         <div className="w-full max-w-[1920px] mx-auto" style={{ paddingLeft: 'clamp(16px, 5vw, 80px)', paddingRight: 'clamp(16px, 5vw, 80px)' }}>
           <div className="flex flex-col md:flex-row md:items-end justify-between" style={{ marginBottom: 'clamp(16px, 2vw, 28px)', gap: 'clamp(8px, 1vw, 16px)' }}>
             <div>
-              <div className="flex items-center text-[#fb5607] font-bold uppercase tracking-[0.2em]" style={{ gap: 'clamp(6px, 0.5vw, 10px)', fontSize: 'clamp(9px, 0.7vw, 11px)', marginBottom: 'clamp(8px, 1vw, 14px)' }}>
+              <div className="flex items-center text-[#fb5607] font-semibold uppercase tracking-[0.15em]" style={{ gap: 'clamp(6px, 0.5vw, 10px)', fontSize: 'clamp(9px, 0.7vw, 11px)', marginBottom: 'clamp(6px, 0.8vw, 10px)' }}>
                 <Flame className="fill-[#fb5607]" style={{ width: 'clamp(11px, 0.9vw, 14px)', height: 'clamp(11px, 0.9vw, 14px)' }} /> Trending Now
               </div>
-              <h2 className="font-bold tracking-tight text-zinc-900 dark:text-white leading-[1.05]" style={{ fontSize: 'clamp(26px, 3.5vw, 52px)' }}>
-                Trending <span className="text-[#fb5607]">Drops</span>
+              <h2 className="font-bold tracking-tight text-zinc-900 dark:text-white leading-[1.1]" style={{ fontSize: 'clamp(22px, 2.5vw, 40px)' }}>
+                Trending <span className="text-[#fb5607]">Collection</span>
               </h2>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function Home() {
                 CRAYZEE<span className="text-[#fb5607]">.IN</span>
               </Link>
               <p className="text-zinc-500 font-normal leading-relaxed" style={{ maxWidth: 'clamp(280px, 30vw, 400px)', fontSize: 'clamp(12px, 0.95vw, 15px)', marginBottom: 'clamp(20px, 2.5vw, 36px)' }}>
-                India's wildest streetwear label. We don't just sell clothes, we drop vibes. Built for the rebels, the dreamers, and the ones who never blend in.
+                India's favourite streetwear destination. Premium quality, bold designs, and styles that make you stand out. Made for those who dare to be different.
               </p>
               <div className="flex" style={{ gap: 'clamp(8px, 0.8vw, 14px)' }}>
                 <a href="https://www.instagram.com/crayzee.in?igsh=MXQzNjF3cDE3bmpoZA==" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-white/5 flex items-center justify-center hover:bg-gradient-to-br hover:from-[#f09433] hover:via-[#e6683c] hover:to-[#bc1888] transition-all cursor-pointer group" style={{ width: 'clamp(38px, 3vw, 48px)', height: 'clamp(38px, 3vw, 48px)' }}>
@@ -204,7 +204,7 @@ export default function Home() {
 
           {/* Bottom Bar */}
           <div className="border-t border-white/5 flex flex-col md:flex-row justify-between items-center" style={{ paddingTop: 'clamp(18px, 2.2vw, 32px)', gap: 'clamp(12px, 1.5vw, 24px)' }}>
-            <p className="text-zinc-600 font-medium" style={{ fontSize: 'clamp(9px, 0.7vw, 11px)', letterSpacing: '0.12em' }}>© 2026 CRAYZEE STREETWEAR CO. MADE IN INDIA 🇮🇳</p>
+            <p className="text-zinc-600 font-medium" style={{ fontSize: 'clamp(9px, 0.7vw, 11px)', letterSpacing: '0.08em' }}>© 2026 CRAYZEE.IN — All rights reserved. Made in India 🇮🇳</p>
             <div className="flex items-center opacity-25 invert" style={{ gap: 'clamp(12px, 1.5vw, 24px)' }}>
               <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" style={{ height: 'clamp(12px, 1vw, 16px)' }} />
               <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" style={{ height: 'clamp(12px, 1vw, 16px)' }} />

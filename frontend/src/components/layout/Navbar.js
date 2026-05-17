@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useStore } from '@/store/useStore';
-import { ShoppingCart, Heart, User, Search, Menu, X } from 'lucide-react';
+import { ShoppingCart, Heart, User, Search, Menu, X, Clock, ArrowUpRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -18,7 +18,54 @@ export default function Navbar() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [categories, setCategories] = useState([]);
+  const [recentSearches, setRecentSearches] = useState([]);
   const router = useRouter();
+
+  // Load recent searches from localStorage
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('crayzee_recent_searches') || '[]');
+      setRecentSearches(saved.slice(0, 5));
+    } catch { setRecentSearches([]); }
+  }, []);
+
+  const saveRecentSearch = (term) => {
+    if (!term || term.trim().length < 2) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem('crayzee_recent_searches') || '[]');
+      const updated = [term.trim(), ...saved.filter(s => s.toLowerCase() !== term.trim().toLowerCase())].slice(0, 5);
+      localStorage.setItem('crayzee_recent_searches', JSON.stringify(updated));
+      setRecentSearches(updated);
+    } catch {}
+  };
+
+  const clearRecentSearches = () => {
+    localStorage.removeItem('crayzee_recent_searches');
+    setRecentSearches([]);
+  };
+
+  const performSearch = (term) => {
+    if (!term || !term.trim()) return;
+    saveRecentSearch(term.trim());
+    router.push(`/search?q=${encodeURIComponent(term.trim())}`);
+    setSearchQuery('');
+    setIsSearchFocused(false);
+    setIsMobileSearchOpen(false);
+    setSelectedIndex(-1);
+  };
+
+  const highlightMatch = (text, query) => {
+    if (!query || query.length < 1) return text;
+    const idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return text;
+    return (
+      <>
+        {text.slice(0, idx)}
+        <span className="font-bold text-zinc-900 dark:text-white">{text.slice(idx, idx + query.length)}</span>
+        {text.slice(idx + query.length)}
+      </>
+    );
+  };
   const pathname = usePathname();
 
   const isMenActive = pathname.startsWith('/men');
@@ -87,13 +134,9 @@ export default function Navbar() {
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
       if (selectedIndex >= 0 && suggestions[selectedIndex]) {
-        router.push(`/search?q=${encodeURIComponent(suggestions[selectedIndex].text)}`);
-        setSearchQuery('');
-        setIsSearchFocused(false);
+        performSearch(suggestions[selectedIndex].text);
       } else if (searchQuery.trim()) {
-        router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-        setSearchQuery('');
-        setIsSearchFocused(false);
+        performSearch(searchQuery.trim());
       }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -168,52 +211,92 @@ export default function Navbar() {
 
             {/* Suggestions Dropdown */}
             <AnimatePresence>
-              {isSearchFocused && (suggestions.length > 0 || searchQuery.length > 2) && (
+              {isSearchFocused && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full right-0 mt-2 w-[320px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-100 dark:border-white/5 overflow-hidden z-[60]"
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                  transition={{ duration: 0.18, ease: 'easeOut' }}
+                  className="absolute top-full right-0 mt-2 w-[380px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-100 dark:border-white/10 overflow-hidden z-[60]"
                 >
-                  <div className="py-1">
-                    {suggestions.length > 0 ? (
-                      <div className="flex flex-col">
-                        {suggestions.map((item, idx) => (
-                          <button
-                            key={idx}
-                            onMouseEnter={() => setSelectedIndex(idx)}
-                            onClick={() => {
-                              router.push(`/search?q=${encodeURIComponent(item.text)}`);
-                              setSearchQuery('');
-                              setIsSearchFocused(false);
-                            }}
-                            className={`flex items-center gap-3 px-4 py-2.5 transition-all text-left ${selectedIndex === idx ? 'bg-zinc-50 dark:bg-white/5' : ''}`}
-                          >
-                            <Search size={14} className="text-zinc-300 shrink-0" />
-                            <span className="text-sm text-zinc-700 dark:text-zinc-200 truncate flex-1">{item.text}</span>
-                          </button>
-                        ))}
-                      </div>
-                    ) : searchQuery.length > 2 && (
-                      <div className="px-4 py-3 text-center">
-                        <p className="text-xs text-zinc-400">No suggestions found</p>
-                      </div>
-                    )}
+                  {/* When query is empty/short — show recent searches only */}
+                  {searchQuery.trim().length < 2 ? (
+                    <div className="py-2">
+                      {recentSearches.length > 0 ? (
+                        <div className="px-4 pt-2 pb-2">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+                              <Clock size={11} /> Recent Searches
+                            </p>
+                            <button onClick={clearRecentSearches} className="text-[10px] text-zinc-400 hover:text-[#fb5607] transition-colors">Clear</button>
+                          </div>
+                          <div className="flex flex-col">
+                            {recentSearches.map((term, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => performSearch(term)}
+                                className="flex items-center gap-3 px-1 py-2 text-left hover:bg-zinc-50 dark:hover:bg-white/5 rounded-lg transition-colors group"
+                              >
+                                <Clock size={13} className="text-zinc-300 dark:text-zinc-600 shrink-0" />
+                                <span className="text-[13px] text-zinc-600 dark:text-zinc-300 flex-1 truncate">{term}</span>
+                                <ArrowUpRight size={13} className="text-zinc-300 dark:text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="px-4 py-4 text-center">
+                          <Search size={20} className="mx-auto text-zinc-200 dark:text-zinc-700 mb-2" />
+                          <p className="text-xs text-zinc-400 dark:text-zinc-500">Search for products...</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    /* When typing — show Flipkart-style suggestions with images */
+                    <div className="py-1">
+                      {suggestions.length > 0 ? (
+                        <div className="flex flex-col">
+                          {suggestions.map((item, idx) => (
+                            <button
+                              key={idx}
+                              onMouseEnter={() => setSelectedIndex(idx)}
+                              onClick={() => performSearch(item.text)}
+                              className={`flex items-center gap-3 px-4 py-2.5 transition-all text-left group ${selectedIndex === idx ? 'bg-zinc-50 dark:bg-white/5' : ''}`}
+                            >
+                              {/* Product thumbnail */}
+                              {item.image ? (
+                                <img src={item.image} alt="" className="w-8 h-8 rounded-lg object-cover shrink-0 bg-zinc-100 dark:bg-zinc-800" />
+                              ) : (
+                                <Search size={14} className="text-zinc-300 dark:text-zinc-600 shrink-0 w-8 flex justify-center" />
+                              )}
+                              {/* Text + category label */}
+                              <div className="flex-1 min-w-0">
+                                <span className="text-[13px] text-zinc-700 dark:text-zinc-300 truncate block">{highlightMatch(item.text, searchQuery)}</span>
+                                {item.categoryLabel && (
+                                  <span className="text-[10px] text-[#2874f0] dark:text-[#6b9eff] font-medium">{item.categoryLabel}</span>
+                                )}
+                              </div>
+                              <ArrowUpRight size={13} className="text-zinc-300 dark:text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                            </button>
+                          ))}
+                        </div>
+                      ) : searchQuery.length > 2 && (
+                        <div className="px-4 py-4 text-center">
+                          <p className="text-xs text-zinc-400 dark:text-zinc-500">No suggestions found</p>
+                        </div>
+                      )}
 
-                    {searchQuery.trim().length > 1 && (
-                      <button
-                        onClick={() => {
-                          router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-                          setIsSearchFocused(false);
-                          setSearchQuery('');
-                        }}
-                        className="w-full px-4 py-2.5 border-t border-zinc-100 dark:border-white/5 text-[11px] font-semibold text-[#fb5607] hover:bg-[#fb5607]/5 transition-colors flex items-center gap-2"
-                      >
-                        <Search size={12} />
-                        Search for "{searchQuery}"
-                      </button>
-                    )}
-                  </div>
+                      {searchQuery.trim().length > 1 && (
+                        <button
+                          onClick={() => performSearch(searchQuery)}
+                          className="w-full px-4 py-2.5 border-t border-zinc-100 dark:border-white/5 text-[11px] font-semibold text-[#fb5607] hover:bg-[#fb5607]/5 transition-colors flex items-center gap-2"
+                        >
+                          <Search size={12} />
+                          Search for &ldquo;{searchQuery}&rdquo;
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -285,9 +368,7 @@ export default function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && searchQuery.trim()) {
-                      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-                      setIsMobileSearchOpen(false);
-                      setSearchQuery('');
+                      performSearch(searchQuery.trim());
                     }
                   }}
                   className="w-full pl-12 pr-4 py-4 bg-zinc-100 dark:bg-white/5 rounded-2xl text-lg font-bold outline-none border-2 border-transparent focus:border-[#fb5607]"
@@ -305,35 +386,59 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* Mobile Suggestions */}
-            <div className="flex flex-col">
-              {suggestions.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    router.push(`/search?q=${encodeURIComponent(item.text)}`);
-                    setIsMobileSearchOpen(false);
-                    setSearchQuery('');
-                  }}
-                  className="flex items-center gap-3 px-2 py-3 border-b border-zinc-100 dark:border-white/5 text-left"
-                >
-                  <Search size={16} className="text-zinc-300 shrink-0" />
-                  <span className="text-sm text-zinc-700 dark:text-zinc-200 flex-1">{item.text}</span>
-                </button>
-              ))}
-              {searchQuery.trim().length > 2 && (
-                <button
-                  onClick={() => {
-                    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-                    setIsMobileSearchOpen(false);
-                    setSearchQuery('');
-                  }}
-                  className="w-full py-4 mt-4 rounded-2xl bg-[#fb5607] text-white font-semibold text-sm text-center"
-                >
-                  Search for "{searchQuery}"
-                </button>
-              )}
-            </div>
+            {/* Mobile - Recent Searches (when empty) */}
+            {searchQuery.trim().length < 2 && recentSearches.length > 0 && (
+              <div>
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <Clock size={13} /> Recent Searches
+                    </p>
+                    <button onClick={clearRecentSearches} className="text-[11px] text-zinc-400 hover:text-[#fb5607] transition-colors">Clear</button>
+                  </div>
+                  {recentSearches.map((term, idx) => (
+                    <button key={idx} onClick={() => performSearch(term)} className="flex items-center gap-3 w-full px-1 py-3 border-b border-zinc-100 dark:border-white/5 text-left">
+                      <Clock size={15} className="text-zinc-300 dark:text-zinc-600 shrink-0" />
+                      <span className="text-sm text-zinc-700 dark:text-zinc-200 flex-1">{term}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Suggestions — Flipkart style with images */}
+            {searchQuery.trim().length >= 2 && (
+              <div className="flex flex-col">
+                {suggestions.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => performSearch(item.text)}
+                    className="flex items-center gap-3 px-2 py-3 border-b border-zinc-100 dark:border-white/5 text-left"
+                  >
+                    {/* Product thumbnail */}
+                    {item.image ? (
+                      <img src={item.image} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0 bg-zinc-100 dark:bg-zinc-800" />
+                    ) : (
+                      <Search size={16} className="text-zinc-300 dark:text-zinc-600 shrink-0 w-10 flex justify-center" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-zinc-700 dark:text-zinc-200 block truncate">{highlightMatch(item.text, searchQuery)}</span>
+                      {item.categoryLabel && (
+                        <span className="text-[11px] text-[#2874f0] dark:text-[#6b9eff] font-medium">{item.categoryLabel}</span>
+                      )}
+                    </div>
+                  </button>
+                ))}
+                {searchQuery.trim().length > 1 && (
+                  <button
+                    onClick={() => performSearch(searchQuery)}
+                    className="w-full py-4 mt-4 rounded-2xl bg-[#fb5607] text-white font-semibold text-sm text-center"
+                  >
+                    Search for &ldquo;{searchQuery}&rdquo;
+                  </button>
+                )}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
