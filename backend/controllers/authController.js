@@ -50,31 +50,42 @@ exports.registerUser = async (req, res) => {
     }
 
     const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ message: 'User already exists' });
 
-    const user = await User.create({ name, email, password, isVerified: false });
-    
-    if (user) {
-      // Generate OTP
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      user.signupOtp = otp;
-      user.signupOtpExpires = Date.now() + 15 * 60 * 1000;
-      await user.save();
-
-      console.log(`[SIGNUP OTP GENERATED] ${otp} for ${email}`);
-
-      // Send email in background (don't await — respond immediately)
-      transporter.sendMail({
-        from: '"Crayzee" <noreply@crayzee.in>',
-        to: email,
-        subject: 'Your Crayzee Verification Code',
-        html: `<p>Your verification code is: <strong>${otp}</strong></p><p>Please enter it to verify your account.</p>`,
-      }).catch(emailErr => {
-        console.log('Email send failed:', emailErr.message);
-      });
-
-      res.status(201).json({ message: 'OTP sent to email. Please verify.' });
+    // Only block if user is already verified (actual existing user)
+    if (userExists && userExists.isVerified) {
+      return res.status(400).json({ message: 'User already exists. Please login.' });
     }
+
+    let user;
+    if (userExists && !userExists.isVerified) {
+      // User exists but never verified — let them re-signup (resend OTP)
+      userExists.name = name;
+      if (password) userExists.password = password;
+      user = userExists;
+    } else {
+      // Brand new user
+      user = await User.create({ name, email, password, isVerified: false });
+    }
+    
+    // Generate fresh OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.signupOtp = otp;
+    user.signupOtpExpires = Date.now() + 15 * 60 * 1000;
+    await user.save();
+
+    console.log(`[SIGNUP OTP GENERATED] ${otp} for ${email}`);
+
+    // Send email in background (don't await — respond immediately)
+    transporter.sendMail({
+      from: `"Crayzee" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Your Crayzee Verification Code',
+      html: `<p>Your verification code is: <strong>${otp}</strong></p><p>Please enter it to verify your account.</p>`,
+    }).catch(emailErr => {
+      console.log('Email send failed:', emailErr.message);
+    });
+
+    res.status(201).json({ message: 'OTP sent to email. Please verify.' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -150,7 +161,7 @@ exports.forgotPassword = async (req, res) => {
 
     // Send email in background (don't await — respond immediately)
     transporter.sendMail({
-      from: '"Crayzee" <noreply@crayzee.in>',
+      from: `"Crayzee" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Your Crayzee Password Reset OTP',
       html: `<p>Your OTP for password reset is: <strong>${otp}</strong></p><p>It covers the next 15 minutes.</p>`,
