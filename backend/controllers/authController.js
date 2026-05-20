@@ -6,10 +6,42 @@ const { OAuth2Client } = require('google-auth-library');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+// --- TOKEN GENERATION ---
+const generateAccessToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '15m' });
 };
 
+const generateRefreshToken = (id) => {
+  return jwt.sign({ id, type: 'refresh' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+};
+
+// Helper: generate both tokens and save refresh token to DB
+const generateTokenPair = async (user) => {
+  const accessToken = generateAccessToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
+
+  // Save hashed refresh token to user document
+  user.refreshToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
+  await user.save({ validateBeforeSave: false });
+
+  return { accessToken, refreshToken };
+};
+
+// Helper: build user response with both tokens
+const buildAuthResponse = async (user) => {
+  const { accessToken, refreshToken } = await generateTokenPair(user);
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+    token: accessToken,
+    refreshToken: refreshToken
+  };
+};
+
+// --- REGISTER ---
 exports.registerUser = async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -49,6 +81,7 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+// --- VERIFY SIGNUP OTP ---
 exports.verifySignupOTP = async (req, res) => {
   const { email, otp } = req.body;
   try {
@@ -65,18 +98,14 @@ exports.verifySignupOTP = async (req, res) => {
     user.signupOtpExpires = undefined;
     await user.save();
 
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user._id)
-    });
+    const response = await buildAuthResponse(user);
+    res.json(response);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+// --- LOGIN ---
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -87,13 +116,8 @@ exports.loginUser = async (req, res) => {
         return res.status(403).json({ message: 'Please verify your email address to log in' });
       }
 
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id)
-      });
+      const response = await buildAuthResponse(user);
+      res.json(response);
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -186,6 +210,7 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+// --- GOOGLE AUTH ---
 exports.googleAuth = async (req, res) => {
   const { credential } = req.body;
   try {
@@ -216,13 +241,8 @@ exports.googleAuth = async (req, res) => {
       await user.save();
     }
 
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user._id)
-    });
+    const authResponse = await buildAuthResponse(user);
+    res.json(authResponse);
 
   } catch (error) {
     console.error('Google Auth Error:', error);
@@ -230,6 +250,59 @@ exports.googleAuth = async (req, res) => {
   }
 };
 
+// --- REFRESH TOKEN ---
+exports.refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(401).json({ message: 'Refresh token required' });
+  }
+
+  try {
+    // Verify the refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    
+    if (decoded.type !== 'refresh') {
+      return res.status(401).json({ message: 'Invalid token type' });
+    }
+
+    // Find user and check stored refresh token matches
+    const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    const user = await User.findOne({ _id: decoded.id, refreshToken: hashedToken });
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid refresh token' });
+    }
+
+    if (user.isBlocked) {
+      return res.status(403).json({ message: 'User is blocked' });
+    }
+
+    // Generate new token pair
+    const authResponse = await buildAuthResponse(user);
+    res.json(authResponse);
+
+  } catch (error) {
+    // Token expired or invalid
+    return res.status(401).json({ message: 'Refresh token expired, please login again' });
+  }
+};
+
+// --- LOGOUT (Invalidate refresh token) ---
+exports.logoutUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      user.refreshToken = undefined;
+      await user.save({ validateBeforeSave: false });
+    }
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// --- PROFILE ---
 exports.getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (user) {
@@ -238,6 +311,7 @@ exports.getUserProfile = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      createdAt: user.createdAt,
       shippingAddress: user.shippingAddress
     });
   } else {
@@ -268,13 +342,17 @@ exports.updateUserProfile = async (req, res) => {
 
       const updatedUser = await user.save();
 
+      const { accessToken, refreshToken } = await generateTokenPair(updatedUser);
+
       res.json({
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
         role: updatedUser.role,
+        createdAt: updatedUser.createdAt,
         shippingAddress: updatedUser.shippingAddress,
-        token: generateToken(updatedUser._id),
+        token: accessToken,
+        refreshToken: refreshToken,
       });
     } else {
       res.status(404).json({ message: 'User not found' });

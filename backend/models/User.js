@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   signupOtp: { type: String },
   signupOtpExpires: { type: Date },
+  refreshToken: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 

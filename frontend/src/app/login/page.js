@@ -17,13 +17,14 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/';
+  const sessionExpired = searchParams.get('expired') === '1';
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const { data } = await API.post('/auth/login', { email, password });
-      setUser(data, data.token);
+      setUser(data, data.token, data.refreshToken);
 
       // Fetch user's wishlist immediately after login
       try {
@@ -45,7 +46,7 @@ function LoginContent() {
     onSuccess: async (tokenResponse) => {
       try {
         const { data } = await API.post('/auth/google', { credential: tokenResponse.access_token });
-        setUser(data, data.token);
+        setUser(data, data.token, data.refreshToken);
 
         try {
           const { data: wishlistData } = await API.get('/users/wishlist');
@@ -101,6 +102,13 @@ function LoginContent() {
               <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">Welcome back</h2>
               <p className="text-zinc-400 text-sm mt-1">Sign in to your account</p>
             </div>
+
+            {/* Session Expired Message */}
+            {sessionExpired && (
+              <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl text-amber-700 dark:text-amber-400 text-[12px] font-medium text-center">
+                Session expired. Please sign in again.
+              </div>
+            )}
 
             {/* Google Button — First for faster conversion */}
             <button

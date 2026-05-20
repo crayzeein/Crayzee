@@ -43,7 +43,7 @@ export default function SignupPage() {
     setLoading(true);
     try {
       const { data } = await API.post('/auth/verify-signup', { email, otp });
-      setUser(data, data.token);
+      setUser(data, data.token, data.refreshToken);
       router.push('/');
     } catch (error) {
       alert(error.response?.data?.message || 'Invalid verification code');
@@ -59,7 +59,7 @@ export default function SignupPage() {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
         const { data } = await API.post('/auth/google', { credential: tokenResponse.access_token });
-        setUser(data, data.token);
+        setUser(data, data.token, data.refreshToken);
         router.push('/');
       } catch (error) {
         alert(error.response?.data?.message || 'Google Signup failed');

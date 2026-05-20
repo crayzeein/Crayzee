@@ -49,7 +49,7 @@ export default function ProfilePage() {
       }
 
       const { data } = await API.put('/auth/profile', payload);
-      setUser(data, data.token);
+      setUser(data, data.token, data.refreshToken);
       setEditMode(null);
       setSecurityData({ password: '', confirmPassword: '' });
       setMessage({ type: 'success', text: `${mode.charAt(0).toUpperCase() + mode.slice(1)} updated successfully!` });

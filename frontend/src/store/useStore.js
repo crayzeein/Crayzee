@@ -7,6 +7,7 @@ export const useStore = create(
     (set, get) => ({
       user: null,
       token: null,
+      refreshToken: null,
       cart: [],
       wishlist: [],
       cartToast: null,
@@ -14,9 +15,15 @@ export const useStore = create(
       _hasHydrated: false,
 
       setHasHydrated: (state) => set({ _hasHydrated: state }),
-      setUser: (user, token) => set({ user, token }),
-      logout: () => {
-        set({ user: null, token: null, cart: [], wishlist: [] });
+      setUser: (user, token, refreshToken) => set({ user, token, refreshToken: refreshToken || null }),
+      logout: async () => {
+        // Invalidate refresh token on backend
+        try {
+          await API.post('/auth/logout');
+        } catch (e) {
+          // Ignore errors during logout
+        }
+        set({ user: null, token: null, refreshToken: null, cart: [], wishlist: [] });
         localStorage.removeItem('crayzee-storage');
       },
       setWishlist: (wishlist) => set({ wishlist }),
@@ -115,6 +122,7 @@ export const useStore = create(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        refreshToken: state.refreshToken,
         cart: state.cart,
         wishlist: state.wishlist
       }),
