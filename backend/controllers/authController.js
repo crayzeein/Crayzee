@@ -63,16 +63,15 @@ exports.registerUser = async (req, res) => {
 
       console.log(`[SIGNUP OTP GENERATED] ${otp} for ${email}`);
 
-      try {
-        await transporter.sendMail({
-          from: '"Crayzee" <noreply@crayzee.in>',
-          to: email,
-          subject: 'Your Crayzee Verification Code',
-          html: `<p>Your verification code is: <strong>${otp}</strong></p><p>Please enter it to verify your account.</p>`,
-        });
-      } catch(emailErr) {
-        console.log('Nodemailer error (safe to ignore in dev if testing with console log):', emailErr);
-      }
+      // Send email in background (don't await — respond immediately)
+      transporter.sendMail({
+        from: '"Crayzee" <noreply@crayzee.in>',
+        to: email,
+        subject: 'Your Crayzee Verification Code',
+        html: `<p>Your verification code is: <strong>${otp}</strong></p><p>Please enter it to verify your account.</p>`,
+      }).catch(emailErr => {
+        console.log('Email send failed:', emailErr.message);
+      });
 
       res.status(201).json({ message: 'OTP sent to email. Please verify.' });
     }
@@ -149,17 +148,15 @@ exports.forgotPassword = async (req, res) => {
 
     console.log(`[OTP GENERATED] ${otp} for ${email}`);
 
-    // Try sending email, catch error but don't crash standard flow during development
-    try {
-      await transporter.sendMail({
-        from: '"Crayzee" <noreply@crayzee.in>',
-        to: email,
-        subject: 'Your Crayzee Password Reset OTP',
-        html: `<p>Your OTP for password reset is: <strong>${otp}</strong></p><p>It covers the next 15 minutes.</p>`,
-      });
-    } catch(emailErr) {
-      console.log('Nodemailer error (safe to ignore in dev if testing with console log):', emailErr);
-    }
+    // Send email in background (don't await — respond immediately)
+    transporter.sendMail({
+      from: '"Crayzee" <noreply@crayzee.in>',
+      to: email,
+      subject: 'Your Crayzee Password Reset OTP',
+      html: `<p>Your OTP for password reset is: <strong>${otp}</strong></p><p>It covers the next 15 minutes.</p>`,
+    }).catch(emailErr => {
+      console.log('Email send failed:', emailErr.message);
+    });
 
     res.json({ message: 'OTP sent to your email successfully.' });
   } catch (error) {
