@@ -16,6 +16,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const { setUser } = useStore();
   const router = useRouter();
 
@@ -49,6 +50,24 @@ export default function SignupPage() {
       alert(error.response?.data?.message || 'Invalid verification code');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    if (resendCooldown > 0) return;
+    try {
+      await API.post('/auth/register', { name, email, password });
+      alert('New verification code sent! Check your inbox & spam folder.');
+      // Start 60s cooldown
+      setResendCooldown(60);
+      const timer = setInterval(() => {
+        setResendCooldown(prev => {
+          if (prev <= 1) { clearInterval(timer); return 0; }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to resend code');
     }
   };
 
@@ -183,6 +202,10 @@ export default function SignupPage() {
 
             {step === 2 && (
               <form onSubmit={handleVerifyOTP} className="space-y-4">
+                <div className="p-3 bg-blue-50 dark:bg-blue-500/10 rounded-xl text-[12px] text-blue-600 dark:text-blue-400 text-center">
+                  Code sent to <strong>{email}</strong><br/>
+                  <span className="text-[11px] text-zinc-400">Check inbox, spam & promotions folder</span>
+                </div>
                 <div>
                   <label className="block text-[12px] font-medium text-zinc-500 mb-1.5">Verification Code</label>
                   <input
@@ -198,6 +221,14 @@ export default function SignupPage() {
                 <button disabled={loading}
                   className="w-full py-3 rounded-xl bg-[#fb5607] text-white font-semibold text-sm hover:bg-[#e04e06] transition-all disabled:opacity-50">
                   {loading ? 'Verifying...' : 'Verify & Sign In'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResendOTP}
+                  disabled={resendCooldown > 0}
+                  className="w-full py-2.5 rounded-xl text-[12px] font-medium text-zinc-500 hover:text-[#fb5607] transition-colors disabled:text-zinc-300 disabled:cursor-not-allowed"
+                >
+                  {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Didn't receive code? Resend"}
                 </button>
               </form>
             )}
