@@ -12,6 +12,9 @@ const rateLimit = require('express-rate-limit');
 
 const app = express();
 
+// Trust proxy for rate limiting behind Render/reverse proxy
+app.set('trust proxy', 1);
+
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
