@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const { OAuth2Client } = require('google-auth-library');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -76,8 +76,8 @@ exports.registerUser = async (req, res) => {
     console.log(`[SIGNUP OTP GENERATED] ${otp} for ${email}`);
 
     // Send email in background (don't await — respond immediately)
-    transporter.sendMail({
-      from: `"Crayzee" <${process.env.EMAIL_USER}>`,
+    resend.emails.send({
+      from: `Crayzee <${emailFrom}>`,
       to: email,
       subject: 'Your Crayzee Verification Code',
       html: `<p>Your verification code is: <strong>${otp}</strong></p><p>Please enter it to verify your account.</p>`,
@@ -138,22 +138,8 @@ exports.loginUser = async (req, res) => {
 
 // --- FORGOT PASSWORD FLOW ---
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  family: 4,
-  auth: {
-    user: process.env.EMAIL_USER || 'test@example.com',
-    pass: process.env.EMAIL_PASS || 'testpass',
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
+const emailFrom = process.env.EMAIL_FROM || 'onboarding@resend.dev';
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -169,8 +155,8 @@ exports.forgotPassword = async (req, res) => {
     console.log(`[OTP GENERATED] ${otp} for ${email}`);
 
     // Send email in background (don't await — respond immediately)
-    transporter.sendMail({
-      from: `"Crayzee" <${process.env.EMAIL_USER}>`,
+    resend.emails.send({
+      from: `Crayzee <${emailFrom}>`,
       to: email,
       subject: 'Your Crayzee Password Reset OTP',
       html: `<p>Your OTP for password reset is: <strong>${otp}</strong></p><p>It covers the next 15 minutes.</p>`,
