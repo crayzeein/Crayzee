@@ -81,8 +81,14 @@ exports.registerUser = async (req, res) => {
       to: email,
       subject: 'Your Crayzee Verification Code',
       html: `<p>Your verification code is: <strong>${otp}</strong></p><p>Please enter it to verify your account.</p>`,
+    }).then(response => {
+      if (response.error) {
+        console.log('Email send failed:', response.error);
+      } else {
+        console.log('Email sent successfully:', response.data);
+      }
     }).catch(emailErr => {
-      console.log('Email send failed:', emailErr.message);
+      console.log('Email send failed (network error):', emailErr.message);
     });
 
     res.status(201).json({ message: 'OTP sent to email. Please verify.' });
@@ -160,8 +166,14 @@ exports.forgotPassword = async (req, res) => {
       to: email,
       subject: 'Your Crayzee Password Reset OTP',
       html: `<p>Your OTP for password reset is: <strong>${otp}</strong></p><p>It covers the next 15 minutes.</p>`,
+    }).then(response => {
+      if (response.error) {
+        console.log('Email send failed:', response.error);
+      } else {
+        console.log('Email sent successfully:', response.data);
+      }
     }).catch(emailErr => {
-      console.log('Email send failed:', emailErr.message);
+      console.log('Email send failed (network error):', emailErr.message);
     });
 
     res.json({ message: 'OTP sent to your email successfully.' });
