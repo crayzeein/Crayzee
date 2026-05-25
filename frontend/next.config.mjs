@@ -18,6 +18,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'yisol-idm-vton.hf.space',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.hf.space',
+      },
     ],
   },
 };

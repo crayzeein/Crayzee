@@ -183,7 +183,11 @@ export default function TryOnModal({ isOpen, onClose, product, onAddToCart }) {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Download error:', err);
+      console.error('Download error, falling back to direct link:', err);
+      // Fallback: open in new tab
+      if (typeof window !== 'undefined') {
+        window.open(resultImage, '_blank');
+      }
     }
   };
 
@@ -480,7 +484,7 @@ export default function TryOnModal({ isOpen, onClose, product, onAddToCart }) {
                           <Sparkles size={9} /> AI Result
                         </p>
                         <div className="aspect-[3/4] rounded-xl overflow-hidden relative bg-zinc-100 dark:bg-zinc-800 ring-2 ring-purple-400/30">
-                          <Image src={resultImage} alt="Try-On Result" fill className="object-cover" unoptimized />
+                          <img src={resultImage} alt="Try-On Result" className="w-full h-full object-cover" />
                         </div>
                       </div>
                     </div>
