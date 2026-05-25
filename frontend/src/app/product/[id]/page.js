@@ -3,6 +3,8 @@ import { useEffect, useState, use } from 'react';
 import { useStore } from '@/store/useStore';
 import Navbar from '@/components/layout/Navbar';
 import ProductCard from '@/components/product/ProductCard';
+import TryOnButton from '@/components/product/TryOnButton';
+import TryOnModal from '@/components/product/TryOnModal';
 import API from '@/utils/api';
 import { ShoppingCart, Heart, Share2, Star, ChevronDown, ChevronRight, Truck, Shield, RotateCcw, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,6 +30,7 @@ export default function ProductDetailPage({ params }) {
   const [userComment, setUserComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [hoverRating, setHoverRating] = useState(0);
+  const [showTryOn, setShowTryOn] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -293,6 +296,11 @@ export default function ProductDetailPage({ params }) {
                   </button>
                 </div>
 
+                {/* AI Try-On Button */}
+                <div className="hidden sm:block mb-5">
+                  <TryOnButton onClick={() => setShowTryOn(true)} category={product.category} />
+                </div>
+
                 {/* Share */}
                 <button onClick={handleShare}
                   className="hidden sm:flex items-center gap-2 text-zinc-400 hover:text-[#fb5607] transition-colors text-[11px] font-medium mb-6">
@@ -482,7 +490,22 @@ export default function ProductDetailPage({ params }) {
           className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-400">
           <Share2 size={16} />
         </button>
+        {(!product.category || ['clothing', 'fashion'].includes(product.category.toLowerCase())) && (
+          <button onClick={() => setShowTryOn(true)}
+            className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl transition-all"
+            style={{ background: 'linear-gradient(135deg, #7c3aed, #ec4899)' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+          </button>
+        )}
       </div>
+
+      {/* AI Try-On Modal */}
+      <TryOnModal
+        isOpen={showTryOn}
+        onClose={() => setShowTryOn(false)}
+        product={product}
+        onAddToCart={() => addToCart(product, quantity, selectedSize)}
+      />
     </main>
   );
 }

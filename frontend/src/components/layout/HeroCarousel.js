@@ -9,6 +9,15 @@ import API from '@/utils/api';
 // Professional static banners — always look great on all screen sizes
 const STATIC_BANNERS = [
   {
+    id: 'static-ai',
+    badge: '✨ New Feature',
+    title1: 'AI VIRTUAL',
+    title2: 'TRY-ON',
+    subtitle: 'See how any outfit looks on you before buying. Upload your photo and let AI style you instantly.',
+    image: '/banners/hero-ai-tryon.png',
+    link: '/browse',
+  },
+  {
     id: 'static-1',
     badge: 'Limited Drop',
     title1: 'URBAN',
