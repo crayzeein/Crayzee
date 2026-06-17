@@ -158,7 +158,7 @@ export default function TryOnModal({ isOpen, onClose, product, onAddToCart }) {
 
     try {
       const result = await generateTryOn(product._id, userPhotoFile);
-      setResultImage(result.resultImage);
+      setResultImage(result.resultImage || result.resultimage);
       setRemaining(result.remaining);
       setStep(STEPS.RESULT);
     } catch (err) {

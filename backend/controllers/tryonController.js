@@ -156,10 +156,10 @@ const generateTryOn = async (req, res) => {
       console.error('Failed to cleanup temp photo:', err.message);
     });
 
-    // 7. Return result
     res.json({
       success: true,
       resultImage: resultImageUrl,
+      resultimage: resultImageUrl,
       remaining: rateCheck.remaining,
       message: `Try-on generated! You have ${rateCheck.remaining} tries remaining today.`
     });
