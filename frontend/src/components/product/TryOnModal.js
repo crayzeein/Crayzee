@@ -484,7 +484,7 @@ export default function TryOnModal({ isOpen, onClose, product, onAddToCart }) {
                           <Sparkles size={9} /> AI Result
                         </p>
                         <div className="aspect-[3/4] rounded-xl overflow-hidden relative bg-zinc-100 dark:bg-zinc-800 ring-2 ring-purple-400/30">
-                          <img src={resultImage} alt="Try-On Result" className="w-full h-full object-cover" />
+                          <img src={resultImage} alt="Try-On Result" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         </div>
                       </div>
                     </div>
