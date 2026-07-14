@@ -55,47 +55,95 @@ const uploadToCloudinary = (buffer) => {
   });
 };
 
-// Helper: Call HuggingFace IDM-VTON Space (FREE)
-const callHuggingFace = async (garmentImageUrl, humanImageUrl, garmentDescription) => {
-  // Dynamic import for ES module
+// Helper: pull a usable image URL out of a Gradio output value, whatever
+// shape it comes in (raw string, {url}, {path}, or a gallery item wrapping
+// one of those in an "image" key).
+const extractImageUrl = (outputItem, spaceOrigin) => {
+  if (!outputItem) return null;
+  const item = outputItem.image || outputItem;
+  if (typeof item === 'string') return item;
+  if (item.url) return item.url;
+  if (item.path) return `${spaceOrigin}/file=${item.path}`;
+  return null;
+};
+
+// Free public virtual try-on Spaces, tried in order. Each Space has its own
+// independent HuggingFace GPU quota, so when one is exhausted/busy we fall
+// through to the next instead of failing the whole request.
+const TRYON_PROVIDERS = [
+  {
+    name: 'IDM-VTON',
+    call: async (Client, handle_file, garmentImageUrl, humanImageUrl, garmentDescription) => {
+      const client = await Client.connect('yisol/IDM-VTON');
+      const result = await client.predict('/tryon', {
+        dict: {
+          background: handle_file(humanImageUrl),
+          layers: [],
+          composite: null
+        },
+        garm_img: handle_file(garmentImageUrl),
+        garment_des: garmentDescription || 'clothing item',
+        is_checked: true,
+        is_checked_crop: true,
+        denoise_steps: 35,
+        seed: 42
+      });
+      return extractImageUrl(result?.data?.[0], 'https://yisol-idm-vton.hf.space');
+    }
+  },
+  {
+    name: 'OOTDiffusion',
+    call: async (Client, handle_file, garmentImageUrl, humanImageUrl) => {
+      const client = await Client.connect('levihsu/OOTDiffusion');
+      const result = await client.predict('/process_hd', [
+        handle_file(humanImageUrl),  // Model
+        handle_file(garmentImageUrl), // Garment
+        1,    // Images
+        30,   // Steps
+        2.0,  // Guidance scale
+        -1    // Seed (random)
+      ]);
+      const gallery = result?.data?.[0];
+      const first = Array.isArray(gallery) ? gallery[0] : gallery;
+      return extractImageUrl(first, 'https://levihsu-ootdiffusion.hf.space');
+    }
+  },
+  {
+    name: 'Kolors-Virtual-Try-On',
+    call: async (Client, handle_file, garmentImageUrl, humanImageUrl) => {
+      const client = await Client.connect('Kwai-Kolors/Kolors-Virtual-Try-On');
+      const result = await client.predict(2, [
+        handle_file(humanImageUrl),   // Person image
+        handle_file(garmentImageUrl), // Garment image
+        0,     // Seed
+        true   // Randomize seed
+      ]);
+      return extractImageUrl(result?.data?.[0], 'https://kwai-kolors-kolors-virtual-try-on.hf.space');
+    }
+  }
+];
+
+// Helper: try each free provider in order until one succeeds
+const generateWithFallback = async (garmentImageUrl, humanImageUrl, garmentDescription) => {
   const { Client, handle_file } = await import('@gradio/client');
 
-  console.log('Connecting to HuggingFace IDM-VTON Space...');
-  const client = await Client.connect("yisol/IDM-VTON");
-
-  console.log('Calling /tryon API...');
-  const result = await client.predict("/tryon", {
-    dict: {
-      "background": handle_file(humanImageUrl),
-      "layers": [],
-      "composite": null
-    },
-    garm_img: handle_file(garmentImageUrl),
-    garment_des: garmentDescription || "clothing item",
-    is_checked: true,        // Use auto-masking
-    is_checked_crop: true,   // Auto-crop
-    denoise_steps: 35,       // More steps = better garment blending/realism
-    seed: 42                 // Fixed seed for reproducible output
-  });
-
-  console.log('HuggingFace result received');
-
-  // Result contains [output_image, masked_image]
-  // We want the first one (the try-on result)
-  if (result && result.data && result.data[0]) {
-    const outputData = result.data[0];
-    // The result can be a URL or a file object with url property
-    if (typeof outputData === 'string') {
-      return outputData;
-    } else if (outputData.url) {
-      return outputData.url;
-    } else if (outputData.path) {
-      // Build the URL from the Space
-      return `https://yisol-idm-vton.hf.space/file=${outputData.path}`;
+  let lastError;
+  for (const provider of TRYON_PROVIDERS) {
+    try {
+      console.log(`Trying AI try-on provider: ${provider.name}...`);
+      const resultImageUrl = await provider.call(Client, handle_file, garmentImageUrl, humanImageUrl, garmentDescription);
+      if (resultImageUrl) {
+        console.log(`Provider ${provider.name} succeeded`);
+        return { resultImageUrl, providerUsed: provider.name };
+      }
+      throw new Error(`No result image received from ${provider.name}`);
+    } catch (err) {
+      console.error(`Provider ${provider.name} failed:`, err.message);
+      lastError = err;
     }
   }
 
-  throw new Error('No result image received from AI model');
+  throw lastError || new Error('All AI try-on providers failed');
 };
 
 // Helper: Download the HuggingFace result immediately and inline it as base64.
@@ -157,14 +205,14 @@ const generateTryOn = async (req, res) => {
     const userPhotoResult = await uploadToCloudinary(req.file.buffer);
     console.log('User photo uploaded:', userPhotoResult.url);
 
-    // 5. Call HuggingFace Free API
-    console.log('Calling HuggingFace IDM-VTON (free)...');
-    const resultImageUrl = await callHuggingFace(
+    // 5. Call free AI try-on providers, falling back through the list if
+    // one is out of quota/busy
+    const { resultImageUrl, providerUsed } = await generateWithFallback(
       garmentImageUrl,
       userPhotoResult.url,
       `${product.name} - ${product.subCategory || 'clothing'}`
     );
-    console.log('Try-on result:', resultImageUrl);
+    console.log(`Try-on result (via ${providerUsed}):`, resultImageUrl);
 
     // 6. Download the result now, while it's still fresh, and inline it
     // so the browser never has to fetch the ephemeral HuggingFace URL itself.
@@ -193,7 +241,7 @@ const generateTryOn = async (req, res) => {
     } else if (error.message?.includes('timeout') || error.message?.includes('timed out')) {
       message = 'Request timed out. The AI server is slow right now. Please try again.';
     } else if (error.message?.includes('GPU') || error.message?.includes('quota')) {
-      message = 'AI server GPU quota exceeded. Please try again in a few minutes.';
+      message = 'All AI servers are busy right now. Please try again in a few minutes.';
     }
 
     res.status(500).json({
