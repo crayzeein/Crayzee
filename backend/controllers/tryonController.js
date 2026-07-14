@@ -67,6 +67,10 @@ const extractImageUrl = (outputItem, spaceOrigin) => {
   return null;
 };
 
+// Free HF account token (optional). Logged-in requests get a larger
+// ZeroGPU quota than fully anonymous ones on these public Spaces.
+const HF_TOKEN = process.env.HF_TOKEN || undefined;
+
 // Free public virtual try-on Spaces, tried in order. Each Space has its own
 // independent HuggingFace GPU quota, so when one is exhausted/busy we fall
 // through to the next instead of failing the whole request.
@@ -74,7 +78,7 @@ const TRYON_PROVIDERS = [
   {
     name: 'IDM-VTON',
     call: async (Client, handle_file, garmentImageUrl, humanImageUrl, garmentDescription) => {
-      const client = await Client.connect('yisol/IDM-VTON');
+      const client = await Client.connect('yisol/IDM-VTON', { hf_token: HF_TOKEN });
       const result = await client.predict('/tryon', {
         dict: {
           background: handle_file(humanImageUrl),
@@ -94,7 +98,7 @@ const TRYON_PROVIDERS = [
   {
     name: 'OOTDiffusion',
     call: async (Client, handle_file, garmentImageUrl, humanImageUrl) => {
-      const client = await Client.connect('levihsu/OOTDiffusion');
+      const client = await Client.connect('levihsu/OOTDiffusion', { hf_token: HF_TOKEN });
       const result = await client.predict('/process_hd', [
         handle_file(humanImageUrl),  // Model
         handle_file(garmentImageUrl), // Garment
@@ -111,7 +115,7 @@ const TRYON_PROVIDERS = [
   {
     name: 'Kolors-Virtual-Try-On',
     call: async (Client, handle_file, garmentImageUrl, humanImageUrl) => {
-      const client = await Client.connect('Kwai-Kolors/Kolors-Virtual-Try-On');
+      const client = await Client.connect('Kwai-Kolors/Kolors-Virtual-Try-On', { hf_token: HF_TOKEN });
       const result = await client.predict(2, [
         handle_file(humanImageUrl),   // Person image
         handle_file(garmentImageUrl), // Garment image
