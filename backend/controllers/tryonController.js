@@ -74,8 +74,8 @@ const callHuggingFace = async (garmentImageUrl, humanImageUrl, garmentDescriptio
     garment_des: garmentDescription || "clothing item",
     is_checked: true,        // Use auto-masking
     is_checked_crop: true,   // Auto-crop
-    denoise_steps: 20,       // Fewer steps = faster
-    seed: 0                  // Random seed
+    denoise_steps: 35,       // More steps = better garment blending/realism
+    seed: 42                 // Fixed seed for reproducible output
   });
 
   console.log('HuggingFace result received');
@@ -96,6 +96,21 @@ const callHuggingFace = async (garmentImageUrl, humanImageUrl, garmentDescriptio
   }
 
   throw new Error('No result image received from AI model');
+};
+
+// Helper: Download the HuggingFace result immediately and inline it as base64.
+// HuggingFace's temp file URLs get evicted/expire within moments, so the
+// browser fetching them later (from a different machine/session) fails with
+// "File not found". Downloading right away, while the file is still fresh,
+// and embedding the bytes directly avoids that race condition entirely.
+const inlineResultImage = async (resultImageUrl) => {
+  const response = await fetch(resultImageUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to download AI result image (status ${response.status})`);
+  }
+  const contentType = response.headers.get('content-type') || 'image/png';
+  const buffer = Buffer.from(await response.arrayBuffer());
+  return `data:${contentType};base64,${buffer.toString('base64')}`;
 };
 
 // @desc    Generate AI Virtual Try-On
@@ -151,15 +166,19 @@ const generateTryOn = async (req, res) => {
     );
     console.log('Try-on result:', resultImageUrl);
 
-    // 6. Clean up temp user photo from Cloudinary (async, don't wait)
+    // 6. Download the result now, while it's still fresh, and inline it
+    // so the browser never has to fetch the ephemeral HuggingFace URL itself.
+    const inlinedResultImage = await inlineResultImage(resultImageUrl);
+
+    // 7. Clean up temp user photo from Cloudinary (async, don't wait)
     cloudinary.uploader.destroy(userPhotoResult.public_id).catch(err => {
       console.error('Failed to cleanup temp photo:', err.message);
     });
 
     res.json({
       success: true,
-      resultImage: resultImageUrl,
-      resultimage: resultImageUrl,
+      resultImage: inlinedResultImage,
+      resultimage: inlinedResultImage,
       remaining: rateCheck.remaining,
       message: `Try-on generated! You have ${rateCheck.remaining} tries remaining today.`
     });
