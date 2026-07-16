@@ -106,6 +106,17 @@ export default function HeroCarousel() {
         >
           {/* Full-bleed Background Image */}
           <div className="hero-img-wrap">
+            {/* Blurred copy fills the wide strip behind the uncropped image */}
+            <Image
+              src={slides[current].image}
+              alt=""
+              aria-hidden="true"
+              fill
+              priority
+              className="hero-img-blur"
+              unoptimized
+              sizes="100vw"
+            />
             <Image
               src={slides[current].image}
               alt={slides[current].title1}

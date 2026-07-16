@@ -73,8 +73,6 @@ exports.registerUser = async (req, res) => {
     user.signupOtpExpires = Date.now() + 15 * 60 * 1000;
     await user.save();
 
-    console.log(`[SIGNUP OTP GENERATED] ${otp} for ${email}`);
-
     // Send email in background (don't await — respond immediately)
     resend.emails.send({
       from: `Crayzee <${emailFrom}>`,
@@ -125,9 +123,16 @@ exports.verifySignupOTP = async (req, res) => {
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
+    // Reject empty credentials outright. This also closes an auth-bypass where
+    // Google-created accounts (which have no real password) could be logged into
+    // with a blank password.
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
     const user = await User.findOne({ email });
-    if (user && (await user.comparePassword(password))) {
-      
+    if (user && user.password && (await user.comparePassword(password))) {
+
       if (user.isVerified === false) {
         return res.status(403).json({ message: 'Please verify your email address to log in' });
       }
@@ -157,8 +162,6 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordOtp = otp;
     user.resetPasswordOtpExpires = Date.now() + 15 * 60 * 1000; // 15 mins
     await user.save();
-
-    console.log(`[OTP GENERATED] ${otp} for ${email}`);
 
     // Send email in background (don't await — respond immediately)
     resend.emails.send({
@@ -247,7 +250,7 @@ exports.googleAuth = async (req, res) => {
       user = await User.create({
         name,
         email,
-        password: '', // Optional password
+        // No password for Google accounts — they authenticate via Google only
         isVerified: true
       });
     } else if (user.isVerified === false) {

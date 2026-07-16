@@ -54,13 +54,12 @@ export default function CheckoutPage() {
         }
     };
 
-    const placeOrder = async (payMethod, paymentResult = {}) => {
+    // paymentDetails carries the Razorpay ids/signature for online payments so the
+    // server can verify the payment itself. Price & paid-status are decided server-side.
+    const placeOrder = async (payMethod, paymentDetails = {}) => {
         const orderData = {
             orderItems: cart.map(item => ({
-                name: item.name,
                 qty: item.qty,
-                image: item.images?.[0]?.url || item.image,
-                price: item.price,
                 size: item.selectedSize,
                 product: item._id
             })),
@@ -68,13 +67,11 @@ export default function CheckoutPage() {
                 address: formData.address,
                 city: formData.city,
                 postalCode: formData.postalCode,
-                country: formData.country
+                country: formData.country,
+                phone: formData.phone
             },
             paymentMethod: payMethod,
-            totalPrice: total,
-            isPaid: payMethod === 'Razorpay',
-            paidAt: payMethod === 'Razorpay' ? new Date() : undefined,
-            paymentResult: paymentResult
+            ...paymentDetails
         };
 
         const { data } = await API.post('/orders', orderData);
@@ -136,12 +133,11 @@ export default function CheckoutPage() {
                         });
 
                         if (verification.verified) {
-                            // 4. Place order with payment details
+                            // 4. Place order — server re-verifies these before marking paid
                             await placeOrder('Razorpay', {
-                                id: response.razorpay_payment_id,
-                                status: 'completed',
-                                update_time: new Date().toISOString(),
-                                email_address: user.email
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
                             });
                         } else {
                             setError('Payment verification failed. Please contact support.');

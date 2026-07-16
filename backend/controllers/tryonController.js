@@ -70,7 +70,6 @@ const extractImageUrl = (outputItem, spaceOrigin) => {
 // Free HF account token (optional). Logged-in requests get a larger
 // ZeroGPU quota than fully anonymous ones on these public Spaces.
 const HF_TOKEN = process.env.HF_TOKEN || undefined;
-console.log('HF_TOKEN loaded from env:', HF_TOKEN ? `yes (starts with ${HF_TOKEN.slice(0, 6)}...)` : 'NO - not set');
 
 // Free public virtual try-on Spaces, tried in order. Each Space has its own
 // independent HuggingFace GPU quota, so when one is exhausted/busy we fall

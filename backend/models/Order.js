@@ -14,7 +14,10 @@ const orderSchema = new mongoose.Schema({
     address: { type: String, required: true },
     city: { type: String, required: true },
     postalCode: { type: String, required: true },
-    country: { type: String, required: true }
+    country: { type: String, required: true },
+    // Not required — orders placed before this field existed have no phone,
+    // and marking it required would fail validation when they're updated.
+    phone: { type: String }
   },
   paymentMethod: { type: String, required: true },
   paymentResult: {
