@@ -23,9 +23,13 @@ const userSchema = new mongoose.Schema({
   },
   resetPasswordOtp: { type: String },
   resetPasswordOtpExpires: { type: Date },
+  resetOtpAttempts: { type: Number, default: 0 },
   isVerified: { type: Boolean, default: false },
   signupOtp: { type: String },
   signupOtpExpires: { type: Date },
+  signupOtpAttempts: { type: Number, default: 0 },
+  tryonCount: { type: Number, default: 0 },
+  tryonLastDate: { type: Date },
   refreshToken: { type: String },
   createdAt: { type: Date, default: Date.now }
 });

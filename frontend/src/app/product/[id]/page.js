@@ -10,6 +10,7 @@ import { ShoppingCart, Heart, Share2, Star, ChevronDown, ChevronRight, Truck, Sh
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import BrandLoader from '@/components/ui/BrandLoader';
 
 export default function ProductDetailPage({ params }) {
@@ -31,6 +32,15 @@ export default function ProductDetailPage({ params }) {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [hoverRating, setHoverRating] = useState(0);
   const [showTryOn, setShowTryOn] = useState(false);
+  const router = useRouter();
+
+  const handleTryOn = () => {
+    if (!user) {
+      router.push(`/login?redirect=/product/${id}`);
+      return;
+    }
+    setShowTryOn(true);
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -298,7 +308,7 @@ export default function ProductDetailPage({ params }) {
 
                 {/* AI Try-On Button */}
                 <div className="hidden sm:block mb-5">
-                  <TryOnButton onClick={() => setShowTryOn(true)} category={product.category} />
+                  <TryOnButton onClick={handleTryOn} category={product.category} />
                 </div>
 
                 {/* Share */}
@@ -491,7 +501,7 @@ export default function ProductDetailPage({ params }) {
           <Share2 size={16} />
         </button>
         {(!product.category || ['clothing', 'fashion'].includes(product.category.toLowerCase())) && (
-          <button onClick={() => setShowTryOn(true)}
+          <button onClick={handleTryOn}
             className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl transition-all"
             style={{ background: 'linear-gradient(135deg, #7c3aed, #ec4899)' }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>

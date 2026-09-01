@@ -1,36 +1,32 @@
 const Product = require('../models/Product');
 const { cloudinary } = require('../utils/cloudinary');
+const User = require('../models/User');
 
-// In-memory rate limit store (resets on server restart)
-const tryonLimits = new Map();
 const MAX_TRYON_PER_DAY = 3;
 
-// Clean up old entries every hour
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, data] of tryonLimits.entries()) {
-    if (now - data.firstRequest > 24 * 60 * 60 * 1000) {
-      tryonLimits.delete(key);
-    }
-  }
-}, 60 * 60 * 1000);
-
-// Helper: Check rate limit by IP
-const checkRateLimit = (ip) => {
-  const now = Date.now();
-  const userData = tryonLimits.get(ip);
-
-  if (!userData || now - userData.firstRequest > 24 * 60 * 60 * 1000) {
-    tryonLimits.set(ip, { count: 1, firstRequest: now });
-    return { allowed: true, remaining: MAX_TRYON_PER_DAY - 1 };
+// Helper: Check and update user try-on quota in database
+const checkUserTryonQuota = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    return { allowed: false, remaining: 0, error: 'User not found' };
   }
 
-  if (userData.count >= MAX_TRYON_PER_DAY) {
-    return { allowed: false, remaining: 0 };
+  const now = new Date();
+  const lastDate = user.tryonLastDate ? new Date(user.tryonLastDate) : null;
+  
+  // Check if today is a different calendar day (UTC)
+  const isSameDay = lastDate &&
+    lastDate.getUTCFullYear() === now.getUTCFullYear() &&
+    lastDate.getUTCMonth() === now.getUTCMonth() &&
+    lastDate.getUTCDate() === now.getUTCDate();
+
+  let currentCount = isSameDay ? (user.tryonCount || 0) : 0;
+
+  if (currentCount >= MAX_TRYON_PER_DAY) {
+    return { allowed: false, remaining: 0, user };
   }
 
-  userData.count += 1;
-  return { allowed: true, remaining: MAX_TRYON_PER_DAY - userData.count };
+  return { allowed: true, remaining: MAX_TRYON_PER_DAY - currentCount, user, isSameDay };
 };
 
 // Helper: Upload buffer to Cloudinary and return URL
@@ -167,14 +163,17 @@ const inlineResultImage = async (resultImageUrl) => {
 
 // @desc    Generate AI Virtual Try-On
 // @route   POST /api/tryon/generate
-// @access  Public (rate limited)
+// @access  Private (authenticated users only, rate limited)
 const generateTryOn = async (req, res) => {
   try {
-    // 1. Rate limit check
-    const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
-    const rateCheck = checkRateLimit(clientIp);
+    // 1. Rate limit check via authenticated user's DB quota
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: 'Authentication required for virtual try-on' });
+    }
 
-    if (!rateCheck.allowed) {
+    const quotaCheck = await checkUserTryonQuota(req.user._id);
+
+    if (!quotaCheck.allowed) {
       return res.status(429).json({
         message: 'Daily limit reached! You can try 3 times per day. Come back tomorrow! 🙏',
         remaining: 0
@@ -227,12 +226,20 @@ const generateTryOn = async (req, res) => {
       console.error('Failed to cleanup temp photo:', err.message);
     });
 
+    // 8. Deduct quota in DB
+    const user = quotaCheck.user;
+    user.tryonCount = (quotaCheck.isSameDay ? (user.tryonCount || 0) : 0) + 1;
+    user.tryonLastDate = new Date();
+    await user.save({ validateBeforeSave: false });
+
+    const remaining = Math.max(0, MAX_TRYON_PER_DAY - user.tryonCount);
+
     res.json({
       success: true,
       resultImage: inlinedResultImage,
       resultimage: inlinedResultImage,
-      remaining: rateCheck.remaining,
-      message: `Try-on generated! You have ${rateCheck.remaining} tries remaining today.`
+      remaining: remaining,
+      message: `Try-on generated! You have ${remaining} tries remaining today.`
     });
 
   } catch (error) {

@@ -3,6 +3,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Camera, Upload, Download, Share2, ShoppingCart, RotateCcw, Sparkles, AlertCircle, CheckCircle, ImagePlus } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { generateTryOn } from '@/utils/tryonApi';
 
 const STEPS = {
@@ -27,8 +28,10 @@ export default function TryOnModal({ isOpen, onClose, product, onAddToCart }) {
   const [resultImage, setResultImage] = useState(null);
   const [remaining, setRemaining] = useState(null);
   const [error, setError] = useState('');
+  const [isAuthError, setIsAuthError] = useState(false);
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const router = useRouter();
 
   const fileInputRef = useRef(null);
   const videoRef = useRef(null);
@@ -163,8 +166,14 @@ export default function TryOnModal({ isOpen, onClose, product, onAddToCart }) {
       setStep(STEPS.RESULT);
     } catch (err) {
       console.error('Try-on error:', err);
-      const msg = err.response?.data?.message || err.message || 'Something went wrong. Please try again.';
-      setError(msg);
+      if (err.response?.status === 401) {
+        setIsAuthError(true);
+        setError('Please log in to your account to use Virtual Try-On.');
+      } else {
+        setIsAuthError(false);
+        const msg = err.response?.data?.message || err.message || 'Something went wrong. Please try again.';
+        setError(msg);
+      }
       setStep(STEPS.ERROR);
     }
   };
@@ -214,6 +223,7 @@ export default function TryOnModal({ isOpen, onClose, product, onAddToCart }) {
     setUserPhotoFile(null);
     setResultImage(null);
     setError('');
+    setIsAuthError(false);
     setStep(STEPS.UPLOAD);
   };
 
@@ -539,13 +549,26 @@ export default function TryOnModal({ isOpen, onClose, product, onAddToCart }) {
                     <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-2">Oops! Something went wrong</h3>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center mb-5 max-w-[280px]">{error}</p>
                     <div className="flex gap-2 w-full">
-                      <button
-                        onClick={handleRetry}
-                        className="flex-1 h-11 rounded-xl font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2 text-white active:scale-[0.98] transition-all"
-                        style={{ background: 'linear-gradient(135deg, #7c3aed, #ec4899)' }}
-                      >
-                        <RotateCcw size={13} /> Try Again
-                      </button>
+                      {isAuthError ? (
+                        <button
+                          onClick={() => {
+                            onClose();
+                            router.push(`/login?redirect=/product/${product?._id || ''}`);
+                          }}
+                          className="flex-1 h-11 rounded-xl font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2 text-white active:scale-[0.98] transition-all"
+                          style={{ background: 'linear-gradient(135deg, #7c3aed, #ec4899)' }}
+                        >
+                          Log In to Continue
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleRetry}
+                          className="flex-1 h-11 rounded-xl font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2 text-white active:scale-[0.98] transition-all"
+                          style={{ background: 'linear-gradient(135deg, #7c3aed, #ec4899)' }}
+                        >
+                          <RotateCcw size={13} /> Try Again
+                        </button>
+                      )}
                       <button
                         onClick={onClose}
                         className="h-11 px-5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-xl font-semibold text-xs transition-all hover:bg-zinc-200 dark:hover:bg-zinc-700"

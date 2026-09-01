@@ -7,13 +7,23 @@ const protect = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      // Ensure refresh token cannot be used as an access token
+      if (decoded.type === 'refresh') {
+        return res.status(401).json({ message: 'Invalid token type. Access token required.' });
+      }
+
       req.user = await User.findById(decoded.id).select('-password');
-      if (req.user && req.user.isBlocked) {
+      if (!req.user) {
+        return res.status(401).json({ message: 'User not found or session expired' });
+      }
+
+      if (req.user.isBlocked) {
         return res.status(403).json({ message: 'User is blocked' });
       }
       next();
     } catch (error) {
-      console.error(error);
+      console.error('Auth middleware error:', error.message);
       res.status(401).json({ message: 'Not authorized, token failed' });
     }
   }

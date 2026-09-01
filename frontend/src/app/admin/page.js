@@ -21,7 +21,7 @@ export default function AdminDashboard() {
   const { user } = useStore();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
-  const [data, setData] = useState({ products: [], users: [], orders: [], categories: [] });
+  const [data, setData] = useState({ products: [], users: [], orders: [], categories: [], analytics: null });
   const [loading, setLoading] = useState(true);
   const [orderTab, setOrderTab] = useState('all');
 
@@ -82,12 +82,22 @@ export default function AdminDashboard() {
     if (loading && data.users.length > 0) return; // Guard against redundant fetches if we already have data
     setLoading(true);
     try {
-      const [userRes, orderRes, catRes] = await Promise.all([
+      const [userRes, orderRes, catRes, analyticsRes] = await Promise.all([
         API.get('/users'),
         API.get('/orders'),
-        API.get('/categories/admin')
+        API.get('/categories/admin'),
+        API.get('/analytics/dashboard').catch(err => {
+          console.log('Analytics fetch info:', err.message);
+          return { data: null };
+        })
       ]);
-      setData(prev => ({ ...prev, users: userRes.data, orders: orderRes.data, categories: catRes.data || [] }));
+      setData(prev => ({ 
+        ...prev, 
+        users: userRes.data, 
+        orders: orderRes.data, 
+        categories: catRes.data || [],
+        analytics: analyticsRes.data || null
+      }));
       await fetchProducts();
     } catch (error) {
       console.error('Error fetching admin data:', error);
