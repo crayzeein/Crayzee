@@ -68,6 +68,71 @@ export default function OrderSuccessPage({ params }) {
                         <p className="text-zinc-400 text-sm">Order #{order._id.slice(-8).toUpperCase()} has been confirmed.</p>
                     </div>
 
+                    {/* Order Status Timeline */}
+                    <div className="bg-white dark:bg-zinc-900 p-5 sm:p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 mb-4">
+                      <div className="flex items-center gap-2.5 mb-5">
+                        <Truck size={18} className="text-[#fb5607]" />
+                        <h3 className="text-base font-bold text-zinc-900 dark:text-white">Order Status</h3>
+                      </div>
+                      <div className="flex items-center justify-between max-w-lg mx-auto">
+                        {[
+                          { label: 'Placed', done: true },
+                          { label: 'Processing', done: ['Processing', 'Shipped', 'Delivered'].includes(order.status) },
+                          { label: 'Shipped', done: ['Shipped', 'Delivered'].includes(order.status) },
+                          { label: 'Delivered', done: order.status === 'Delivered' }
+                        ].map((step, i, arr) => (
+                          <div key={step.label} className="flex items-center">
+                            <div className="flex flex-col items-center">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                                step.done ? 'bg-emerald-500 text-white' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400'
+                              }`}>
+                                {step.done ? '✓' : i + 1}
+                              </div>
+                              <span className={`text-[10px] mt-1.5 font-semibold ${step.done ? 'text-emerald-600' : 'text-zinc-400'}`}>{step.label}</span>
+                            </div>
+                            {i < arr.length - 1 && <div className={`w-12 sm:w-20 h-[2px] mx-1.5 mb-5 ${step.done ? 'bg-emerald-500' : 'bg-zinc-200 dark:bg-zinc-700'}`} />}
+                          </div>
+                        ))}
+                      </div>
+                      {order.status === 'Cancelled' && (
+                        <div className="mt-4 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 dark:bg-red-500/10 rounded-xl text-red-500 text-sm font-semibold">
+                          <span>Order Cancelled</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Tracking Info */}
+                    {order.trackingId && (
+                      <div className="bg-white dark:bg-zinc-900 p-5 sm:p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 mb-4">
+                        <div className="flex items-center gap-2.5 mb-4">
+                          <Package size={18} className="text-blue-600" />
+                          <h3 className="text-base font-bold text-zinc-900 dark:text-white">Tracking Details</h3>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-[11px] text-zinc-400 font-medium mb-0.5">Tracking ID</p>
+                            <p className="text-sm font-bold text-blue-600">{order.trackingId}</p>
+                          </div>
+                          <div>
+                            <p className="text-[11px] text-zinc-400 font-medium mb-0.5">Courier</p>
+                            <p className="text-sm font-semibold text-zinc-900 dark:text-white">{order.courierName || 'N/A'}</p>
+                          </div>
+                          {order.shippedAt && (
+                            <div>
+                              <p className="text-[11px] text-zinc-400 font-medium mb-0.5">Shipped On</p>
+                              <p className="text-sm font-semibold text-zinc-900 dark:text-white">{new Date(order.shippedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                            </div>
+                          )}
+                          {order.estimatedDelivery && (
+                            <div>
+                              <p className="text-[11px] text-zinc-400 font-medium mb-0.5">Est. Delivery</p>
+                              <p className="text-sm font-semibold text-zinc-900 dark:text-white">{order.estimatedDelivery}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="grid sm:grid-cols-2 gap-4">
                         {/* Order Info */}
                         <div className="bg-white dark:bg-zinc-900 p-5 sm:p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800">

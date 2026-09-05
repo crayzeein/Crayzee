@@ -38,14 +38,18 @@ export default function MyOrdersPage() {
     }, [user, router]);
 
     const getStatusInfo = (order) => {
-        if (order.isDelivered) return { label: 'Delivered', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10', icon: CheckCircle2 };
-        if (order.isPaid) return { label: 'Confirmed', color: 'text-blue-600 bg-blue-50 dark:bg-blue-500/10', icon: Package };
-        return { label: 'Pending', color: 'text-[#fb5607] bg-[#fb5607]/10', icon: Clock };
+        if (order.status === 'Cancelled') return { label: 'Cancelled', color: 'text-red-600 bg-red-50 dark:bg-red-500/10', icon: XCircle };
+        if (order.status === 'Delivered') return { label: 'Delivered', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10', icon: CheckCircle2 };
+        if (order.status === 'Shipped') return { label: 'Shipped', color: 'text-blue-600 bg-blue-50 dark:bg-blue-500/10', icon: Truck };
+        if (order.status === 'Processing') return { label: 'Processing', color: 'text-[#fb5607] bg-[#fb5607]/10', icon: Package };
+        return { label: 'Pending', color: 'text-zinc-500 bg-zinc-50 dark:bg-zinc-500/10', icon: Clock };
     };
 
     const filteredOrders = filter === 'all' ? orders : orders.filter(o => {
-        if (filter === 'delivered') return o.isDelivered;
-        if (filter === 'processing') return !o.isDelivered;
+        if (filter === 'processing') return o.status === 'Processing';
+        if (filter === 'shipped') return o.status === 'Shipped';
+        if (filter === 'delivered') return o.status === 'Delivered';
+        if (filter === 'cancelled') return o.status === 'Cancelled';
         return true;
     });
 
@@ -71,9 +75,11 @@ export default function MyOrdersPage() {
                     {orders.length > 0 && (
                         <div className="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
                             {[
-                                { id: 'all', label: 'All Orders', count: orders.length },
-                                { id: 'processing', label: 'In Progress', count: orders.filter(o => !o.isDelivered).length },
-                                { id: 'delivered', label: 'Delivered', count: orders.filter(o => o.isDelivered).length },
+                                { id: 'all', label: 'All', count: orders.length },
+                                { id: 'processing', label: 'Processing', count: orders.filter(o => o.status === 'Processing').length },
+                                { id: 'shipped', label: 'Shipped', count: orders.filter(o => o.status === 'Shipped').length },
+                                { id: 'delivered', label: 'Delivered', count: orders.filter(o => o.status === 'Delivered').length },
+                                { id: 'cancelled', label: 'Cancelled', count: orders.filter(o => o.status === 'Cancelled').length },
                             ].map(tab => (
                                 <button
                                     key={tab.id}

@@ -2,6 +2,7 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
+const { sendOrderConfirmationEmail, sendOrderShippedEmail, sendOrderDeliveredEmail } = require('../utils/emailService');
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -23,6 +24,11 @@ exports.addOrderItems = async (req, res) => {
 
   if (!orderItems || orderItems.length === 0) {
     return res.status(400).json({ message: 'No order items' });
+  }
+
+  const phone = shippingAddress?.phone;
+  if (!phone || !/^[6-9]\d{9}$/.test(String(phone).trim())) {
+    return res.status(400).json({ message: 'Valid 10-digit Indian phone number is required' });
   }
 
   // For online payments, verify the Razorpay signature BEFORE touching the DB.
@@ -114,6 +120,9 @@ exports.addOrderItems = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
+    // Send confirmation email (non-blocking, don't let email failure block order)
+    sendOrderConfirmationEmail(createdOrder, req.user).catch(err => console.error('Order confirmation email failed:', err.message));
+
     res.status(201).json(createdOrder);
   } catch (error) {
     await session.abortTransaction();
@@ -159,6 +168,10 @@ exports.updateOrderToDelivered = async (req, res) => {
     order.deliveredAt = Date.now();
     order.status = 'Delivered';
     const updatedOrder = await order.save();
+    
+    const populatedOrder = await Order.findById(updatedOrder._id).populate('user', 'name email');
+    sendOrderDeliveredEmail(populatedOrder, populatedOrder.user).catch(err => console.error('Delivered email failed:', err.message));
+    
     res.json(updatedOrder);
   } else {
     res.status(404).json({ message: 'Order not found' });
@@ -171,8 +184,20 @@ exports.updateOrderToShipped = async (req, res) => {
     if (order.status !== 'Processing') {
       return res.status(400).json({ message: 'Only Processing orders can be Shipped' });
     }
+    const { trackingId, courierName, estimatedDelivery } = req.body;
+    if (!trackingId) {
+      return res.status(400).json({ message: 'Tracking ID is required to mark as shipped' });
+    }
     order.status = 'Shipped';
+    order.trackingId = trackingId;
+    order.courierName = courierName || '';
+    order.shippedAt = Date.now();
+    order.estimatedDelivery = estimatedDelivery || '';
     const updatedOrder = await order.save();
+
+    const populatedOrder = await Order.findById(updatedOrder._id).populate('user', 'name email');
+    sendOrderShippedEmail(populatedOrder, populatedOrder.user).catch(err => console.error('Shipped email failed:', err.message));
+
     res.json(updatedOrder);
   } else {
     res.status(404).json({ message: 'Order not found' });

@@ -39,6 +39,10 @@ export default function CheckoutPage() {
             setError('Please fill all shipping details.');
             return false;
         }
+        if (!formData.phone || !/^[6-9]\d{9}$/.test(formData.phone.trim())) {
+            setError('Please enter a valid 10-digit Indian phone number.');
+            return false;
+        }
         return true;
     };
 

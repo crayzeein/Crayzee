@@ -17,7 +17,7 @@ const orderSchema = new mongoose.Schema({
     country: { type: String, required: true },
     // Not required — orders placed before this field existed have no phone,
     // and marking it required would fail validation when they're updated.
-    phone: { type: String }
+    phone: { type: String, required: [true, 'Phone number is required'], match: [/^[6-9]\d{9}$/, 'Please provide a valid 10-digit Indian phone number'] }
   },
   paymentMethod: { type: String, required: true },
   paymentResult: {
@@ -36,6 +36,10 @@ const orderSchema = new mongoose.Schema({
     enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
     default: 'Processing'
   },
+  trackingId: { type: String },
+  courierName: { type: String },
+  shippedAt: { type: Date },
+  estimatedDelivery: { type: String }
 }, {
   timestamps: true
 });

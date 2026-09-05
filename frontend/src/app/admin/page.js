@@ -298,9 +298,9 @@ export default function AdminDashboard() {
     setShowOrderModal(true);
   };
 
-  const updateOrderStatus = async (id, status) => {
+  const updateOrderStatus = async (id, status, data = {}) => {
     try {
-      await API.put(`/orders/${id}/${status}`);
+      await API.put(`/orders/${id}/${status}`, data);
       if (showOrderModal) {
         const { data: updatedOrder } = await API.get(`/orders/${id}`);
         setCurrentOrder(updatedOrder);
