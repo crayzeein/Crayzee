@@ -37,9 +37,14 @@ app.get('/', (req, res) => {
   res.send('Crayzee.in API is running...');
 });
 
+// Health check — ping this every 14 min to keep Render from sleeping
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', uptime: Math.floor(process.uptime()) });
+});
+
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI, {
-  serverSelectionTimeoutMS: 3000 // Fail fast if no connection
+  serverSelectionTimeoutMS: 15000 // Give Atlas free tier enough time to wake up
 })
   .then(() => {
     console.log('MongoDB connected');
