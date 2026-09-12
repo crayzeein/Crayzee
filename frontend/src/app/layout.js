@@ -10,8 +10,14 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "CRAYZEE.IN | Gen-Z Streetwear",
+  metadataBase: new URL('https://www.crayzee.in'),
+  // Child routes set only their own title; the template appends the brand
+  title: {
+    default: 'CRAYZEE.IN | Gen-Z Streetwear',
+    template: '%s | CRAYZEE.IN'
+  },
   description: "The sickest collection of Oversized, Anime, and Graphic Tees.",
+  alternates: { canonical: '/' }
 };
 
 export default function RootLayout({ children }) {
