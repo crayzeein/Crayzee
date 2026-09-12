@@ -50,18 +50,6 @@ export default function AdminDashboard() {
       genders: ['men', 'women', 'unisex'],
       subCategories: ['none', 'oversized', 'graphic', 'anime', 'regular']
     },
-    footwear: {
-      genders: ['men', 'women', 'unisex'],
-      subCategories: ['none', 'sneakers', 'slides', 'boots', 'formal']
-    },
-    'mobile-accessories': {
-      genders: ['unisex'],
-      subCategories: ['none', 'covers', 'cables', 'chargers']
-    },
-    gifts: {
-      genders: ['unisex'],
-      subCategories: ['none', 'combos', 'accessories']
-    }
   };
 
   useEffect(() => {

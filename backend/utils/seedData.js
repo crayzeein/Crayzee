@@ -5,10 +5,7 @@ const Product = require('../models/Product');
 dotenv.config({ path: '.env' });
 
 const categoriesConfig = {
-  Clothing: ['Mens', 'Womens', 'Oversized', 'Anime', 'Graphic', 'Plain', 'Trending'],
-  'Mobile Accessories': ['Phone Covers', 'Skins', 'AirPods Covers'],
-  Gifts: ['Combo Packs', 'Gift Cards', 'Couple Gifts', 'Customized Gifts'],
-  Footwear: ['Sneakers', 'Slides', 'Boots']
+  Clothing: ['Mens', 'Womens', 'Oversized', 'Anime', 'Graphic', 'Plain', 'Trending']
 };
 
 const images = {
@@ -18,24 +15,11 @@ const images = {
   Anime: ["https://images.unsplash.com/photo-1620799140408-edc6dcb6d633", "https://images.unsplash.com/photo-1614608682850-e0ad6ed30a9c"],
   Graphic: ["https://images.unsplash.com/photo-1576566588028-4147f3842f27", "https://images.unsplash.com/photo-1503341503653-ff47dca9193d"],
   Plain: ["https://images.unsplash.com/photo-1523381210434-271e8be1f52b", "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d"],
-  Trending: ["https://images.unsplash.com/photo-1558769132-cb1aea458c5e", "https://images.unsplash.com/photo-1490481651871-ab68de25d43d"],
-  'Phone Covers': ["https://images.unsplash.com/photo-1541807084-5c52b6b3adef", "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3"],
-  Skins: ["https://images.unsplash.com/photo-1605405748313-a416a1b84491", "https://images.unsplash.com/photo-1586953140530-bc5633854714"],
-  'AirPods Covers': ["https://images.unsplash.com/photo-1592921847399-6a0e5c3e56c1", "https://images.unsplash.com/photo-1588423713661-8600173051c0"],
-  'Combo Packs': ["https://images.unsplash.com/photo-1549465220-1d8c9d9c67cf", "https://images.unsplash.com/photo-147119394590b-354a7c18c161"],
-  'Gift Cards': ["https://images.unsplash.com/photo-1559136555-9303baea8ebd", "https://images.unsplash.com/photo-1549111239-498c86be45f8"],
-  'Couple Gifts': ["https://images.unsplash.com/photo-1513201099691-8816d338fcdc", "https://images.unsplash.com/photo-1512909481869-0eaa1e9817ba"],
-  'Customized Gifts': ["https://images.unsplash.com/photo-1523275335684-37898b6baf30", "https://images.unsplash.com/photo-1533228100845-08145b01de14"],
-  'Sneakers': ["https://images.unsplash.com/photo-1542291026-7eec264c274f", "https://images.unsplash.com/photo-1549298916-b41d501d3772"],
-  'Slides': ["https://images.unsplash.com/photo-1627140224151-24422e0302b1", "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519"],
-  'Boots': ["https://images.unsplash.com/photo-1520639889313-7272170b1ca0", "https://images.unsplash.com/photo-1608256246200-53e635b5b65f"]
+  Trending: ["https://images.unsplash.com/photo-1558769132-cb1aea458c5e", "https://images.unsplash.com/photo-1490481651871-ab68de25d43d"]
 };
 
 const adjectives = ['Luxe', 'Velocity', 'Hyper', 'Cloud-Walk', 'Retro', 'Futura', 'Ghost', 'Stellar', 'Primal', 'Nomad', 'Apex', 'Core', 'Nitro'];
 const clothingNouns = ['Boxy Tee', 'Heavyweight Tee', 'Relic Top', 'Drop Shoulder', 'Graphic Tee', 'Statement Tee', 'Essential Tee', 'Vibe Top', 'Street Jersey'];
-const accessoryNouns = ['Carbon Case', 'Silicone Skin', 'Impact Cover', 'Stealth Guard', 'Hard Shell'];
-const giftNouns = ['Luxe Bundle', 'Digital Pass', 'Memory Box', 'Artisan Kit', 'Crafted Box'];
-const footwearNouns = ['Runner x1', 'Street Kick', 'Impact Slide', 'Terrain Boot', 'Vibe Step', 'Urban Sole'];
 
 const generateProducts = () => {
   const products = [];
@@ -44,20 +28,14 @@ const generateProducts = () => {
     categoriesConfig[mainCat].forEach(subCat => {
       for (let i = 1; i <= 30; i++) {
         const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-        let noun;
-        if (mainCat === 'Clothing') noun = clothingNouns[Math.floor(Math.random() * clothingNouns.length)];
-        else if (mainCat === 'Mobile Accessories') noun = accessoryNouns[Math.floor(Math.random() * accessoryNouns.length)];
-        else if (mainCat === 'Footwear') noun = footwearNouns[Math.floor(Math.random() * footwearNouns.length)];
-        else noun = giftNouns[Math.floor(Math.random() * giftNouns.length)];
+        const noun = clothingNouns[Math.floor(Math.random() * clothingNouns.length)];
 
         const variantImages = images[subCat] || images['Mens'];
         const img = variantImages[Math.floor(Math.random() * variantImages.length)];
 
         let genderVal = 'unisex';
-        if (mainCat === 'Clothing') {
-          if (subCat === 'Womens') genderVal = 'women';
-          else if (subCat === 'Mens') genderVal = 'men';
-        }
+        if (subCat === 'Womens') genderVal = 'women';
+        else if (subCat === 'Mens') genderVal = 'men';
 
         products.push({
           name: `${adj} ${noun} #${i}`,
@@ -84,14 +62,14 @@ const generateProducts = () => {
 const seedDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('MongoDB connected for Footwear upgrade');
+    console.log('MongoDB connected for seeding');
     
     await Product.deleteMany({});
     console.log('Old inventory purged');
     
     const products = generateProducts();
     await Product.insertMany(products);
-    console.log(`Successfully seeded ${products.length} products with Footwear!`);
+    console.log(`Successfully seeded ${products.length} clothing products!`);
     
     process.exit();
   } catch (error) {

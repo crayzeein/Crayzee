@@ -11,27 +11,6 @@ const categories = [
       { label: 'Men', href: '/browse?category=clothing&gender=men' },
       { label: 'Women', href: '/browse?category=clothing&gender=women' }
     ]
-  },
-  {
-    name: 'Mobile Accessories',
-    slug: 'mobile-accessories',
-    items: [
-      { label: 'All', href: '/browse?category=mobile-accessories' }
-    ]
-  },
-  {
-    name: 'Gifts',
-    slug: 'gifts',
-    items: [
-      { label: 'All', href: '/browse?category=gifts' }
-    ]
-  },
-  {
-    name: 'Footwear',
-    slug: 'footwear',
-    items: [
-      { label: 'All', href: '/browse?category=footwear' }
-    ]
   }
 ];
 
