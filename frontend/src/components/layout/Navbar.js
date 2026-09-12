@@ -625,13 +625,21 @@ export default function Navbar() {
                 >
                   <span className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 group-hover:text-[#fb5607] transition-colors">All Drops</span>
                 </Link>
-                <Link
-                  href="/privacy-policy"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center py-3.5 group"
-                >
-                  <span className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 group-hover:text-[#fb5607] transition-colors">Privacy Policy</span>
-                </Link>
+                {[
+                  { href: '/privacy-policy', label: 'Privacy Policy' },
+                  { href: '/terms', label: 'Terms & Conditions' },
+                  { href: '/refund-policy', label: 'Refund & Cancellation' },
+                  { href: '/shipping-policy', label: 'Shipping Policy' }
+                ].map((item, i, arr) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`flex items-center py-3.5 group ${i < arr.length - 1 ? 'border-b border-zinc-50 dark:border-white/5' : ''}`}
+                  >
+                    <span className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 group-hover:text-[#fb5607] transition-colors">{item.label}</span>
+                  </Link>
+                ))}
               </div>
 
               {/* Admin Link - only for admins */}

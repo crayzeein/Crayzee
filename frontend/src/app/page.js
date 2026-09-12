@@ -198,8 +198,15 @@ export default function Home() {
             <div>
               <h4 className="font-bold uppercase tracking-[0.2em] text-zinc-500" style={{ fontSize: 'clamp(9px, 0.7vw, 11px)', marginBottom: 'var(--header-gap)' }}>Info</h4>
               <ul style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(10px, 1.2vw, 18px)' }}>
-                <li><Link href="/privacy-policy" className="font-medium text-zinc-400 hover:text-white transition-colors" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>Privacy Policy</Link></li>
-                <li><Link href="/contact" className="font-medium text-zinc-400 hover:text-white transition-colors" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>Contact Us</Link></li>
+                {[
+                  { href: '/privacy-policy', label: 'Privacy Policy' },
+                  { href: '/terms', label: 'Terms & Conditions' },
+                  { href: '/refund-policy', label: 'Refund & Cancellation' },
+                  { href: '/shipping-policy', label: 'Shipping Policy' },
+                  { href: '/contact', label: 'Contact Us' }
+                ].map(item => (
+                  <li key={item.href}><Link href={item.href} className="font-medium text-zinc-400 hover:text-white transition-colors" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>{item.label}</Link></li>
+                ))}
               </ul>
             </div>
           </div>
