@@ -34,7 +34,7 @@ const Legend = ({ items }) => (
   </div>
 );
 
-export default function AuditLogsTab({ data }) {
+export default function AnalyticsTab({ data }) {
   const analytics = data.analytics || {};
   const retention = analytics.retention || {};
   const trend = analytics.dailyTrend || [];

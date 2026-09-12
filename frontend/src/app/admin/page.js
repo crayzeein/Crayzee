@@ -4,7 +4,7 @@ import { useStore } from '@/store/useStore';
 import API from '@/utils/api';
 import {
   LayoutDashboard, Package, Users as UsersIcon, ShoppingCart,
-  MessageSquare, ShieldAlert, TrendingUp, ScrollText
+  MessageSquare, ShieldAlert, TrendingUp, BarChart3
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import OverviewTab from './components/OverviewTab';
@@ -13,7 +13,7 @@ import CategoriesTab from './components/CategoriesTab';
 import UsersTab from './components/UsersTab';
 import OrdersTab from './components/OrdersTab';
 import ReviewsTab from './components/ReviewsTab';
-import AuditLogsTab from './components/AuditLogsTab';
+import AnalyticsTab from './components/AnalyticsTab';
 import ProductModal from './components/ProductModal';
 import CategoryModal from './components/CategoryModal';
 import OrderModal from './components/OrderModal';
@@ -337,7 +337,7 @@ export default function AdminDashboard() {
     { id: 'users', label: 'Customers', icon: UsersIcon },
     { id: 'orders', label: 'Orders', icon: ShoppingCart },
     { id: 'reviews', label: 'Reviews', icon: MessageSquare },
-    { id: 'audit', label: 'Audit Logs', icon: ScrollText }
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 }
   ];
 
   if (loading && activeTab === 'overview') return <div className="min-h-screen flex items-center justify-center font-semibold text-lg animate-pulse text-zinc-400">Loading dashboard...</div>;
@@ -409,7 +409,7 @@ export default function AdminDashboard() {
         </header>
 
         {activeTab === 'overview' && <OverviewTab data={data} />}
-        {activeTab === 'audit' && <AuditLogsTab data={data} />}
+        {activeTab === 'analytics' && <AnalyticsTab data={data} />}
 
         {activeTab === 'products' && (
           <ProductsTab
