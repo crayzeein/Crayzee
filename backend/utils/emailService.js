@@ -132,3 +132,27 @@ exports.sendOrderDeliveredEmail = async (order, user) => {
     html: baseTemplate('Order Delivered! 🎊', content)
   });
 };
+
+// Alerts the admin when money arrived but no matching order was created
+exports.sendOrphanPaymentAlert = async (payment) => {
+  const adminEmail = process.env.ADMIN_ALERT_EMAIL || process.env.EMAIL_FROM;
+  if (!adminEmail) return;
+
+  const content = `
+    <p style="color:#52525b;line-height:1.6;margin:0 0 16px">A payment was captured but no order exists for it. Refund or fulfil it manually.</p>
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="color:#b91c1c;font-size:12px;font-weight:700;padding:4px 0">Payment ID</td><td style="text-align:right;font-weight:700;color:#991b1b;font-size:13px">${payment.paymentId}</td></tr>
+        <tr><td style="color:#b91c1c;font-size:12px;font-weight:700;padding:4px 0">Amount</td><td style="text-align:right;font-weight:800;color:#991b1b;font-size:18px">${formatPrice(payment.amount)}</td></tr>
+        <tr><td style="color:#b91c1c;font-size:12px;font-weight:700;padding:4px 0">Customer</td><td style="text-align:right;color:#991b1b;font-size:13px">${payment.email || '-'} / ${payment.contact || '-'}</td></tr>
+      </table>
+    </div>
+  `;
+
+  await resend.emails.send({
+    from: emailFrom,
+    to: adminEmail,
+    subject: `⚠️ Payment without order — ${payment.paymentId}`,
+    html: baseTemplate('Orphan Payment Detected', content)
+  });
+};

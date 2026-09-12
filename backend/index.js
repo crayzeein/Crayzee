@@ -16,6 +16,8 @@ const app = express();
 app.set('trust proxy', 1);
 
 // Middlewares
+// Razorpay signs the raw bytes, so this route must skip the JSON parser
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
