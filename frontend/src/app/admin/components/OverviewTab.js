@@ -1,7 +1,7 @@
 'use client';
-import { 
-  Package, Users as UsersIcon, ShoppingCart, DollarSign, 
-  Eye, UserCheck, Activity, Flame, ArrowUpRight, Smartphone, Monitor, Tablet
+import {
+  Package, Users as UsersIcon, ShoppingCart, DollarSign,
+  Eye, UserCheck, Activity, Flame
 } from 'lucide-react';
 
 export default function OverviewTab({ data }) {
@@ -133,81 +133,6 @@ export default function OverviewTab({ data }) {
         </div>
       </div>
 
-      {/* ── 3. DETAILED RETENTION BREAKDOWN & TOP VISITED PAGES ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Retention Distribution Bar */}
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl">
-          <h4 className="text-sm font-bold text-zinc-900 dark:text-white mb-1">Audience Retention Breakdown</h4>
-          <p className="text-xs text-zinc-400 mb-4">Comparison of first-time visitors vs repeat buyers & browsers</p>
-
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1.5">
-                <span className="text-zinc-600 dark:text-zinc-300">New Visitors (1 visit)</span>
-                <span className="text-zinc-900 dark:text-white">{retention.newVisitors || 0}</span>
-              </div>
-              <div className="w-full h-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-blue-500 rounded-full transition-all duration-500" 
-                  style={{ width: `${retention.totalVisitors ? Math.round((retention.newVisitors / retention.totalVisitors) * 100) : 0}%` }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1.5">
-                <span className="text-zinc-600 dark:text-zinc-300">Returning Visitors (2+ visits)</span>
-                <span className="text-zinc-900 dark:text-white">{retention.returningVisitors || 0}</span>
-              </div>
-              <div className="w-full h-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-rose-500 rounded-full transition-all duration-500" 
-                  style={{ width: `${retention.totalVisitors ? Math.round((retention.returningVisitors / retention.totalVisitors) * 100) : 0}%` }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1.5">
-                <span className="text-zinc-600 dark:text-zinc-300">Highly Loyal Visitors (4+ visits)</span>
-                <span className="text-zinc-900 dark:text-white">{retention.highlyRetainedVisitors || 0}</span>
-              </div>
-              <div className="w-full h-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-orange-500 rounded-full transition-all duration-500" 
-                  style={{ width: `${retention.totalVisitors ? Math.round((retention.highlyRetainedVisitors / retention.totalVisitors) * 100) : 0}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Top Visited Pages */}
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl">
-          <h4 className="text-sm font-bold text-zinc-900 dark:text-white mb-1">Most Visited Pages (Last 7 Days)</h4>
-          <p className="text-xs text-zinc-400 mb-4">Where your visitors are spending their time</p>
-
-          {analytics.topPages && analytics.topPages.length > 0 ? (
-            <div className="space-y-2.5">
-              {analytics.topPages.map((page, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/50">
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <span className="text-[11px] font-bold text-zinc-400 w-4">{idx + 1}.</span>
-                    <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">{page._id || '/'}</span>
-                  </div>
-                  <span className="text-xs font-bold text-[#fb5607] bg-[#fb5607]/10 px-2 py-0.5 rounded-lg shrink-0 ml-2">
-                    {page.count} views
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="py-8 text-center text-xs text-zinc-400">
-              No pageviews recorded yet. As visitors browse the site, real-time views will appear here.
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
-}
+}

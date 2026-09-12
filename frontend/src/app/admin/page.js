@@ -4,7 +4,7 @@ import { useStore } from '@/store/useStore';
 import API from '@/utils/api';
 import {
   LayoutDashboard, Package, Users as UsersIcon, ShoppingCart,
-  MessageSquare, ShieldAlert, TrendingUp
+  MessageSquare, ShieldAlert, TrendingUp, ScrollText
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import OverviewTab from './components/OverviewTab';
@@ -13,6 +13,7 @@ import CategoriesTab from './components/CategoriesTab';
 import UsersTab from './components/UsersTab';
 import OrdersTab from './components/OrdersTab';
 import ReviewsTab from './components/ReviewsTab';
+import AuditLogsTab from './components/AuditLogsTab';
 import ProductModal from './components/ProductModal';
 import CategoryModal from './components/CategoryModal';
 import OrderModal from './components/OrderModal';
@@ -335,7 +336,8 @@ export default function AdminDashboard() {
     { id: 'categories', label: 'Categories', icon: TrendingUp },
     { id: 'users', label: 'Customers', icon: UsersIcon },
     { id: 'orders', label: 'Orders', icon: ShoppingCart },
-    { id: 'reviews', label: 'Reviews', icon: MessageSquare }
+    { id: 'reviews', label: 'Reviews', icon: MessageSquare },
+    { id: 'audit', label: 'Audit Logs', icon: ScrollText }
   ];
 
   if (loading && activeTab === 'overview') return <div className="min-h-screen flex items-center justify-center font-semibold text-lg animate-pulse text-zinc-400">Loading dashboard...</div>;
@@ -395,7 +397,7 @@ export default function AdminDashboard() {
       <section className="flex-1 md:ml-[260px] p-4 sm:p-6 md:p-8 lg:p-10 overflow-y-auto overflow-x-hidden">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-3">
           <div>
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 capitalize">{activeTab === 'overview' ? 'Dashboard' : activeTab}</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 capitalize">{sidebarItems.find(i => i.id === activeTab)?.label || activeTab}</h1>
             <p className="text-[12px] text-zinc-400 dark:text-zinc-500 font-normal mt-0.5">Welcome back, manage your store</p>
           </div>
           <div className="flex items-center gap-2">
@@ -407,6 +409,7 @@ export default function AdminDashboard() {
         </header>
 
         {activeTab === 'overview' && <OverviewTab data={data} />}
+        {activeTab === 'audit' && <AuditLogsTab data={data} />}
 
         {activeTab === 'products' && (
           <ProductsTab
