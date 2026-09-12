@@ -8,13 +8,6 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
   isBlocked: { type: Boolean, default: false },
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-  cart: [
-    {
-      product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-      qty: { type: Number, required: true, default: 1 },
-      size: { type: String, required: true }
-    }
-  ],
   shippingAddress: {
     address: { type: String },
     city: { type: String },

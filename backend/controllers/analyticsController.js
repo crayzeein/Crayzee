@@ -12,13 +12,25 @@ exports.trackVisit = async (req, res) => {
       return res.status(400).json({ message: 'visitorId is required' });
     }
 
+    const vid = String(visitorId).trim();
+    if (!/^v_[a-z0-9]{8,40}$/i.test(vid)) {
+      return res.status(400).json({ message: 'Invalid visitorId' });
+    }
+
+    const cleanPath = pagePath ? String(pagePath).trim().slice(0, 200) : '/';
+
+    // One row per visitor+path per 30 min, so a spammer cannot inflate the numbers
+    const halfHourAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const recent = await Visit.exists({ visitorId: vid, path: cleanPath, createdAt: { $gte: halfHourAgo } });
+    if (recent) return res.status(200).json({ success: true, deduped: true });
+
     const userId = req.user ? req.user._id : null;
 
     await Visit.create({
-      visitorId: String(visitorId).trim(),
+      visitorId: vid,
       user: userId,
-      path: pagePath ? String(pagePath).trim() : '/',
-      referrer: referrer ? String(referrer).trim() : 'Direct',
+      path: cleanPath,
+      referrer: referrer ? String(referrer).trim().slice(0, 200) : 'Direct',
       deviceType: ['mobile', 'desktop', 'tablet'].includes(deviceType) ? deviceType : 'unknown'
     });
 

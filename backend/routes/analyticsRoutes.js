@@ -6,7 +6,7 @@ const { protect, admin } = require('../middleware/auth');
 
 const visitLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 60,
+  max: 20,
   standardHeaders: true,
   legacyHeaders: false,
 });
