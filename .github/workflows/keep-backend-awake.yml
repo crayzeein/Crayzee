@@ -1,0 +1,21 @@
+name: Keep backend awake
+
+# Render free instances sleep after 15 min idle and take ~35s to wake, which is
+# longer than cron-job.org will wait before marking the ping failed.
+on:
+  schedule:
+    # Every 10 min between 00:00-19:59 UTC (05:30-01:30 IST), leaving the quiet
+    # hours asleep so the month stays under Render's 750 free instance hours.
+    - cron: '*/10 0-19 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: |
+          # --max-time 120 outlasts a cold start, so waking the server is never a failure
+          curl --fail --silent --show-error --max-time 120 \
+            --retry 2 --retry-delay 15 --retry-all-errors \
+            https://crayzee.onrender.com/api/health
