@@ -25,7 +25,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(helmet());
-app.use(morgan('dev'));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -39,10 +39,19 @@ app.get('/', (req, res) => {
   res.send('Crayzee.in API is running...');
 });
 
-// Health check — ping this every 14 min to keep Render from sleeping
+// Health & Readiness check — reports database connectivity and uptime
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', uptime: Math.floor(process.uptime()) });
+  const dbState = mongoose.connection.readyState;
+  const isDbHealthy = dbState === 1; // 1 = connected
+  res.status(isDbHealthy ? 200 : 503).json({
+    status: isDbHealthy ? 'ok' : 'degraded',
+    uptime: Math.floor(process.uptime()),
+    database: isDbHealthy ? 'connected' : 'disconnected',
+    timestamp: new Date().toISOString()
+  });
 });
+
+let server;
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -51,13 +60,13 @@ mongoose.connect(process.env.MONGODB_URI, {
   .then(() => {
     console.log('MongoDB connected');
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
+    server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })
   .catch(err => {
     console.error('MongoDB connection error:', err);
-    process.exit(1); // Exit if DB connection fails
+    process.exit(1);
   });
 
 // Routes
@@ -92,3 +101,33 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });
+
+// Process Crash Protection & Logging
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Promise Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+// Graceful Shutdown on SIGTERM / SIGINT
+const gracefulShutdown = (signal) => {
+  console.log(`Received ${signal}. Shutting down gracefully...`);
+  if (server) {
+    server.close(async () => {
+      try {
+        await mongoose.connection.close(false);
+        console.log('MongoDB connection closed.');
+      } catch (e) {
+        console.error('Error closing MongoDB connection:', e);
+      }
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
