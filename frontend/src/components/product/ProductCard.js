@@ -36,7 +36,6 @@ export default function ProductCard({ product }) {
             sizes="(max-width: 768px) 50vw, 25vw"
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             loading="lazy"
-            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-zinc-300 text-[10px] font-medium tracking-widest uppercase">

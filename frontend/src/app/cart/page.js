@@ -130,7 +130,6 @@ export default function CartPage() {
                         alt={item.name}
                         fill
                         className="object-cover"
-                        unoptimized
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-zinc-400 text-[10px]">

@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import HeroCarousel from '@/components/layout/HeroCarousel';
 import ProductCard from '@/components/product/ProductCard';
+import ProductCardSkeleton from '@/components/product/ProductCardSkeleton';
 import API from '@/utils/api';
 import Link from 'next/link';
 import { ChevronRight, Zap, Flame, ArrowRight, Instagram, Mail, Truck, Shield, RefreshCw, Headphones, ChevronLeft, Lock } from 'lucide-react';
@@ -48,7 +49,7 @@ export default function Home() {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const { data } = await API.get('/products?limit=50');
+        const { data } = await API.get('/products?limit=16');
         const allProducts = data.products || [];
 
         // New Arrivals (Latest 8)
@@ -149,9 +150,7 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4" style={{ gap: 'var(--card-gap)' }}>
             {loading ? (
-              [...Array(4)].map((_, i) => (
-                <div key={i} className="aspect-[3/4] bg-zinc-100 dark:bg-zinc-900 animate-pulse rounded-lg" />
-              ))
+              <ProductCardSkeleton count={4} />
             ) : (
               featured.map((product) => (
                 <ProductCard key={product._id} product={product} />

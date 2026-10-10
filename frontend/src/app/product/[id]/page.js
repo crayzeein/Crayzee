@@ -191,7 +191,7 @@ export default function ProductDetailPage({ params }) {
                         activeImageIndex === idx ? 'border-[#fb5607] ring-1 ring-[#fb5607]/30' : 'border-zinc-200 dark:border-zinc-700 opacity-60 hover:opacity-100'
                       }`}
                     >
-                      <Image src={img.url} alt="" fill className="object-cover !relative" unoptimized />
+                      <Image src={img.url} alt="" fill className="object-cover !relative" />
                     </button>
                   ))}
                 </div>
@@ -206,7 +206,6 @@ export default function ProductDetailPage({ params }) {
                     alt={product.name}
                     fill
                     priority
-                    unoptimized
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-zinc-400 text-sm">No Image</div>

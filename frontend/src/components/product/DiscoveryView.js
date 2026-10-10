@@ -8,6 +8,7 @@ import { SlidersHorizontal, ChevronDown, Check, ChevronRight, Star, ArrowDownUp,
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/store/useStore';
 import BrandLoader, { BrandLoaderOverlay } from '@/components/ui/BrandLoader';
+import ProductCardSkeleton from '@/components/product/ProductCardSkeleton';
 
 // When no products are found, show popular products instead of a dead end
 function NoResultsSection({ query, isSearch, clearAllFilters, activeFilterCount, activeSubCat }) {
@@ -65,8 +66,8 @@ function NoResultsSection({ query, isSearch, clearAllFilters, activeFilterCount,
       )}
 
       {loadingPopular && (
-        <div className="flex items-center justify-center py-16">
-          <BrandLoader size="md" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 py-4">
+          <ProductCardSkeleton count={4} />
         </div>
       )}
     </div>
@@ -504,8 +505,8 @@ function DiscoveryContent({
                 )
               )}
               {loading && products.length === 0 && (
-                <div className="flex items-center justify-center py-32">
-                  <BrandLoader size="lg" />
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-12">
+                  <ProductCardSkeleton count={8} />
                 </div>
               )}
             </div>

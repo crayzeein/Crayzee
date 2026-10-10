@@ -114,7 +114,6 @@ export default function HeroCarousel() {
               fill
               priority
               className="hero-img-blur"
-              unoptimized
               sizes="100vw"
             />
             <Image
@@ -123,7 +122,6 @@ export default function HeroCarousel() {
               fill
               priority
               className="hero-img"
-              unoptimized
               sizes="100vw"
             />
             {/* Cinematic dark overlay */}
